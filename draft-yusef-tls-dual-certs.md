@@ -1,8 +1,8 @@
 ---
-title: Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3
-abbrev: Dual Certs in TLS
 v: 3
 docname: draft-yusef-tls-dual-certs-latest
+title: "Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3"
+abbrev: "Dual Certs in TLS"
 cat: std
 ipr: trust200902
 consensus: 'true'
@@ -21,7 +21,7 @@ pi:
   inline: yes
   text-list-symbols: -o*+
   docmapping: yes
-area: ""
+area: "sec"
 wg: TLS Working Group
 keyword:
  - PKI
@@ -31,18 +31,17 @@ keyword:
 #github: "hannestschofenig/tls-dual-certs"
 stand_alone: yes
 author:
-  -
-    fullname: Rifaat Shekh-Yusef
-    organization: Ciena
-    country: Canada
-    email: rifaat.s.ietf@gmail.com
-
- -
-    fullname: Hannes Tschofenig
-    organization: University of Applied Sciences Bonn-Rhein-Sieg
-    abbrev: H-BRS
-    country: Germany
-    email: hannes.tschofenig@gmx.net
+ -    ins: R. Shekh-Yusef
+      fullname: Rifaat Shekh-Yusef
+      organization: Ciena
+      country: Canada
+      email: rifaat.s.ietf@gmail.com
+ -    ins: H. Tschofenig
+      fullname: Hannes Tschofenig
+      organization: University of Applied Sciences Bonn-Rhein-Sieg
+      abbrev: H-BRS
+      country: Germany
+      email: hannes.tschofenig@gmx.net
 
 normative:
   RFC2119:
