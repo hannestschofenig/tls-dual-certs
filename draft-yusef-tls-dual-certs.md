@@ -60,7 +60,7 @@ informative:
 
 --- abstract
 
-aaa
+This document extends the TLS 1.3 authentication mechanism to allow the use of two certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.
 
 --- middle
 
