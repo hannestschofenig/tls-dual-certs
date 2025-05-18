@@ -1,8 +1,8 @@
 <!-- regenerate: on (set to off if you edit this file) -->
 
-# Nonce-based Freshness for Remote Attestation in Certificate Signing Requests (CSRs) for the Certification Management Protocol (CMP) and for Enrollment over Secure Transport (EST)
+# Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3
 
-This is the working area for the individual Internet-Draft, "Nonce-based Freshness for Remote Attestation in Certificate Signing Requests (CSRs) for the Certification Management Protocol (CMP) and for Enrollment over Secure Transport (EST)".
+This is the working area for the individual Internet-Draft, "Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3".
 
 * [Editor's Copy](https://hannestschofenig.github.io/tls-dual-certs/#go.draft-yusef-tls-dual-certs.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-yusef-tls-dual-certs)
