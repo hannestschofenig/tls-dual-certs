@@ -57,7 +57,6 @@ author:
       organization: Nokia
       country: India
       email: kondtir@gmail.com
-
 normative:
   RFC2119:
   RFC8446:
