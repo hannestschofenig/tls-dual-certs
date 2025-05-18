@@ -42,6 +42,22 @@ author:
       abbrev: H-BRS
       country: Germany
       email: hannes.tschofenig@gmx.net
+ -    ins: M. Ounsworth
+      fullname: Mike Ounsworth
+      organization: Entrust
+      country: Canada
+      email: mike.ounsworth@entrust.com
+ -    ins: Y. Sheffer
+      fullname: Yaron Sheffer
+      organization: Intuit
+      country: Israel
+      email: yaronf.ietf@gmail.com
+ -    ins: T. Reddy
+      fullname: Tirumaleswar Reddy
+      organization: Nokia
+      country: India
+      email: kondtir@gmail.com
+      
 
 normative:
   RFC2119:
