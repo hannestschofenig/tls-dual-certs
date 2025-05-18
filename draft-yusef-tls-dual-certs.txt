@@ -6,6 +6,12 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Intended status: Standards Track                           H. Tschofenig
 Expires: 19 November 2025                                          H-BRS
+                                                            M. Ounsworth
+                                                                 Entrust
+                                                              Y. Sheffer
+                                                                  Intuit
+                                                                T. Reddy
+                                                                   Nokia
                                                              18 May 2025
 
 
@@ -317,3 +323,21 @@ Authors' Addresses
    University of Applied Sciences Bonn-Rhein-Sieg
    Germany
    Email: hannes.tschofenig@gmx.net
+
+
+   Mike Ounsworth
+   Entrust
+   Canada
+   Email: mike.ounsworth@entrust.com
+
+
+   Yaron Sheffer
+   Intuit
+   Israel
+   Email: yaronf.ietf@gmail.com
+
+
+   Tirumaleswar Reddy
+   Nokia
+   India
+   Email: kondtir@gmail.com
