@@ -1,4 +1,6 @@
 ---
+title: Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3
+abbrev: Dual Certs in TLS
 v: 3
 docname: draft-yusef-tls-dual-certs-latest
 cat: std
@@ -6,6 +8,8 @@ ipr: trust200902
 consensus: 'true'
 submissiontype: IETF
 lang: en
+date:
+number:
 pi:
   rfcedstyle: yes
   toc: yes
@@ -17,8 +21,6 @@ pi:
   inline: yes
   text-list-symbols: -o*+
   docmapping: yes
-title: Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3
-abbrev: Dual Certs in TLS
 area: ""
 wg: TLS Working Group
 keyword:
@@ -26,7 +28,6 @@ keyword:
  - Post-Quantum Traditional (PQ/T) Hybrid Authentication
  - PQC
  - TLS
-date: 2025
 #github: "hannestschofenig/tls-dual-certs"
 stand_alone: yes
 author:
