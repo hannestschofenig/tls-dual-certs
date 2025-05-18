@@ -192,7 +192,7 @@ This extension can be included in the extensions field of the CertificateEntry s
 
 ~~~
 struct {
-	ExtensionType extension_type; 
+	ExtensionType extension_type;
 	opaque pq_certificate<1..2^24-1>;
 } PQCertificateExtension;
 ~~~
