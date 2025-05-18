@@ -47,9 +47,16 @@ normative:
   RFC2119:
   RFC8446:
   I-D.ietf-tls-tlsflags:
+  RFC7250:
 
 informative:
   RFC9261:
+  TLS-Ext-Registry:
+     author:
+        org: IANA
+     title: Transport Layer Security (TLS) Extensions
+     target: https://www.iana.org/assignments/tls-extensiontype-values
+     date: May 2025
 
 --- abstract
 
