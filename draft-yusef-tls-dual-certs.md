@@ -1,6 +1,6 @@
 ---
 v: 3
-docname:  draft-ietf-lamps-attestation-freshness-latest
+docname: draft-yusef-tls-dual-certs-latest
 cat: std
 ipr: trust200902
 consensus: 'true'
