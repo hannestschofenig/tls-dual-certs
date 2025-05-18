@@ -40,7 +40,7 @@ author:
     organization: University of Applied Sciences Bonn-Rhein-Sieg
     abbrev: H-BRS
     country: Germany
-    email: "hannes.tschofenig@gmx.net"
+    email: hannes.tschofenig@gmx.net
 
 normative:
   RFC2119:
@@ -151,7 +151,6 @@ IANA is requested to add the following entry to the "TLS Flags"
 extension registry {{TLS-Ext-Registry}}:
 
  *  Value: TBD1
-
  *  Flag Name: dual_cert
  *  Messages: CH, EE
  *  Recommended: Y
@@ -192,8 +191,8 @@ This extension can be included in the extensions field of the CertificateEntry s
 
 ~~~
 struct {
-	ExtensionType extension_type;
-	opaque pq_certificate<1..2^24-1>;
+   ExtensionType extension_type;
+   opaque pq_certificate<1..2^24-1>;
 } PQCertificateExtension;
 ~~~
 
@@ -205,13 +204,12 @@ Each CertificateEntry can carry either a traditional certificate or a PQ certifi
 
 ## CertificateVerify Message Design
 
-As an alternative to the current design, the use of a Composite Signature is possible. This approach requires registering new cryptographic algorithm - one for each desireable combination.
-The benefit of this approach is the ease of integration into an existing implementation since the structure of the message remains unchanged.
+As an alternative to the current design, the use of a Composite Signature is possible. This approach requires registering new cryptographic algorithm - one for each desireable combination. The benefit of this approach is the ease of integration into an existing implementation since the structure of the message remains unchanged.
 
 ~~~
 struct {
-	SignatureScheme algorithm;
-	opaque signature<0..2^16-1>;
+   SignatureScheme algorithm;
+   opaque signature<0..2^16-1>;
 } CertificateVerify;
 ~~~
 
