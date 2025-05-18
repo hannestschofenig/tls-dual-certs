@@ -19,7 +19,7 @@ pi:
   docmapping: yes
 title: Nonce-based Freshness for Remote Attestation in Certificate Signing Requests (CSRs) for the Certification Management Protocol (CMP) and for Enrollment over Secure Transport (EST)
 abbrev: Freshness Nonces for Remote Attestation
-area: sec
+area: ""
 wg: LAMPS Working Group
 keyword:
 - Remote Attestation
