@@ -27,7 +27,7 @@ keyword:
  - PQC
  - TLS
 date: 2025
-github: "hannestschofenig/tls-dual-certs"
+#github: "hannestschofenig/tls-dual-certs"
 stand_alone: yes
 author:
   -
