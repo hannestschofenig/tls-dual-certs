@@ -42,6 +42,11 @@ author:
       abbrev: H-BRS
       country: Germany
       email: hannes.tschofenig@gmx.net
+ -    ins: T. Reddy
+      fullname: Tirumaleswar Reddy
+      organization: Nokia
+      country: India
+      email: kondtir@gmail.com
  -    ins: M. Ounsworth
       fullname: Mike Ounsworth
       organization: Entrust
@@ -52,43 +57,34 @@ author:
       organization: Intuit
       country: Israel
       email: yaronf.ietf@gmail.com
- -    ins: T. Reddy
-      fullname: Tirumaleswar Reddy
-      organization: Nokia
-      country: India
-      email: kondtir@gmail.com
+
 normative:
   RFC2119:
   RFC8446:
-  I-D.ietf-tls-tlsflags:
-  RFC7250:
 
 informative:
   RFC9261:
-  TLS-Ext-Registry:
-     author:
-        org: IANA
-     title: Transport Layer Security (TLS) Extensions
-     target: https://www.iana.org/assignments/tls-extensiontype-values
-     date: May 2025
+
 
 --- abstract
 
-This document extends the TLS 1.3 authentication mechanism to allow the use of two certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.
+This document extends the TLS 1.3 authentication mechanism to allow the use of two certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the TLS session.
+
+It defines a mechanism using Exported Authenticators defined in RFC9261 to enable authentication with a traditional certificate during the TLS handshake and PQC certificate after the TLS handshake.
 
 --- middle
 
 #  Introduction
 
-There are several potential mechanisms to address concerns related to the anticipated emergence of cryptographically relevant quantum computers (CRQCs). While the encryption-related aspects are covered in other documents, this document focuses on the authentication component of the TLS 1.3 handshake {{RFC9261}}.
+There are several potential mechanisms to address concerns related to the anticipated emergence of cryptographically relevant quantum computers (CRQCs). While the encryption-related aspects are covered in other documents, this document focuses on the authentication component of the TLS 1.3 handshake.
 
-One approach is the use of dual certificates: issuing two distinct certificates for the same end entity — one using a traditional algorithm (e.g., ECDSA), and the other using a post-quantum (PQ) algorithm (e.g., ML-DSA).
+One approach is the use of dual certificates: issuing two distinct certificates for the same end entity, one using a traditional algorithm (e.g., ECDSA), and the other using a post-quantum (PQ) algorithm (e.g., ML-DSA).
 
-This document defines how TLS 1.3 can utilize such certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.
+This document defines how TLS 1.3 {{RFC8446}} can utilize such certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the TLS session.
 
 It also addresses the challenges of integrating hybrid authentication in TLS 1.3 while balancing backward compatibility, forward security, and deployment practicality.
 
-This document makes changes to the Certificate and CertificateVerify messages to take advantage of both certificates when authenticating the end entity.
+This document leverages Exported Authenticators {{RFC9261}} to authenticate with a traditional certificate during the TLS handshake and a PQC certificate after the TLS handshake.
 
 # Terminology and Requirements Language
 
@@ -96,142 +92,74 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in RFC 2119 {{RFC2119}}.
 
-# Flags Extension
+# Scope
 
-Client and servers use the TLS flags extension
-{{I-D.ietf-tls-tlsflags}} to indicate support for the functionality
-defined in this document.  We call this the "dual_cert"
-extension and the corresponding flag is called "Dual_Cert"
-flag.
+This document is intended for use in closed-network deployments where a single entity manages both the TLS peers. It is not designed for deployments where TLS peers operate in public networks.
 
-The "Dual_Cert" flag proposed by the client in the
-ClientHello (CH) MUST be acknowledged in the EncryptedExtensions
-(EE), if the server also supports the functionality defined in this
-document and is configured to use it.
+This approach is also compatible with deployments that require compliance with FIPS certification, as it allows the use of existing FIPS-approved traditional signature algorithms during the TLS handshake. This ensures that systems can remain compliant with FIPS while still incorporating post-quantum authentication using Exported Authenticators.
 
-If the "Dual_Cert" flag is not set, servers ignore any of
-the functionality specified in this document and applications that
-require perfect forward security will have to initiate a full
-handshake.
+The mechanism is fully backward compatible, as traditional certificates and authentication continue to work with existing TLS 1.3 implementations. As CRQCs emerge, deployments can progressively transition by disabling traditional authentication and enabling pure PQ-based authentication. This flexibility ensures that long-term security, compliance and backward compatibiltiy can be maintained without disruption to existing infrastructure.
 
-The "Dual_Cert" flag is assigned the value (TBD1).
+# Design of Dual Certificate Authentication
 
-If both client and server support the "dual_cert" extension,
-the Certificate message includes both the traditional and
-PQ certificates. The certificates are included as separate entries
-and the CertificateVerify message uses several signatures - one for
-each end-entity certificate.
+There are several approaches for conveying two certificate chains and demonstrating possession of the corresponding private keys.
 
-# Certificate Extension
+The approach outlined in the document assumes two distinct certificate-based authentication exchanges during the TLS handshake and post-handsake. {{RFC9261}} relies on the application-layer protocol to carry the Certificate, CertificateVerify, and Finished messages outside the initial handshake. Unlike the post-handshake authentication mechanism defined in TLS 1.3, {{RFC9261}} supports mutual authentication, allowing both client and server to authenticate after the handshake.
 
-To convey a new certificate payload a new certificate type
-"Dual Certificate" is registered via RFC 7250.
+# Post-Handshake PQ Certificate Using Exported Authenticators
 
-The structure of the message is shown below:
+In scenarios where TLS endpoints wish to authenticate using a traditional certificate during the TLS handshake (for compliance or performance reasons) and use a PQ certificate for long-term cryptographic assurance, {{RFC9261}} provides a suitable framework.
 
-~~~
-  enum {
-      X509(0),
-      RawPublicKey(2),
-      DualCert(TBD2),
-      (255)
-  } CertificateType;
+In such deployments, either endpoint (client or server) can perform traditional certificate-based authentication during the TLS handshake. Following the handshake, an Authenticator Request can be initiated by either party, and the responding peer provides a post-quantum certificate using an Exported Authenticator. This authenticator includes the PQ certificate, a corresponding CertificateVerify, and a Finished message.
 
-  struct {
-       /* Traditional cryptographic certs */
-       opaque cert_data<1..2^24-1>;
-       /* PQC certs */
-       opaque cert_data<1..2^24-1>;
-  } DualCert;
+This bidirectional authentication approach ensures that post-quantum identities are strongly bound to the underlying TLS connection while maintaining backward compatibility with existing TLS implementations and minimizing initial handshake overhead.
 
-  struct {
-      select (certificate_type) {
-          case RawPublicKey:
-            /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
-            opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
-
-          case X509:
-            opaque cert_data<1..2^24-1>;
-
-          case DualCert:
-            DualCert dual_cert_data<1..2^24-1>;
-      };
-      Extension extensions<0..2^16-1>;
-  } CertificateEntry;
-
-  struct {
-      opaque certificate_request_context<0..2^8-1>;
-      CertificateEntry certificate_list<0..2^24-1>;
-  } Certificate;
-~~~
-
-This document allows for more than one CertificateEntry in the Certificate structure.
+The use of dual-certificate authentication via Exported Authenticators is useful where post-quantum algorithms introduce significant performance or message size impacts that are best avoided during the TLS handshake.
 
 #  IANA Considerations
 
-IANA is requested to add the following entry to the "TLS Flags"
-extension registry {{TLS-Ext-Registry}}:
-
- *  Value: TBD1
- *  Flag Name: dual_cert
- *  Messages: CH, EE
- *  Recommended: Y
- *  Reference: [[This document]]
-
-This document adds a new entry to the "TLS Certificate Types"
-registry defined in {{RFC7250}}:
-
--  Value: TBD2
--  Description: Dual Certificate
--  Reference: [[This document]]
+This document has no IANA actions.
 
 #  Security Considerations
 
-tbd
+## Downgrade and Zero-Day Attack Protection
+
+The mechanism proposed in this document is designed to mitigate a range of cryptographic transition risks.
+
+## Dual Authentication Binding
+
+By using a traditional certificate during the TLS handshake and a PQ certificate after the handshake via Exported Authenticators {{RFC9261}}, the solution ensures that authentication relies on two distinct algorithms. The security of the session is hardened because an attacker must break both the traditional and the post-quantum algorithms to successfully impersonate a peer.
+
+This dual-layered authentication can help defend against downgrade attacks, in which a CRQC-enabled adversary compromises one of the algorithms (e.g., a traditional certificate) and attempts to suppress the stronger authentication stage. However, protection against such attacks depends entirely on the deployment's connection policy which must enforce that PQ authentication using Exported Authenticators is required and that connections lacking it are rejected. In such environments, the TLS session's trustworthiness ultimately depends on the stronger of the two algorithms.
+
+## Resilience to Zero-Day CRQC Attacks
+
+The proposed mechanism also anticipates a zero-day scenario, where CRQCs become available and are exploited covertly much like the sudden exploitation of a software vulnerability. In such cases, victims may unknowingly rely on compromised traditional algorithms for authentication.
+
+The use of PQ authentication after the handshake ensures that:
+
+- Even if the handshake (traditional) certificate is silently broken by a CRQC,
+- The attacker will still have to break the post-handshake PQ authentication bound to the session.
+
+This layered approach buys time for the ecosystem to detect, respond, and transition securely, even under zero-day attacks.
+
+## Resilience to PQ Algorithm Implementation Failures
+
+This mechanism also accounts for the possibility of implementation vulnerabilities or future cryptanalytic breakthroughs affecting post-quantum algorithms (e.g., ML-DSA). If a flaw enables certificate forgery, the traditional authentication step offers a fallback layer of assurance.
+
+## Migration to PQ-Only Authentication
+
+The proposed approach is fully backward compatible with existing TLS 1.3 implementations and can be deployed incrementally in closed-network environments. It enables gradual adoption of post-quantum (PQ) authentication without requiring changes to the TLS handshake itself.
+
+As the cryptographic landscape evolves, deployments can adapt by updating the TLS configuration. With the anticipated availability of CRQCs in the near future, deployments will be able to disable the use of traditional certificates during the handshake and rely solely on PQ certificates.
+
+This flexibility supports a graceful migration path, beginning with hybrid (traditional + PQ) authentication for cryptographic resilience and backward compatibility, and evolving toward pure PQ authentication as cryptographic confidence and ecosystem readiness mature.
+
+Further, this model can avoid the need for dual truststore transitions when used in conjunction with composite certificates. Composite certificates allow a single certificate structure to support both traditional and PQ algorithms. 
 
 # Acknowledgments
 
 We would like to thank ... for their comments.
 
 --- back
-
-# Design Alternatives
-
-There are several approaches for conveying two certificate chains and demonstrating possession of the corresponding private keys.
-
-The approaches outlined below assume two distinct certificate-based authentication exchanges during the TLS handshake. An alternative mechanism is the use of Exported Authenticators, as defined in RFC 9261, which enables the use of one certificate during the initial handshake and a second certificate after the handshake has completed.
-
-RFC 9261 {{RFC9261}} relies on the application-layer protocol to carry the Certificate, CertificateVerify, and Finished messages outside the initial handshake. Unlike the post-handshake authentication mechanism defined in TLS 1.3, RFC 9261 supports mutual authentication, allowing both client and server to authenticate after the handshake.
-
-## Certificate Design
-
-### Certificate Message Extension
-
-Utilize the existing Certificate message extensions to carry additional certificates. Define a new pq_certificate extension to carry the post-quantum certificate.
-
-This extension can be included in the extensions field of the CertificateEntry structure:
-
-~~~
-struct {
-   ExtensionType extension_type;
-   opaque pq_certificate<1..2^24-1>;
-} PQCertificateExtension;
-~~~
-
-### Separate Certificate Entries
-
-Use the existing Certificate structure to include both traditional and PQ certificates as separate entries within the certificate_list:
-
-Each CertificateEntry can carry either a traditional certificate or a PQ certificate. The extensions field within CertificateEntry can be used to indicate the type of certificate (e.g., traditional or PQ).
-
-## CertificateVerify Message Design
-
-As an alternative to the current design, the use of a Composite Signature is possible. This approach requires registering new cryptographic algorithm - one for each desireable combination. The benefit of this approach is the ease of integration into an existing implementation since the structure of the message remains unchanged.
-
-~~~
-struct {
-   SignatureScheme algorithm;
-   opaque signature<0..2^16-1>;
-} CertificateVerify;
-~~~
 
