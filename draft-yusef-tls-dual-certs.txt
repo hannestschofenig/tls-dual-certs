@@ -5,14 +5,14 @@
 TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Intended status: Standards Track                           H. Tschofenig
-Expires: 19 November 2025                                          H-BRS
+Expires: 30 November 2025                                          H-BRS
                                                             M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
                                                                 T. Reddy
                                                                    Nokia
-                                                             18 May 2025
+                                                             29 May 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 November 2025.
+   This Internet-Draft will expire on 30 November 2025.
 
 Copyright Notice
 
@@ -93,7 +93,7 @@ Table of Contents
    the anticipated emergence of cryptographically relevant quantum
    computers (CRQCs).  While the encryption-related aspects are covered
    in other documents, this document focuses on the authentication
-   component of the TLS 1.3 handshake [RFC9261].
+   component of the TLS 1.3 handshake [RFC8446].
 
    One approach is the use of dual certificates: issuing two distinct
    certificates for the same end entity — one using a traditional
