@@ -12,6 +12,8 @@ Expires: 30 November 2025                                          H-BRS
                                                                   Intuit
                                                                 T. Reddy
                                                                    Nokia
+                                                            Y. Rosomakho
+                                                                 Zscaler
                                                              29 May 2025
 
 
@@ -381,3 +383,8 @@ Authors' Addresses
    Nokia
    India
    Email: kondtir@gmail.com
+
+
+   Yaroslav Rosomakho
+   Zscaler
+   Email: yrosomakho@zscaler.com
