@@ -96,6 +96,14 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in RFC 2119 {{RFC2119}}.
 
+# Scope
+
+This document is intended for use in closed-network deployments, where a single administrative entity manages both TLS peers. It is not designed for use in open or public network environments where peers are operated independently.
+
+The approach described herein is also compatible with FIPS-compliant deployments, as it supports the continued use of FIPS-approved traditional signature algorithms during the TLS handshake. This enables systems to maintain regulatory compliance while incrementally introducing post-quantum authentication mechanisms using Exported Authenticators.
+
+The proposed mechanism is fully backward compatible: traditional certificates and authentication methods remain functional with existing TLS 1.3 implementations. As cryptographically relevant quantum computers (CRQCs) emerge, deployments can transition by gradually disabling traditional authentication and enabling post-quantum–only authentication. This strategy offers a smooth migration path, ensuring long-term cryptographic agility, regulatory compliance, and operational continuity without disrupting existing infrastructure.
+
 # Flags Extension
 
 Client and servers use the TLS flags extension
