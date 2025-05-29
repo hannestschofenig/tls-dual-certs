@@ -167,6 +167,21 @@ The structure of the message is shown below:
 
 This document allows for more than one CertificateEntry in the Certificate structure.
 
+# CertificateVerify Extension
+
+The structure of the CertificateVerify message is:
+
+~~~
+  struct {
+      SignatureScheme algorithm;
+      opaque signature<0..2^16-1>;
+      SignatureScheme pq_algorithm;
+      opaque pq_signature<0..2^16-1>;
+  } CertificateVerify;
+~~~
+
+As with the Certificate message, this message allows more than one signature, one per CertificateEntry.
+
 #  IANA Considerations
 
 IANA is requested to add the following entry to the "TLS Flags"
