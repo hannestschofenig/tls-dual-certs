@@ -1,0 +1,368 @@
+
+
+
+
+TLS Working Group                                         R. Shekh-Yusef
+Internet-Draft                                                     Ciena
+Intended status: Standards Track                           H. Tschofenig
+Expires: 30 November 2025                                          H-BRS
+                                                            M. Ounsworth
+                                                                 Entrust
+                                                              Y. Sheffer
+                                                                  Intuit
+                                                                T. Reddy
+                                                                   Nokia
+                                                             29 May 2025
+
+
+    Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
+                        Certificates in TLS 1.3
+                   draft-yusef-tls-dual-certs-latest
+
+Abstract
+
+   This document extends the TLS 1.3 authentication mechanism to allow
+   the use of two certificates to enable dual-algorithm authentication,
+   ensuring that an attacker would need to break both algorithms to
+   compromise the session.
+
+Discussion Venues
+
+   This note is to be removed before publishing as an RFC.
+
+   Discussion of this document takes place on the Transport Layer
+   Security mailing list (tls@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/tls/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/hannestschofenig/tls-dual-certs.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 30 November 2025.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Terminology and Requirements Language
+   3.  Scope
+   4.  Flags Extension
+   5.  Certificate Extension
+   6.  IANA Considerations
+   7.  Security Considerations
+   8.  Acknowledgments
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
+   Appendix A.  Design Alternatives
+     A.1.  Certificate Design
+       A.1.1.  Certificate Message Extension
+       A.1.2.  Separate Certificate Entries
+     A.2.  CertificateVerify Message Design
+   Authors' Addresses
+
+1.  Introduction
+
+   There are several potential mechanisms to address concerns related to
+   the anticipated emergence of cryptographically relevant quantum
+   computers (CRQCs).  While the encryption-related aspects are covered
+   in other documents, this document focuses on the authentication
+   component of the TLS 1.3 handshake [RFC8446].
+
+   One approach is the use of dual certificates: issuing two distinct
+   certificates for the same end entity — one using a traditional
+   algorithm (e.g., ECDSA), and the other using a post-quantum (PQ)
+   algorithm (e.g., ML-DSA).
+
+   This document defines how TLS 1.3 can utilize such certificates to
+   enable dual-algorithm authentication, ensuring that an attacker would
+   need to break both algorithms to compromise the session.
+
+   It also addresses the challenges of integrating hybrid authentication
+   in TLS 1.3 while balancing backward compatibility, forward security,
+   and deployment practicality.
+
+   This document makes changes to the Certificate and CertificateVerify
+   messages to take advantage of both certificates when authenticating
+   the end entity.
+
+2.  Terminology and Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119 [RFC2119].
+
+3.  Scope
+
+   This document is intended for use in closed-network deployments,
+   where a single administrative entity manages both TLS peers.  It is
+   not designed for use in open or public network environments where
+   peers are operated independently.
+
+   The approach described herein is also compatible with FIPS-compliant
+   deployments, as it supports the continued use of FIPS-approved
+   traditional signature algorithms during the TLS handshake.  This
+   enables systems to maintain regulatory compliance while incrementally
+   introducing post-quantum authentication mechanisms using Exported
+   Authenticators.
+
+   The proposed mechanism is fully backward compatible: traditional
+   certificates and authentication methods remain functional with
+   existing TLS 1.3 implementations.  As cryptographically relevant
+   quantum computers (CRQCs) emerge, deployments can transition by
+   gradually disabling traditional authentication and enabling post-
+   quantum–only authentication.  This strategy offers a smooth migration
+   path, ensuring long-term cryptographic agility, regulatory
+   compliance, and operational continuity without disrupting existing
+   infrastructure.
+
+4.  Flags Extension
+
+   Client and servers use the TLS flags extension
+   [I-D.ietf-tls-tlsflags] to indicate support for the functionality
+   defined in this document.  We call this the "dual_cert" extension and
+   the corresponding flag is called "Dual_Cert" flag.
+
+   The "Dual_Cert" flag proposed by the client in the ClientHello (CH)
+   MUST be acknowledged in the EncryptedExtensions (EE), if the server
+   also supports the functionality defined in this document and is
+   configured to use it.
+
+   If the "Dual_Cert" flag is not set, servers ignore any of the
+   functionality specified in this document and applications that
+   require perfect forward security will have to initiate a full
+   handshake.
+
+   The "Dual_Cert" flag is assigned the value (TBD1).
+
+   If both client and server support the "dual_cert" extension, the
+   Certificate message includes both the traditional and PQ
+   certificates.  The certificates are included as separate entries and
+   the CertificateVerify message uses several signatures - one for each
+   end-entity certificate.
+
+5.  Certificate Extension
+
+   To convey a new certificate payload a new certificate type "Dual
+   Certificate" is registered via RFC 7250.
+
+   The structure of the message is shown below:
+
+     enum {
+         X509(0),
+         RawPublicKey(2),
+         DualCert(TBD2),
+         (255)
+     } CertificateType;
+
+     struct {
+          /* Traditional cryptographic certs */
+          opaque cert_data<1..2^24-1>;
+          /* PQC certs */
+          opaque cert_data<1..2^24-1>;
+     } DualCert;
+
+     struct {
+         select (certificate_type) {
+             case RawPublicKey:
+               /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
+               opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
+
+             case X509:
+               opaque cert_data<1..2^24-1>;
+
+             case DualCert:
+               DualCert dual_cert_data<1..2^24-1>;
+         };
+         Extension extensions<0..2^16-1>;
+     } CertificateEntry;
+
+     struct {
+         opaque certificate_request_context<0..2^8-1>;
+         CertificateEntry certificate_list<0..2^24-1>;
+     } Certificate;
+
+   This document allows for more than one CertificateEntry in the
+   Certificate structure.
+
+6.  IANA Considerations
+
+   IANA is requested to add the following entry to the "TLS Flags"
+   extension registry [TLS-Ext-Registry]:
+
+   *  Value: TBD1
+
+   *  Flag Name: dual_cert
+
+   *  Messages: CH, EE
+
+   *  Recommended: Y
+
+   *  Reference: [[This document]]
+
+   This document adds a new entry to the "TLS Certificate Types"
+   registry defined in [RFC7250]:
+
+   *  Value: TBD2
+
+   *  Description: Dual Certificate
+
+   *  Reference: [[This document]]
+
+7.  Security Considerations
+
+   tbd
+
+8.  Acknowledgments
+
+   We would like to thank ... for their comments.
+
+9.  References
+
+9.1.  Normative References
+
+   [I-D.ietf-tls-tlsflags]
+              Nir, Y., "A Flags Extension for TLS 1.3", Work in
+              Progress, Internet-Draft, draft-ietf-tls-tlsflags-15, 15
+              March 2025, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-tls-tlsflags-15>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC7250]  Wouters, P., Ed., Tschofenig, H., Ed., Gilmore, J.,
+              Weiler, S., and T. Kivinen, "Using Raw Public Keys in
+              Transport Layer Security (TLS) and Datagram Transport
+              Layer Security (DTLS)", RFC 7250, DOI 10.17487/RFC7250,
+              June 2014, <https://www.rfc-editor.org/rfc/rfc7250>.
+
+   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+              <https://www.rfc-editor.org/rfc/rfc8446>.
+
+9.2.  Informative References
+
+   [RFC9261]  Sullivan, N., "Exported Authenticators in TLS", RFC 9261,
+              DOI 10.17487/RFC9261, July 2022,
+              <https://www.rfc-editor.org/rfc/rfc9261>.
+
+   [TLS-Ext-Registry]
+              IANA, "Transport Layer Security (TLS) Extensions", May
+              2025, <https://www.iana.org/assignments/tls-extensiontype-
+              values>.
+
+Appendix A.  Design Alternatives
+
+   There are several approaches for conveying two certificate chains and
+   demonstrating possession of the corresponding private keys.
+
+   The approaches outlined below assume two distinct certificate-based
+   authentication exchanges during the TLS handshake.  An alternative
+   mechanism is the use of Exported Authenticators, as defined in RFC
+   9261, which enables the use of one certificate during the initial
+   handshake and a second certificate after the handshake has completed.
+
+   RFC 9261 [RFC9261] relies on the application-layer protocol to carry
+   the Certificate, CertificateVerify, and Finished messages outside the
+   initial handshake.  Unlike the post-handshake authentication
+   mechanism defined in TLS 1.3, RFC 9261 supports mutual
+   authentication, allowing both client and server to authenticate after
+   the handshake.
+
+A.1.  Certificate Design
+
+A.1.1.  Certificate Message Extension
+
+   Utilize the existing Certificate message extensions to carry
+   additional certificates.  Define a new pq_certificate extension to
+   carry the post-quantum certificate.
+
+   This extension can be included in the extensions field of the
+   CertificateEntry structure:
+
+   struct {
+      ExtensionType extension_type;
+      opaque pq_certificate<1..2^24-1>;
+   } PQCertificateExtension;
+
+A.1.2.  Separate Certificate Entries
+
+   Use the existing Certificate structure to include both traditional
+   and PQ certificates as separate entries within the certificate_list:
+
+   Each CertificateEntry can carry either a traditional certificate or a
+   PQ certificate.  The extensions field within CertificateEntry can be
+   used to indicate the type of certificate (e.g., traditional or PQ).
+
+A.2.  CertificateVerify Message Design
+
+   As an alternative to the current design, the use of a Composite
+   Signature is possible.  This approach requires registering new
+   cryptographic algorithm - one for each desireable combination.  The
+   benefit of this approach is the ease of integration into an existing
+   implementation since the structure of the message remains unchanged.
+
+   struct {
+      SignatureScheme algorithm;
+      opaque signature<0..2^16-1>;
+   } CertificateVerify;
+
+Authors' Addresses
+
+   Rifaat Shekh-Yusef
+   Ciena
+   Canada
+   Email: rifaat.s.ietf@gmail.com
+
+
+   Hannes Tschofenig
+   University of Applied Sciences Bonn-Rhein-Sieg
+   Germany
+   Email: hannes.tschofenig@gmx.net
+
+
+   Mike Ounsworth
+   Entrust
+   Canada
+   Email: mike.ounsworth@entrust.com
+
+
+   Yaron Sheffer
+   Intuit
+   Israel
+   Email: yaronf.ietf@gmail.com
+
+
+   Tirumaleswar Reddy
+   Nokia
+   India
+   Email: kondtir@gmail.com
