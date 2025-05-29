@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-27T01:00:55.961494+00:00",
+  "timestamp": "2025-05-29T01:02:26.884764+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -50,5 +50,32 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOOsIF4s6X9V0A",
+      "title": "Updated draft to use Exported Authenticators",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/1",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-28T12:46:46Z",
+      "updatedAt": "2025-05-28T12:46:47Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "4563f84c145b0739658a1d56bdaf7402e5b85aa0",
+      "headRepository": "tireddy2/tls-dual-certs",
+      "headRefName": "main",
+      "headRefOid": "d3938a241be4073c802be34d28860ccf37f6c201",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
