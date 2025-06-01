@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-29T01:02:26.884764+00:00",
+  "timestamp": "2025-06-01T01:14:37.654837+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -49,7 +49,72 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOOsIF4s641TDX",
+      "title": "Certificate Message",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/3",
+      "state": "OPEN",
+      "author": "hannestschofenig",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "We need to state that the DualCert structure each contains the certificate chains of the certs.",
+      "createdAt": "2025-05-29T17:20:52Z",
+      "updatedAt": "2025-05-29T17:20:52Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOOsIF4s641VVu",
+      "title": "Discuss Trusted CA Indication from RFC 6066",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/4",
+      "state": "OPEN",
+      "author": "hannestschofenig",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-29T17:24:08Z",
+      "updatedAt": "2025-05-29T17:24:08Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOOsIF4s64_8G7",
+      "title": "Section 3 - reference to exported authenticators",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/7",
+      "state": "OPEN",
+      "author": "rifaat-ietf",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Second paragraph, last sentence - should remove \"Exported Authenticators\"",
+      "createdAt": "2025-05-30T17:11:03Z",
+      "updatedAt": "2025-05-30T17:11:03Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOOsIF4s64_9GM",
+      "title": "Section 5 - CertificateEntry, Dual Cert",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/8",
+      "state": "OPEN",
+      "author": "rifaat-ietf",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\n          case DualCert:\n            DualCert dual_cert_data<1..2^24-1>;\n\nI think this should probably be as follows:\n\n          case DualCert:\n            DualCert dual_cert_data;\n\nSince the structure itself contains the certificates data.",
+      "createdAt": "2025-05-30T17:13:22Z",
+      "updatedAt": "2025-05-30T17:13:22Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
@@ -74,6 +139,98 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOOsIF4s6YKCQ8",
+      "title": "Specifying CertificateVerify",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/2",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-29T17:18:25Z",
+      "updatedAt": "2025-05-29T19:09:10Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a467fb014b05d9fec8398bf569b74946816faf99",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "hannestschofenig-patch-1",
+      "headRefOid": "1aacecc2dc37ad5de903a0210b78f1271c027a60",
+      "closedAt": "2025-05-29T19:09:08Z",
+      "mergedAt": "2025-05-29T19:09:08Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "0ef89a31568b00cbebc09a0305ce8c15c61dda6a"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDOOsIF4s6YKI4j",
+      "title": "Added Scope",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/5",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-29T17:30:01Z",
+      "updatedAt": "2025-05-29T19:08:54Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a467fb014b05d9fec8398bf569b74946816faf99",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "hannestschofenig-patch-2",
+      "headRefOid": "c7d1cac211fadaa3dfa7b8eb318f28829d076c26",
+      "closedAt": "2025-05-29T19:08:51Z",
+      "mergedAt": "2025-05-29T19:08:51Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "f41d339352c665331f35130cb9f79a2e73a2fc95"
+      },
+      "comments": [
+        {
+          "author": "hannestschofenig",
+          "authorAssociation": "OWNER",
+          "body": "This new section is based on text provided by Tiru!",
+          "createdAt": "2025-05-29T19:08:48Z",
+          "updatedAt": "2025-05-29T19:08:48Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDOOsIF4s6YLE3f",
+      "title": "Adding Yaroslav",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/6",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-29T19:22:00Z",
+      "updatedAt": "2025-05-29T19:31:32Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "0ef89a31568b00cbebc09a0305ce8c15c61dda6a",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "hannestschofenig-patch-1",
+      "headRefOid": "9d14e248bd646e40b68c2d531413749684c93aac",
+      "closedAt": "2025-05-29T19:31:28Z",
+      "mergedAt": "2025-05-29T19:31:28Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "d8cfa898e3a08d7d861b3d7e85785ecf060fd40a"
+      },
       "comments": [],
       "reviews": []
     }
