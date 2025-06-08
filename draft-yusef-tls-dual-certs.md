@@ -280,17 +280,17 @@ Certificate chains must be validated independently, including trust anchors, cer
 
 #  IANA Considerations
 
-This specification registers the `secondary_signature_algorithms` TLS extension and `dual_certificate_required` TLS Flag.
+This specification registers the `secondary_signature_algorithms` TLS extension, `dual_certificate_required` TLS Flag and `dual_certificate_required` TLS alert.
 
 ## TLS extension
 
 IANA is requested to assign a new value from the TLS ExtensionType Values registry:
 
- * Extension Name: secondary_signature_algorithms
- * TLS 1.3: CH, CR
- * DTLS-Only: N
- * Recommended: Y
- * Reference: [[This document]]
+ *  Extension Name: secondary_signature_algorithms
+ *  TLS 1.3: CH, CR
+ *  DTLS-Only: N
+ *  Recommended: Y
+ *  Reference: [[This document]]
 
 ## TLS flag
 
@@ -302,6 +302,15 @@ IANA is requested to add the following entry to the "TLS Flags" extension regist
  *  Recommended: Y
  *  Reference: [[This document]]
 
+## TLS alert
+
+IANA is requested to add the following entry to the "TLS Alerts" registry:
+
+ *  Value: TBD
+ *  Description: dual_certificate_required
+ *  DTLS-OK: Y
+ *  Reference: [[This document]]
+ *  Comment: None
 
 # Acknowledgments
 
