@@ -61,6 +61,7 @@ author:
       fullname: Yaroslav Rosomakho
       organization: Zscaler
       email: yrosomakho@zscaler.com
+updates: RFC9261, RFC8446
 
 --- abstract
 
