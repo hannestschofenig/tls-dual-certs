@@ -97,6 +97,7 @@ The proposed mechanism is fully backward compatible: traditional certificates an
 
 The following diagrma describes, at high level, the proposed changes by this draft:
 
+```
      ┌──────┐                           ┌──────┐
      │Client│                           │Server│
      └───┬──┘                           └───┬──┘
@@ -130,7 +131,7 @@ The following diagrma describes, at high level, the proposed changes by this dra
      ┌───┴──┐                           ┌───┴──┐
      │Client│                           │Server│
      └──────┘                           └──────┘
-
+```
 
 # Design Overview
 
