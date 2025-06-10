@@ -1586,14 +1586,26 @@ struct {
           <h4 id="name-context-strings">
 <a href="#section-5.4.1" class="section-number selfRef">5.4.1. </a><a href="#name-context-strings" class="section-name selfRef">Context Strings</a>
           </h4>
-<p id="section-5.4.1-1">First signature context string is matching TLS 1.3 specification:
-- for a server context string is "TLS 1.3, server CertificateVerify"
-- for a client context string is "TLS 1.3, client CertificateVerify"<a href="#section-5.4.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.4.1-2">Second signature context string is defined as follows:
-- for a server, secondary context string is "TLS 1.3, server secondary CertificateVerify"
-- for a client, secondary context string is "TLS 1.3, client secondary CertificateVerify"<a href="#section-5.4.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.4.1-3">Implementations <span class="bcp14">MUST</span> verify both signatures and <span class="bcp14">MUST</span> associate each with its corresponding certificate chain.<a href="#section-5.4.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.4.1-4">This dual-signature structure applies equally to <code>CertificateVerify</code> messages carried in Exported Authenticators with second signature using "Secondary Exported Authenticator" as the context string.<a href="#section-5.4.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.4.1-1">First signature context string is matching TLS 1.3 specification:<a href="#section-5.4.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.4.1-2.1">
+              <p id="section-5.4.1-2.1.1">for a server context string is "TLS 1.3, server CertificateVerify"<a href="#section-5.4.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-5.4.1-2.2">
+              <p id="section-5.4.1-2.2.1">for a client context string is "TLS 1.3, client CertificateVerify"<a href="#section-5.4.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-5.4.1-3">Second signature context string is defined as follows:<a href="#section-5.4.1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.4.1-4.1">
+              <p id="section-5.4.1-4.1.1">for a server, secondary context string is "TLS 1.3, server secondary CertificateVerify"<a href="#section-5.4.1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-5.4.1-4.2">
+              <p id="section-5.4.1-4.2.1">for a client, secondary context string is "TLS 1.3, client secondary CertificateVerify"<a href="#section-5.4.1-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-5.4.1-5">Implementations <span class="bcp14">MUST</span> verify both signatures and <span class="bcp14">MUST</span> associate each with its corresponding certificate chain.<a href="#section-5.4.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.4.1-6">This dual-signature structure applies equally to <code>CertificateVerify</code> messages carried in Exported Authenticators with second signature using "Secondary Exported Authenticator" as the context string.<a href="#section-5.4.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
