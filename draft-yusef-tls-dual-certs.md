@@ -237,10 +237,12 @@ Each signature covers the transcript hash as in TLS 1.3, but with a distinct con
 ### Context Strings
 
 First signature context string is matching TLS 1.3 specification:
+
 - for a server context string is "TLS 1.3, server CertificateVerify"
 - for a client context string is "TLS 1.3, client CertificateVerify"
 
 Second signature context string is defined as follows:
+
 - for a server, secondary context string is "TLS 1.3, server secondary CertificateVerify"
 - for a client, secondary context string is "TLS 1.3, client secondary CertificateVerify"
 
