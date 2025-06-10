@@ -93,6 +93,45 @@ The approach described herein is also compatible with FIPS-compliant deployments
 
 The proposed mechanism is fully backward compatible: traditional certificates and authentication methods remain functional with existing TLS 1.3 implementations. As cryptographically relevant quantum computers (CRQCs) emerge, deployments can transition by gradually disabling traditional authentication and enabling post-quantum–only authentication. This strategy offers a smooth migration path, ensuring long-term cryptographic agility, regulatory compliance, and operational continuity without disrupting existing infrastructure.
 
+# Overview
+
+The following diagrma describes, at high level, the proposed changes by this draft:
+
+     ┌──────┐                           ┌──────┐
+     │Client│                           │Server│
+     └───┬──┘                           └───┬──┘
+         │ClientHello                       │   
+         │- dual_certificate_required       │   
+         │- signature_algorithms            │   
+         │- secondary_signature_algorithms  │   
+         │- certificate_authorities         │   
+         │─────────────────────────────────>│   
+         │                                  │   
+         │ServerHello                       │   
+         │Encrypted Extensions              │   
+         │- dual_certificate_required       │   
+         │CertificateRequest                │   
+         │- signature_algorithms            │   
+         │- secondary_signature_algorithms  │   
+         │- certificate_authorities         │   
+         │Certificate                       │   
+         │- Certificates                    │   
+         │CertificateVerify                 │   
+         │- Signatures                      │   
+         │Finished                          │   
+         │<─────────────────────────────────│   
+         │                                  │   
+         │Certificate                       │   
+         │- Certificates                    │   
+         │CertificateVerify                 │   
+         │- Signatures                      │   
+         │Finished>                         │   
+         │─────────────────────────────────>│   
+     ┌───┴──┐                           ┌───┴──┐
+     │Client│                           │Server│
+     └──────┘                           └──────┘
+
+
 # Design Overview
 
 This document introduces a mechanism to enable dual-certificate authentication in TLS 1.3. The primary objective is to allow each TLS peer to present two certificate chains—typically a traditional cryptographic chain and a post-quantum (PQ) chain—thereby requiring an attacker to break both authentication algorithms to impersonate a peer.
