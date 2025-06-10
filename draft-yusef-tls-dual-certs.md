@@ -315,3 +315,65 @@ IANA is requested to add the following entry to the "TLS Alerts" registry:
 # Acknowledgments
 
 We would like to thank ... for their comments.
+
+--- back
+
+# Informal Requirements for Dual TLS Certificate Support
+
+## General TLS Semantics
+
+### Protocol Flow Consistency
+
+Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with `Certificate`, `CertificateVerify`, and `Finished` messages.
+
+### Minimal Protocol Changes
+
+Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.
+
+### mTLS support
+
+The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.
+
+### Exported Authenticators Compatibility
+
+The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.
+
+## Certificate Handling Semantics
+
+### Independent Chain Usability
+
+Each certificate chain (e.g., classic and PQ) must be independently usable for authentication, allowing endpoints to fall back to classic or PQ-only validation if necessary.
+
+### Unambiguous Chain Separation
+
+The mechanism must clearly distinguish and delimit multiple certificate chains to prevent ambiguity or misinterpretation.
+
+### Chain-Specific Signature Algorithms
+
+Each certificate chain must be associated with its own set of supported signature algorithms, allowing negotiation of appropriate algorithms for classic and PQ use cases.
+
+### Multiple Chains Support (Generalisation)
+
+The mechanism must be designed in a way that could support more than two certificate chains in the future, not just hardcoded to classic + PQ.
+
+## Use Case and Deployment Flexibility
+
+### Backward Compatibility
+
+When only one certificate chain is used, the mechanism must remain compatible with existing TLS 1.3 endpoints unaware of dual-certificate support or willing to use only a single certificate.
+
+### Policy Signalling
+
+A mechanism must exist for one party (client or server) to signal whether dual certificate presentation is required, optional, or not supported, to coordinate authentication expectations.
+
+### Support for Non-PQC Multi-Cert Use Cases
+
+The mechanism must be expandable to other multi-certificate use cases such as attested TLS
+
+### Mitigation of Side Channels
+
+The mechanism should avoid constructions that enable side-channel attacks by observing how distinct algorithms are applied to the same message.
+
+### Transparency in Signature Validation
+
+The order and pairing between certificates and their corresponding signatures must be explicit, so verifiers can unambiguously match them.
