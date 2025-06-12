@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-10T01:04:05.212011+00:00",
+  "timestamp": "2025-06-12T01:02:50.055036+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -111,6 +111,38 @@
       "body": "\n          case DualCert:\n            DualCert dual_cert_data<1..2^24-1>;\n\nI think this should probably be as follows:\n\n          case DualCert:\n            DualCert dual_cert_data;\n\nSince the structure itself contains the certificates data.",
       "createdAt": "2025-05-30T17:13:22Z",
       "updatedAt": "2025-05-30T17:13:22Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOOsIF4s66upJn",
+      "title": "Atomic validation",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/11",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We may want to clarify on the need to do atomic validation (i.e., if either cert validation fails, authentication fails).",
+      "createdAt": "2025-06-10T09:13:58Z",
+      "updatedAt": "2025-06-10T09:13:58Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOOsIF4s66uyGd",
+      "title": "Certificate revokation",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/12",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": " we may want to clarify on how clients should behave if one of the certificates is revoked ?",
+      "createdAt": "2025-06-10T09:25:56Z",
+      "updatedAt": "2025-06-10T09:25:56Z",
       "closedAt": null,
       "comments": []
     }
@@ -239,24 +271,26 @@
       "id": "PR_kwDOOsIF4s6ZmM8A",
       "title": "Initial set of requirements",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/9",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "yaroslavros",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "As discussed on the call, here is my suggestion for the spec requirements.",
       "createdAt": "2025-06-08T19:33:38Z",
-      "updatedAt": "2025-06-09T22:02:44Z",
+      "updatedAt": "2025-06-10T17:31:16Z",
       "baseRepository": "hannestschofenig/tls-dual-certs",
       "baseRefName": "main",
       "baseRefOid": "d8cfa898e3a08d7d861b3d7e85785ecf060fd40a",
       "headRepository": "yaroslavros/tls-dual-certs",
       "headRefName": "main",
       "headRefOid": "bfb7e4d535c64e706d2ef2deb22f0d6b558a4b48",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-06-10T17:31:16Z",
+      "mergedAt": "2025-06-10T17:31:16Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "354f64307feca5b366c0c1c5564a4a3f5f5efdca"
+      },
       "comments": [
         {
           "author": "yaroslavros",
@@ -264,6 +298,13 @@
           "body": "> 1. I suggest we clarify that these requirements are primarily to enable dual certificates (post-quantum and traditional) and not to enable other use cases like multi-identity certs.\r\n\r\nAs mentioned above - I agree with a caveat that mechanism should be extendable to other use cases in the future.\r\n\r\n> 2. We may want to clarify on the need to do atomic validation (i.e., if either cert validation fails, authentication fails).\r\n\r\nFully agree. Though is it a part of requirements to the design or should this be simply a part of the spec? I suggest opening an issue to track this.\r\n\r\n> 3. we may want to add a requirement about how key usage and extended key usage extensions in certs should be handled in the dual cert scenario, because dual certs with different key usages could create issues.\r\n\r\nThis is an interesting problem to explore. Ideally only key usage and extended key usage that peer matters should be checked - everything else is just noise. Or do you think key usage/extended key usage MUST exactly match even if given usage is irrelevant in given situation?\r\n\r\nFor example, should a client presenting one certificate with just \"Client Authentication\" EKU and another with both \"Client Authentication\" EKU and \"Server Authentication\" EKU be allowed by a server or blocked simply on the grounds of the irrelevant \"Server Authentication\" EKU being inconsistent in the provided certificates?\r\n\r\n> 4. we may want to clarify on how clients should behave if one of the certificates is revoked ?\r\n\r\nAgain, this seems to be part of the spec, not requirement for the design. Please open an issue to track.",
           "createdAt": "2025-06-09T22:00:50Z",
           "updatedAt": "2025-06-09T22:02:43Z"
+        },
+        {
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> > 1. I suggest we clarify that these requirements are primarily to enable dual certificates (post-quantum and traditional) and not to enable other use cases like multi-identity certs.\r\n> \r\n> As mentioned above - I agree with a caveat that mechanism should be extendable to other use cases in the future.\r\n\r\nWorks for me. \r\n\r\n> \r\n> > 2. We may want to clarify on the need to do atomic validation (i.e., if either cert validation fails, authentication fails).\r\n> \r\n> Fully agree. Though is it a part of requirements to the design or should this be simply a part of the spec? I suggest opening an issue to track this.\r\n\r\nI raised an issue, https://github.com/hannestschofenig/tls-dual-certs/issues/11. \r\n\r\n> \r\n> > 3. we may want to add a requirement about how key usage and extended key usage extensions in certs should be handled in the dual cert scenario, because dual certs with different key usages could create issues.\r\n> \r\n> This is an interesting problem to explore. Ideally only key usage and extended key usage that peer matters should be checked - everything else is just noise. \r\n> Or do you think key usage/extended key usage MUST exactly match even if given usage is irrelevant in given situation?\r\n> \r\n> For example, should a client presenting one certificate with just \"Client Authentication\" EKU and another with both \"Client Authentication\" EKU and \"Server Authentication\" EKU be allowed by a server or blocked simply on the grounds of the irrelevant \"Server Authentication\" EKU being inconsistent in the provided certificates?\r\n\r\nIt could be treated as a configuration mismatch or intentional misuse to broaden the scope. \r\n\r\n> \r\n> > 4. we may want to clarify on how clients should behave if one of the certificates is revoked ?\r\n> \r\n> Again, this seems to be part of the spec, not requirement for the design. Please open an issue to track.\r\n\r\nRaised https://github.com/hannestschofenig/tls-dual-certs/issues/12",
+          "createdAt": "2025-06-10T09:49:24Z",
+          "updatedAt": "2025-06-10T09:49:24Z"
         }
       ],
       "reviews": [
@@ -359,6 +400,46 @@
               "updatedAt": "2025-06-09T21:54:05Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6tm3mY",
+          "commit": {
+            "abbreviatedOid": "bfb7e4d"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-10T09:08:48Z",
+          "updatedAt": "2025-06-10T09:08:48Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "I am not familiar with any such proposal being discussed in the expat BoF, https://datatracker.ietf.org/doc/bofreq-fossati-tls-exported-attestation-expat/",
+              "createdAt": "2025-06-10T09:08:48Z",
+              "updatedAt": "2025-06-10T09:08:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6tm3-X",
+          "commit": {
+            "abbreviatedOid": "bfb7e4d"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-10T09:09:18Z",
+          "updatedAt": "2025-06-10T09:09:18Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "Yes, works for me. ",
+              "createdAt": "2025-06-10T09:09:18Z",
+              "updatedAt": "2025-06-10T09:09:18Z"
+            }
+          ]
         }
       ]
     },
@@ -367,24 +448,54 @@
       "id": "PR_kwDOOsIF4s6ZmbFz",
       "title": "Proposal to address requirements",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/10",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "yaroslavros",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "As discussed, here is the initial text specifying my proposal.",
       "createdAt": "2025-06-08T21:29:19Z",
-      "updatedAt": "2025-06-08T22:18:56Z",
+      "updatedAt": "2025-06-10T17:31:04Z",
       "baseRepository": "hannestschofenig/tls-dual-certs",
       "baseRefName": "main",
       "baseRefOid": "d8cfa898e3a08d7d861b3d7e85785ecf060fd40a",
       "headRepository": "yaroslavros/tls-dual-certs",
       "headRefName": "proposal",
       "headRefOid": "b25a3f524c8d544018a8580acb445dd8d4a16d08",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-06-10T17:31:04Z",
+      "mergedAt": "2025-06-10T17:31:04Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "74ae71602f6a493a64ab657283df89238aa0dcfa"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOOsIF4s6Z6GiJ",
+      "title": "Formatting Glitch",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/13",
+      "state": "MERGED",
+      "author": "hannestschofenig",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-10T18:05:53Z",
+      "updatedAt": "2025-06-10T18:54:06Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "8e7954dc8960cc10a77c5c45cd5d70c798153460",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "hannestschofenig-patch-1",
+      "headRefOid": "2ccfcf374d991a741849fc01317e1d111428cd48",
+      "closedAt": "2025-06-10T18:54:06Z",
+      "mergedAt": "2025-06-10T18:54:06Z",
+      "mergedBy": "hannestschofenig",
+      "mergeCommit": {
+        "oid": "3ead87e1b2328c820a9698329172601577c97cae"
+      },
       "comments": [],
       "reviews": []
     }
