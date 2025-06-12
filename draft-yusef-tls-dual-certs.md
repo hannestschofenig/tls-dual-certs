@@ -253,7 +253,9 @@ This dual-signature structure applies equally to `CertificateVerify` messages ca
 
 # Client-Driven Authentication Requirements
 
-This section defines expected client and server behavior under various client configurations. Each case reflects a different client capability and authentication policy, based on how the client populates the `signature_algorithms`, `signature_algorithms_cert`, and `secondary_signature_algorithms` extensions, and whether it sets the `dual_certificate_required` flag.
+The scenarios in this section describe server authentication behavior based on client policy. Each case reflects a different client capability and authentication policy, based on how the client populates the `signature_algorithms`, `signature_algorithms_cert`, and `secondary_signature_algorithms` extensions, and whether it sets the `dual_certificate_required` flag.
+
+For client authentication, the same principles apply with roles reversed: the server drives authentication requirements by sending a `CertificateRequest` message that includes appropriate extensions.
 
 ## Type 1: Classic-Only Clients
 
