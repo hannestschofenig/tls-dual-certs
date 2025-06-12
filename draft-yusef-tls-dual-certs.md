@@ -186,7 +186,7 @@ This flag MAY be included in TLS flags extension of Authenticator Request messag
 
 If the flag is not set, the peer MAY provide either one or two certificate chains, depending on local policy and negotiated capabilities.
 
-## Certificate Message Encoding
+## Certificate Message Encoding {#certificate}
 
 TLS 1.3 defines the `Certificate` message as follows:
 
@@ -219,7 +219,7 @@ A peer receiving this structure MUST validate each chain independently according
 
 This encoding applies equally to the `CompressedCertificate` message and to `Certificate` message of Exported Authenticators.
 
-## CertificateVerify Message
+## CertificateVerify Message {#certificate-verify}
 
 The `CertificateVerify` message is extended to carry two independent signatures. Its modified structure is as follows:
 
@@ -250,6 +250,88 @@ Second signature context string is defined as follows:
 Implementations MUST verify both signatures and MUST associate each with its corresponding certificate chain.
 
 This dual-signature structure applies equally to `CertificateVerify` messages carried in Exported Authenticators with second signature using "Secondary Exported Authenticator" as the context string.
+
+# Client-Driven Authentication Requirements
+
+This section defines expected client and server behavior under various client configurations. Each case reflects a different client capability and authentication policy, based on how the client populates the `signature_algorithms`, `signature_algorithms_cert`, and `secondary_signature_algorithms` extensions, and whether it sets the `dual_certificate_required` flag.
+
+## Type 1: Classic-Only Clients
+
+Client supports only traditional signature algorithms (e.g., RSA, ECDSA).
+
+Client behavior:
+
+- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Does not include `secondary_signature_algorithms`.
+- Does not set `dual_certificate_required` flag.
+
+To satisfy this client, the server MUST send a single certificate chain with compatible classical algorithms and include a single signature in CertificateVerify.
+
+## Type 2: Dual-Compatible, PQ Optional (Classic Primary)
+
+Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.
+
+Client behavior:
+
+- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported PQ algorithms in `secondary_signature_algorithms`.
+- Does not set `dual_certificate_required` flag.
+
+To satisfy this client, the server MUST either:
+
+- Provide a single certificate chain with compatible classical algorithms and include a single signature in CertificateVerify
+- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in CertificateVerify as described in {{certificate-verify}}
+
+## Type 3: Strict Dual
+
+Client requires both classical and PQ authentication to be performed simultaneously.
+
+Client behavior:
+
+- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported PQ algorithms in `secondary_signature_algorithms`.
+- Sets `dual_certificate_required` flag.
+
+To satisfy this client, the server MUST provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in CertificateVerify as described in {{certificate-verify}}
+
+## Type 4: Dual-Compatible, Classic Optional (PQ Primary)
+
+Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.
+
+Client behavior:
+
+- Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported classical algorithms in `secondary_signature_algorithms`.
+- Does not set `dual_certificate_required` flag.
+
+To satisfy this client, the server MUST either:
+
+- Provide a single certificate chain with compatible PQ algorithms and include a single signature in CertificateVerify
+- Provide a PQ certificate chain followed by a classical certificate chain as described in {{certificate}} and two signatures in CertificateVerify as described in {{certificate-verify}}
+
+## Type 5: PQ-Only Clients
+
+Client supports only PQ signature algorithms (e.g., ML-DSA).
+
+Client behavior:
+
+- Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Does not include `secondary_signature_algorithms`.
+- Does not set `dual_certificate_required` flag.
+
+To satisfy this client, the server MUST send a single certificate chain with compatible PQ algorithms and include a single signature in CertificateVerify.
+
+## Type 6: Flexible
+
+Client supports either classical or PQ authentication and accepts any supported certificate type without requiring both simultaneously.
+
+Client behavior:
+
+- Includes supported classical and PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Does not include `secondary_signature_algorithms`.
+- Does not set `dual_certificate_required` flag.
+
+To satisfy this client, the server MUST send a single certificate chain with compatible classical or PQ algorithms and include a single signature in CertificateVerify.
 
 #  Security Considerations
 
