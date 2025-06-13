@@ -71,9 +71,9 @@ This document extends the TLS 1.3 authentication mechanism to allow the use of t
 
 #  Introduction
 
-There are several potential mechanisms to address concerns related to the anticipated emergence of cryptographically relevant quantum computers (CRQCs). While the encryption-related aspects are covered in other documents, this document focuses on the authentication component of the {{!TLS=RFC8446}} handshake.
+There are several potential mechanisms to address concerns related to the anticipated emergence of cryptographically relevant quantum computers (CRQCs). While the encryption-related aspects are covered in other documents, this document focuses on the authentication component of the {{!TLS=I-D.ietf-tls-rfc8446bis}} handshake.
 
-One approach is the use of dual certificates: issuing two distinct certificates for the same end entity — one using a traditional algorithm (e.g., ECDSA), and the other using a post-quantum (PQ) algorithm (e.g., ML-DSA).
+One approach is the use of dual certificates: issuing two distinct certificates for the same end entity — one using a traditional algorithm (e.g., {{?ECDSA=DOI.10.6028/NIST.FIPS.186-5}}), and the other using a post-quantum (PQ) algorithm (e.g., {{?ML-DSA=I-D.ietf-tls-mldsa}}).
 
 This document defines how TLS 1.3 can utilize such certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.
 
