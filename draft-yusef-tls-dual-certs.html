@@ -1548,19 +1548,31 @@ struct {
           <h4 id="name-delimiter">
 <a href="#section-5.3.1" class="section-number selfRef">5.3.1. </a><a href="#name-delimiter" class="section-name selfRef">Delimiter</a>
           </h4>
-<p id="section-5.3.1-1">The delimiter is a zero-length certificate entry, defined as:<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
-<span id="name-delimiter-between-certifica"></span><figure id="figure-3">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.3.1-2.1">
+<p id="section-5.3.1-1">The delimiter is a zero-length certificate entry encoded as 3 bytes of 0x00. TLS 1.3 prohibits empty certificate entries, so this delimiter is unambiguous.<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.3.1-2">This specification expands CertificateEntry structure from <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span> in the following way:<a href="#section-5.3.1-2" class="pilcrow">¶</a></p>
+<span id="name-updated-certificateentry-st"></span><figure id="figure-3">
+            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.3.1-3.1">
 <pre>
 struct {
-    opaque cert_data&lt;0..0&gt;;
+    select (is_delimiter) {
+        case Delimiter: uint24 delimiter = 0;
+        case Non_Delimiter:
+          select (certificate_type) {
+              case RawPublicKey:
+                /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
+                opaque ASN1_subjectPublicKeyInfo&lt;1..2^24-1&gt;;
+
+              case X509:
+                opaque cert_data&lt;1..2^24-1&gt;;
+          };
+          Extension extensions&lt;0..2^16-1&gt;;
+    };
 } CertificateEntry;
 </pre>
 </div>
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
-<a href="#name-delimiter-between-certifica" class="selfRef">Delimiter between Certificate chains</a>
+<a href="#name-updated-certificateentry-st" class="selfRef">Updated CertificateEntry structure definition</a>
             </figcaption></figure>
-<p id="section-5.3.1-3">TLS 1.3 prohibits empty certificate entries, so this delimiter is unambiguous.<a href="#section-5.3.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-4">All entries before the delimiter are treated as the first certificate chain, all entries after the delimiter are treated as the second certificate chain.<a href="#section-5.3.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-5">A peer receiving this structure <span class="bcp14">MUST</span> validate each chain independently according to its corresponding signature algorithm. The end-entity certificate <span class="bcp14">MUST</span> be the first entry in both the first and second certificate chains. The first certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>signature_algorithms</code> or <code>signature_algorithms_cert</code> extension, if present. The second certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>secondary_signature_algorithms</code> extension.<a href="#section-5.3.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.3.1-6">This encoding applies equally to the <code>CompressedCertificate</code> message and to <code>Certificate</code> message of Exported Authenticators.<a href="#section-5.3.1-6" class="pilcrow">¶</a></p>

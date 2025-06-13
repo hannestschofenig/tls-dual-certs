@@ -363,16 +363,30 @@ Table of Contents
 
 5.3.1.  Delimiter
 
-   The delimiter is a zero-length certificate entry, defined as:
+   The delimiter is a zero-length certificate entry encoded as 3 bytes
+   of 0x00.  TLS 1.3 prohibits empty certificate entries, so this
+   delimiter is unambiguous.
+
+   This specification expands CertificateEntry structure from
+   Section 4.4.2 of [TLS] in the following way:
 
    struct {
-       opaque cert_data<0..0>;
+       select (is_delimiter) {
+           case Delimiter: uint24 delimiter = 0;
+           case Non_Delimiter:
+             select (certificate_type) {
+                 case RawPublicKey:
+                   /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
+                   opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
+
+                 case X509:
+                   opaque cert_data<1..2^24-1>;
+             };
+             Extension extensions<0..2^16-1>;
+       };
    } CertificateEntry;
 
-               Figure 3: Delimiter between Certificate chains
-
-   TLS 1.3 prohibits empty certificate entries, so this delimiter is
-   unambiguous.
+          Figure 3: Updated CertificateEntry structure definition
 
    All entries before the delimiter are treated as the first certificate
    chain, all entries after the delimiter are treated as the second
