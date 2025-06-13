@@ -6,7 +6,7 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 12 December 2025                                   M. Ounsworth
+Expires: 15 December 2025                                   M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
@@ -14,7 +14,7 @@ Expires: 12 December 2025                                   M. Ounsworth
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                            10 June 2025
+                                                            13 June 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 December 2025.
+   This Internet-Draft will expire on 15 December 2025.
 
 Copyright Notice
 
@@ -117,7 +117,7 @@ Table of Contents
      A.3.  Use Case and Deployment Flexibility
        A.3.1.  Backward Compatibility
        A.3.2.  Policy Signalling
-       A.3.3.  Support for Non-PQC Multi-Cert Use Cases
+       A.3.3.  Future extendability to Non-PQC Multi-Cert Use cases
        A.3.4.  Mitigation of Side Channels
        A.3.5.  Transparency in Signature Validation
    Authors' Addresses
@@ -639,10 +639,9 @@ A.3.2.  Policy Signalling
    whether dual certificate presentation is required, optional, or not
    supported, to coordinate authentication expectations.
 
-A.3.3.  Support for Non-PQC Multi-Cert Use Cases
+A.3.3.  Future extendability to Non-PQC Multi-Cert Use cases
 
-   The mechanism must be expandable to other multi-certificate use cases
-   such as attested TLS
+   The mechanism must be extendable to other multi-certificate use cases
 
 A.3.4.  Mitigation of Side Channels
 
