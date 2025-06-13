@@ -237,12 +237,12 @@ Each signature covers the transcript hash as in TLS 1.3, but with a distinct con
 
 ### Context Strings
 
-First signature context string is matching TLS 1.3 specification:
+The context string is used as input to the data over which the signature is computed, consistent with the CertificateVerify construction defined in TLS 1.3. The first signature uses the same context string as in the TLS 1.3 specification:
 
 - for a server context string is "TLS 1.3, server CertificateVerify"
 - for a client context string is "TLS 1.3, client CertificateVerify"
 
-Second signature context string is defined as follows:
+The second signature uses a distinct context string to bind it to the secondary certificate:
 
 - for a server, secondary context string is "TLS 1.3, server secondary CertificateVerify"
 - for a client, secondary context string is "TLS 1.3, client secondary CertificateVerify"
@@ -250,6 +250,12 @@ Second signature context string is defined as follows:
 Implementations MUST verify both signatures and MUST associate each with its corresponding certificate chain.
 
 This dual-signature structure applies equally to `CertificateVerify` messages carried in Exported Authenticators with second signature using "Secondary Exported Authenticator" as the context string.
+
+# Performance Considerations
+
+The use of dual certificates increases the size of individual certificates, certificate chains, and associated signatures, which can result in significantly larger TLS handshake messages. These larger payloads may cause packet fragmentation, retransmissions, and handshake delays, especially in constrained or lossy network environments.
+
+To mitigate these impacts, deployments can apply certificate chain optimization techniques, such as those described in Section 6.1 of {{?I-D.reddy-uta-pqc-app}}, to minimize transmission overhead and improve handshake robustness.
 
 #  Security Considerations
 
@@ -271,7 +277,7 @@ Distinct context strings are REQUIRED for the two signatures to prevent cross-pr
 
 ## Dual Certificate Policy Enforcement
 
-When the `dual_certificate_required` flag is set by a peer, failure to provide two certificate chains and two corresponding signatures MUST result in handshake failure. This enforcement MUST NOT be bypassed by falling back to a single-certificate configuration. Implementations MUST emit a `dual_certificate_required` alert when this requirement is violated.
+When the `dual_certificate_required` flag is set by a peer, failure to provide two certificate chains and two corresponding signatures MUST result in handshake failure. This enforcement MUST NOT be bypassed by falling back to a single-certificate configuration. Implementations MUST emit a `dual_certificate_required` alert when this requirement is violated. This mechanism assumes that both peers are explicitly configured to operate in dual certificate mode within a closed, controlled network environment. In an PKI deployment, it is not possible for a peer to determine reliably whether the other side supports dual certificates. In such deployments during the transition to PQ authentication, clients will need to be capable of accepting and validating connections that use traditional certificates only, composite or dual certificates, or purely PQ, depending on the peer's capabilities. This variability means that enforcing a strict dual-certificate requirement is not feasible in the near future for PKI deployments.
 
 ## Cryptographic Independence
 
@@ -279,7 +285,7 @@ To achieve the intended security guarantees, implementers and deployment operato
 
 ## Certificate Usage and Trust
 
-Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. Operators should consider whether the two chains are validated against the same or distinct trust roots, and what implications this has for overall trust decisions.
+Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. Operators SHOULD ensure that revocation checking, such as using OCSP or CRLs, is consistently applied to both chains to prevent reliance on revoked credentials. Additionally, operators should consider whether the two chains are validated against the same or distinct trust roots, and evaluate the implications this has for overall trust decisions and certificate lifecycle management.
 
 #  IANA Considerations
 
