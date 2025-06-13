@@ -164,10 +164,7 @@ Table of Contents
 
    The approach described herein is also compatible with FIPS-compliant
    deployments, as it supports the continued use of FIPS-approved
-   traditional signature algorithms during the TLS handshake.  This
-   enables systems to maintain regulatory compliance while incrementally
-   introducing post-quantum authentication mechanisms using Exported
-   Authenticators.
+   traditional signature algorithms during the TLS handshake.
 
    The proposed mechanism is fully backward compatible: traditional
    certificates and authentication methods remain functional with
