@@ -45,9 +45,9 @@ When only one certificate chain is used, the mechanism must remain compatible wi
 
 A mechanism must exist for one party (client or server) to signal whether dual certificate presentation is required, optional, or not supported, to coordinate authentication expectations.
 
-### 3c. Support for Non-PQC Multi-Cert Use Cases
+### 3c. Future extendability to Non-PQC Multi-Cert Use cases
 
-The mechanism must be expandable to other multi-certificate use cases such as attested TLS
+The mechanism must be extendable to other multi-certificate use cases
 
 ### 3d. Mitigation of Side Channels
 
