@@ -255,7 +255,7 @@ This dual-signature structure applies equally to `CertificateVerify` messages ca
 
 The use of dual certificates increases the size of individual certificates, certificate chains, and associated signatures, which can result in significantly larger TLS handshake messages. These larger payloads may cause packet fragmentation, retransmissions, and handshake delays, especially in constrained or lossy network environments.
 
-To mitigate these impacts, deployments can apply certificate chain optimization techniques, such as those described in Section 6.1 of {{?I-D.reddy-uta-pqc-app}}, to minimize transmission overhead and improve handshake robustness.
+To mitigate these impacts, deployments can apply certificate chain optimization techniques, such as those described in {{Section 6.1 of ?PQ-RECOMMEND=I-D.reddy-uta-pqc-app}}, to minimize transmission overhead and improve handshake robustness.
 
 #  Security Considerations
 
