@@ -451,8 +451,8 @@ Table of Contents
 
    To mitigate these impacts, deployments can apply certificate chain
    optimization techniques, such as those described in Section 6.1 of
-   [I-D.reddy-uta-pqc-app], to minimize transmission overhead and
-   improve handshake robustness.
+   [PQ-RECOMMEND], to minimize transmission overhead and improve
+   handshake robustness.
 
 7.  Security Considerations
 
@@ -611,7 +611,7 @@ Table of Contents
 
 10.2.  Informative References
 
-   [I-D.reddy-uta-pqc-app]
+   [PQ-RECOMMEND]
               Reddy.K, T. and H. Tschofenig, "Post-Quantum Cryptography
               Recommendations for TLS-based Applications", Work in
               Progress, Internet-Draft, draft-reddy-uta-pqc-app-07, 25
