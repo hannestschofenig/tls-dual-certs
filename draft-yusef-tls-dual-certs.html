@@ -1278,7 +1278,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
             <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-informal-requirements-for-d" class="internal xref">Informal Requirements for Dual TLS Certificate Support</a></p>
@@ -1352,7 +1360,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
 <p id="section-1-1">There are several potential mechanisms to address concerns related to the anticipated emergence of cryptographically relevant quantum computers (CRQCs). While the encryption-related aspects are covered in other documents, this document focuses on the authentication component of the <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> handshake.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">One approach is the use of dual certificates: issuing two distinct certificates for the same end entity — one using a traditional algorithm (e.g., ECDSA), and the other using a post-quantum (PQ) algorithm (e.g., ML-DSA).<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-2">One approach is the use of dual certificates: issuing two distinct certificates for the same end entity — one using a traditional algorithm (e.g., <span>[<a href="#ECDSA" class="cite xref">ECDSA</a>]</span>), and the other using a post-quantum (PQ) algorithm (e.g., <span>[<a href="#ML-DSA" class="cite xref">ML-DSA</a>]</span>).<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document defines how TLS 1.3 can utilize such certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">It also addresses the challenges of integrating hybrid authentication in TLS 1.3 while balancing backward compatibility, forward security, and deployment practicality.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">This document makes changes to the Certificate and CertificateVerify messages to take advantage of both certificates when authenticating the end entity.<a href="#section-1-5" class="pilcrow">¶</a></p>
@@ -1469,7 +1477,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <h4 id="name-structure">
 <a href="#section-5.1.1" class="section-number selfRef">5.1.1. </a><a href="#name-structure" class="section-name selfRef">Structure</a>
           </h4>
-<p id="section-5.1.1-1">The structure of the extension is identical to that of <code>signature_algorithms</code> defined in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.2.3" class="relref">Section 4.2.3</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span><a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1.1-1">The structure of the extension is identical to that of <code>signature_algorithms</code> defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.2.3" class="relref">Section 4.2.3</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span><a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
 <span id="name-contents-of-secondary_signa"></span><figure id="figure-1">
             <div class="alignLeft art-ascii-art art-text artwork" id="section-5.1.1-2.1">
 <pre>
@@ -1760,33 +1768,57 @@ struct {
 <p id="section-8-1">We would like to thank ... for their comments.<a href="#section-8-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec-normative-references">
+<div id="sec-combined-references">
 <section id="section-9">
-      <h2 id="name-normative-references">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      <h2 id="name-references">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-9.1">
+        <h3 id="name-normative-references">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
 <dt id="EXPORTED-AUTH">[EXPORTED-AUTH]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Sullivan, N.</span>, <span class="refTitle">"Exported Authenticators in TLS"</span>, <span class="seriesInfo">RFC 9261</span>, <span class="seriesInfo">DOI 10.17487/RFC9261</span>, <time datetime="2022-07" class="refDate">July 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9261">https://www.rfc-editor.org/rfc/rfc9261</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TLS">[TLS]</dt>
-      <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-rfc8446bis-12</span>, <time datetime="2025-02-17" class="refDate">17 February 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12">https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TLS-FLAGS">[TLS-FLAGS]</dt>
-    <dd>
+      <dd>
 <span class="refAuthor">Nir, Y.</span>, <span class="refTitle">"A Flags Extension for TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-tlsflags-15</span>, <time datetime="2025-03-15" class="refDate">15 March 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15">https://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-9.2">
+        <h3 id="name-informative-references">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="ECDSA">[ECDSA]</dt>
+        <dd>
+<span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023-02" class="refDate">February 2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ML-DSA">[ML-DSA]</dt>
+      <dd>
+<span class="refAuthor">Hollebeek, T.</span>, <span class="refAuthor">Schmieg, S.</span>, and <span class="refAuthor">B. Westerbaan</span>, <span class="refTitle">"Use of ML-DSA in TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-mldsa-00</span>, <time datetime="2025-05-16" class="refDate">16 May 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-mldsa-00">https://datatracker.ietf.org/doc/html/draft-ietf-tls-mldsa-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
 </section>
 </div>
 <div id="informal-requirements-for-dual-tls-certificate-support">
