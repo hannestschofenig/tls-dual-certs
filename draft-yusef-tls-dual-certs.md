@@ -285,7 +285,7 @@ To achieve the intended security guarantees, implementers and deployment operato
 
 ## Certificate Usage and Trust
 
-Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. Operators SHOULD ensure that revocation checking, such as using OCSP or CRLs, is consistently applied to both chains to prevent reliance on revoked credentials. Additionally, operators should consider whether the two chains are validated against the same or distinct trust roots, and evaluate the implications this has for overall trust decisions and certificate lifecycle management.
+Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. Operators MUST ensure that revocation checking, such as using OCSP or CRLs, is consistently applied to both chains to prevent reliance on revoked credentials.
 
 #  IANA Considerations
 
