@@ -237,7 +237,7 @@ Each signature covers the transcript hash as in TLS 1.3, but with a distinct con
 
 ### Context Strings
 
-The context string is used as input to the data over which the signature is computed, consistent with the CertificateVerify construction defined in TLS 1.3. The first signature uses the same context string as in the TLS 1.3 specification:
+The context string is used as input to the data over which the signature is computed, consistent with the `CertificateVerify` construction defined in {{Section 4.4.3 of TLS}}. The first signature uses the same context string as in the TLS 1.3 specification:
 
 - for a server context string is "TLS 1.3, server CertificateVerify"
 - for a client context string is "TLS 1.3, client CertificateVerify"
