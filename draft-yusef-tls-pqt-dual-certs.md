@@ -1,8 +1,8 @@
 ---
 v: 3
-docname: draft-yusef-tls-dual-certs-latest
+docname: draft-yusef-tls-pqt-dual-certs-latest
 title: "Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3"
-abbrev: "Dual Certs in TLS"
+abbrev: "PQ/T Dual Certs in TLS"
 cat: std
 ipr: trust200902
 consensus: 'true'
@@ -65,7 +65,7 @@ updates: RFC9261, RFC8446
 
 --- abstract
 
-This document extends the TLS 1.3 authentication mechanism to allow the use of two certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.
+This document extends the TLS 1.3 authentication mechanism to allow the negotiation and use of two signature algorithms to enable dual-algorithm hybrid authentication, ensuring that an attacker would need to break both algorithms to compromise the session. The two signature algorithms come from two independent certificates that together produce a single Certificate and CertificateVerify message.
 
 --- middle
 
@@ -79,7 +79,8 @@ This document defines how TLS 1.3 can utilize such certificates to enable dual-a
 
 It also addresses the challenges of integrating hybrid authentication in TLS 1.3 while balancing backward compatibility, forward security, and deployment practicality.
 
-This document makes changes to the Certificate and CertificateVerify messages to take advantage of both certificates when authenticating the end entity.
+This document defines a new extension `secondary_signature_algorithms` to negotiate support for a second category of signature algorithms, typically post-quantum schemes.
+It also makes changes to the `Certificate` and `CertificateVerify` messages to be able to use both certificates when authenticating the end entity.
 
 # Conventions and Definitions
 
@@ -89,6 +90,8 @@ This document makes changes to the Certificate and CertificateVerify messages to
 
 This document is intended for use in closed-network deployments, where a single administrative entity manages both TLS peers. It is not designed for use in open or public network environments where peers are operated independently.
 
+_EDNOTE: MikeO: Why? This seems like an odd restriction._
+
 The approach described herein is also compatible with FIPS-compliant deployments, as it supports the continued use of FIPS-approved traditional signature algorithms during the TLS handshake.
 
 The proposed mechanism is fully backward compatible: traditional certificates and authentication methods remain functional with existing TLS 1.3 implementations. As cryptographically relevant quantum computers (CRQCs) emerge, deployments can transition by gradually disabling traditional authentication and enabling post-quantum–only authentication. This strategy offers a smooth migration path, ensuring long-term cryptographic agility, regulatory compliance, and operational continuity without disrupting existing infrastructure.
@@ -96,16 +99,44 @@ The proposed mechanism is fully backward compatible: traditional certificates an
 
 # Design Overview
 
-This document introduces a mechanism to enable dual-certificate authentication in TLS 1.3. The primary objective is to allow each TLS peer to present two certificate chains—typically a traditional cryptographic chain and a post-quantum (PQ) chain—thereby requiring an attacker to break both authentication algorithms to impersonate a peer.
+This document introduces a mechanism to enable dual-certificate authentication in TLS 1.3.
 
-The design builds on existing TLS 1.3 structures and introduces minimal protocol changes. It is applicable to both client and server authentication and is compatible with the Exported Authenticators mechanism.
+
+The TLS 1.3 extension defined in this specification follows the following design goals:
+
+* **Design Goal 1**: Clients and servers can negotiate to use two different cryptographic signature algorithms in a PQ/T Hybrid.
+
+  * **Design Goal 1a**: The two signature algorithms come from two independent certificates which both need to satisfy the usual requirements of TLS, such as the `signature_algorithms_cert` and `certificate_authorities` negotiation mechanisms as well as any certificate validation rules such as identifiers (ex. hostname SAN) and policies (ex.: EKUs).
+
+  * **Design Goal 1b**: The PQ/T Hybrid achieves, at least, Weak Non-Separability {{?Signature-Spectrums=I-D.ietf-pquip-hybrid-signature-spectrums-06}} at the time of verification of the `CertificateVerify` message.
+
+* **Design Goal 2**: The mechanism is capable of expressing that some algorithms are acceptable by themselves while others are acceptable only as part of a dual-cert hybrid.
+
+  * **Design Goal 2a**: The negotiation mechanism contains enough expressive power to be able to express, for example, the following:
+    "I would accept any SLH-DSA by itself, and ML-DSA-44 and ML-DSA-65 only in a dual-cert hybrid with RSA, ECDSA P-256 or ECDSA P-384."
+
+  * **Design Goal 2a**: The negotiation mechanism interacts gracefully with composite algorithms. In other words, the dual-algorithm negotiation mechanism contains enough expressive power to be able to express, for example, the following:
+      "I would accept MLDSA65_RSA2048 or MLDSA65_ECDSA-P256 by themselves or ML-DSA-65 in a dual-cert hybrid with RSA or ECDSA P-256."
+
+* **Design Goal 3**: The design is compatible with existing negotiation mechanisms for signature algorithms, certificate types and certificate authorities and is applicable to both in-handshake authentication and Exported Authenticators.
+
+  * **Design Goal 3a**: The design minimizes changes to the TLS handshake and maximizes reuse of `signature_algorithms` and `certificate_type` negotiation mechanisms, and the existing `Certificate` and `CertificateVerify` message structure.
+
+  * **Design Goal 3b**: This specification does not place any additional constraints on the `signature_algorithms`, `signature_algorithms_cert`, and `certificate_type` IANA registries that would make future extension of those registries more difficult.
+
+
+Non-goals:
+
+* **Non-Goal 1**: This is not a generic mechanism for using multiple identities in a single TLS handshake. In particular, this mechanism does not allow for negotiating two certificates with the same algorithm, or for negotiating two independent sets of `certificate_authorities`.
+
+
 
 ## Signature Algorithm Negotiation
 
-A new extension, `secondary_signature_algorithms`, is defined to negotiate support for a second category of signature algorithms, typically post-quantum schemes. This extension is structurally identical to signature_algorithms and is used in the same handshake messages:
+A new extension, `secondary_signature_algorithms`, is defined to negotiate support for a second category of signature algorithms, typically post-quantum schemes. This extension is structurally identical to `signature_algorithms` and is used in the same handshake messages:
 
-- In the `ClientHello`, it indicates the client's supported secondary (PQ) signature algorithms for server authentication.
-- In the `CertificateRequest`, it indicates the server's supported secondary (PQ) signature algorithms for client authentication.
+- In the `ClientHello`, it indicates the client's supported preferences for single and dual-algorithms for server authentication.
+- In the `CertificateRequest`, it indicates the server's supported preferences for single and dual-algorithms for client authentication.
 
 This allows both endpoints to signal independently two distinct algorithms for dual authentication.
 
@@ -117,7 +148,11 @@ TLS 1.3 defines the `Certificate` message to carry a list of certificate entries
 
 A zero-length certificate is defined as a `CertificateEntry` with an empty `cert_data` field and omitted `extensions` field. TLS 1.3 prohibits the use of empty certificate entries, making this delimiter unambiguous. Implementations MUST treat all entries before the zero-length delimiter as the first certificate chain (typically classic), and all entries after it as the second certificate chain (typically post-quantum).
 
+_ENDOTE: MikeO: "unambiguous" is good, but I think we should also mention what is expected to happen if you send a cert chain with a zero-length cert entry to a client that does not implement this specification? I assume things blow up .. I mean "undefined behaviour likely resulting in a fatal alert", ... MUST NOT send multiple cert chains to a peer that has not indicated support for dual certs. These sorts of error cases have to be tightly specified, otherwise the formal analysis becomes really hard._
+
 This encoding applies equally to the `CompressedCertificate` message and to the `Certificate` message of Exported Authenticators as defined in {{Section 5.2.1 of EXPORTED-AUTH}}.
+
+_EDNOTE: MikeO: Can we we prescriptive about the order? Ex.: "The first certificate chain MUST correspond to the algorithm negotiated via `signature_algorithms` and the second MUST correspond to the algorithm negotiated via `secondary_signature_algorithms`."_
 
 ## CertificateVerify Signatures
 
@@ -128,11 +163,17 @@ The `CertificateVerify` message is extended to include two digital signatures:
 
 Each signature is computed over the transcript hash as specified in TLS 1.3, but with distinct context strings to domain-separate the two operations. This approach prevents attackers from comparing timing characteristics or reusing one signature in place of the other.
 
+_EDNOTE: MikeO: it is not clear to me how an domain separator helps with timing analysis attacks. Perhaps more explanation is needed?_
+
 This encoding applies equally to the `CertificateVerify` message of Exported Authenticators as defined in {{Section 5.2.2 of EXPORTED-AUTH}}.
 
 The order of the signatures in the message MUST correspond to the order of the certificate chains in the Certificate message.
 
+_EDNOTE: MikeO: Can we we prescriptive about the order? Ex.: "The first signature MUST correspond to the algorithm negotiated via `signature_algorithms` and the second MUST correspond to the algorithm negotiated via `secondary_signature_algorithms`."_
+
 ## Enforcement Policy
+
+_EDNOTE: MikeO: I don't like this design because it doesn't allow you to say "I would accept SLH-DSA or composite by itself, or these other things only in dual-cert hybrid" (Design Goal 2). I don't have a better proposal at the moment, but I don't think this one has enough expressive power._
 
 A new TLS flag, `dual_certificate_required`, is defined using the {{!TLS-FLAGS=I-D.ietf-tls-tlsflags}} extension. This flag may be set in either direction:
 
