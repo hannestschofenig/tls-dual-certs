@@ -277,7 +277,7 @@ Distinct context strings are REQUIRED for the two signatures to prevent cross-pr
 
 ## Dual Certificate Policy Enforcement
 
-When the `dual_certificate_required` flag is set by a peer, failure to provide two certificate chains and two corresponding signatures MUST result in handshake failure. This enforcement MUST NOT be bypassed by falling back to a single-certificate configuration. Implementations MUST emit a `dual_certificate_required` alert when this requirement is violated. This mechanism assumes that both peers are explicitly configured to operate in dual certificate mode within a closed, controlled network environment. In an PKI deployment, it is not possible for a peer to determine reliably whether the other side supports dual certificates. In such deployments during the transition to PQ authentication, clients will need to be capable of accepting and validating connections that use traditional certificates only, composite or dual certificates, or purely PQ, depending on the peer's capabilities. This variability means that enforcing a strict dual-certificate requirement is not feasible in the near future for PKI deployments.
+When the `dual_certificate_required` flag is set by a peer, failure to provide two certificate chains and two corresponding signatures MUST result in handshake failure. This enforcement MUST NOT be bypassed by falling back to a single-certificate configuration. Implementations MUST emit a `dual_certificate_required` alert when this requirement is violated. 
 
 ## Cryptographic Independence
 
