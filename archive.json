@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-12T01:02:50.055036+00:00",
+  "timestamp": "2025-06-15T01:10:17.704313+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -55,16 +55,24 @@
       "id": "I_kwDOOsIF4s641TDX",
       "title": "Certificate Message",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "hannestschofenig",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "We need to state that the DualCert structure each contains the certificate chains of the certs.",
       "createdAt": "2025-05-29T17:20:52Z",
-      "updatedAt": "2025-05-29T17:20:52Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-12T22:42:36Z",
+      "closedAt": "2025-06-12T22:42:36Z",
+      "comments": [
+        {
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think this can be closed now",
+          "createdAt": "2025-06-12T21:58:00Z",
+          "updatedAt": "2025-06-12T21:58:00Z"
+        }
+      ]
     },
     {
       "number": 4,
@@ -87,32 +95,48 @@
       "id": "I_kwDOOsIF4s64_8G7",
       "title": "Section 3 - reference to exported authenticators",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/7",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "rifaat-ietf",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Second paragraph, last sentence - should remove \"Exported Authenticators\"",
       "createdAt": "2025-05-30T17:11:03Z",
-      "updatedAt": "2025-05-30T17:11:03Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-12T22:41:13Z",
+      "closedAt": "2025-06-12T22:41:13Z",
+      "comments": [
+        {
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addressed by https://github.com/hannestschofenig/tls-dual-certs/pull/15",
+          "createdAt": "2025-06-12T22:18:10Z",
+          "updatedAt": "2025-06-12T22:18:10Z"
+        }
+      ]
     },
     {
       "number": 8,
       "id": "I_kwDOOsIF4s64_9GM",
       "title": "Section 5 - CertificateEntry, Dual Cert",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/8",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "rifaat-ietf",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "\n          case DualCert:\n            DualCert dual_cert_data<1..2^24-1>;\n\nI think this should probably be as follows:\n\n          case DualCert:\n            DualCert dual_cert_data;\n\nSince the structure itself contains the certificates data.",
       "createdAt": "2025-05-30T17:13:22Z",
-      "updatedAt": "2025-05-30T17:13:22Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-12T22:40:36Z",
+      "closedAt": "2025-06-12T22:40:36Z",
+      "comments": [
+        {
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think this can be closed now",
+          "createdAt": "2025-06-12T22:11:39Z",
+          "updatedAt": "2025-06-12T22:11:39Z"
+        }
+      ]
     },
     {
       "number": 11,
@@ -126,9 +150,17 @@
       "labels": [],
       "body": "We may want to clarify on the need to do atomic validation (i.e., if either cert validation fails, authentication fails).",
       "createdAt": "2025-06-10T09:13:58Z",
-      "updatedAt": "2025-06-10T09:13:58Z",
+      "updatedAt": "2025-06-12T22:11:14Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think this is addressed in the following sentence from current text:\n\n> Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. \n\nWould you like to expand it or make it stronger?",
+          "createdAt": "2025-06-12T22:11:14Z",
+          "updatedAt": "2025-06-12T22:11:14Z"
+        }
+      ]
     },
     {
       "number": 12,
@@ -142,7 +174,65 @@
       "labels": [],
       "body": " we may want to clarify on how clients should behave if one of the certificates is revoked ?",
       "createdAt": "2025-06-10T09:25:56Z",
-      "updatedAt": "2025-06-10T09:25:56Z",
+      "updatedAt": "2025-06-12T22:10:25Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The current wording is\n\n> Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status.\n\nDo you want to expand or strengthen it?",
+          "createdAt": "2025-06-12T22:09:59Z",
+          "updatedAt": "2025-06-12T22:10:25Z"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "I_kwDOOsIF4s67Yw6V",
+      "title": "Mention interaction with Certificate_types",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/20",
+      "state": "OPEN",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We believe that you cannot negotiate multiple certificate_types, so both certificates would be required to be of the same type. We should add text to make this clear.",
+      "createdAt": "2025-06-13T14:50:13Z",
+      "updatedAt": "2025-06-13T14:50:13Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 21,
+      "id": "I_kwDOOsIF4s67Y3Vx",
+      "title": "How does this interact with the Recommended Algorithms list?",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/21",
+      "state": "OPEN",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Specifically the Recommended column of the TLS Cipher Suites registry:\n\nhttps://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4\n\nWe need to be careful that this document interacts gracefully with that registry and does not make it more difficult for the maintainers of that registry.",
+      "createdAt": "2025-06-13T14:58:56Z",
+      "updatedAt": "2025-06-13T14:58:56Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 22,
+      "id": "I_kwDOOsIF4s67Y5NO",
+      "title": "Security Considerations needs some analysis of Hybrid Non-Separability properties",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/22",
+      "state": "OPEN",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "ounsworth"
+      ],
+      "labels": [],
+      "body": "Write some text that classifies this scheme according to the various hybrid taxonomies; for example [draft-ietf-pquip-pqt-hybrid-terminology] and [ietf-pquip-hybrid-signature-spectrums]\n\nI volunteer to write this.",
+      "createdAt": "2025-06-13T15:01:16Z",
+      "updatedAt": "2025-06-13T15:01:16Z",
       "closedAt": null,
       "comments": []
     }
@@ -153,25 +243,33 @@
       "id": "PR_kwDOOsIF4s6X9V0A",
       "title": "Updated draft to use Exported Authenticators",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/1",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "tireddy2",
-      "authorAssociation": "NONE",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-05-28T12:46:46Z",
-      "updatedAt": "2025-05-28T12:46:47Z",
+      "updatedAt": "2025-06-13T08:06:54Z",
       "baseRepository": "hannestschofenig/tls-dual-certs",
       "baseRefName": "main",
       "baseRefOid": "4563f84c145b0739658a1d56bdaf7402e5b85aa0",
       "headRepository": "tireddy2/tls-dual-certs",
       "headRefName": "main",
       "headRefOid": "d3938a241be4073c802be34d28860ccf37f6c201",
-      "closedAt": null,
+      "closedAt": "2025-06-13T08:06:54Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I suggest we close this for now",
+          "createdAt": "2025-06-12T22:48:54Z",
+          "updatedAt": "2025-06-12T22:48:54Z"
+        }
+      ],
       "reviews": []
     },
     {
@@ -498,6 +596,292 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOOsIF4s6aStKw",
+      "title": "Update requirements based on Tiru's comments",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/14",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Removed reference to attested TLS and replaced \"Support\" with more vague \"Future extendability\"",
+      "createdAt": "2025-06-12T22:08:09Z",
+      "updatedAt": "2025-06-13T14:58:35Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a21e49c2bb462ce4689c3a14f1c5967564a7588c",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "main",
+      "headRefOid": "4a210913903f2a0ad081711405e613a72f893ff0",
+      "closedAt": "2025-06-13T14:58:35Z",
+      "mergedAt": "2025-06-13T14:58:35Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "7e2b17b72c8e957d4e25148c4e11e46712544130"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6uNuI6",
+          "commit": {
+            "abbreviatedOid": "4a21091"
+          },
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-12T22:46:22Z",
+          "updatedAt": "2025-06-12T22:46:22Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6uRXvv",
+          "commit": {
+            "abbreviatedOid": "4a21091"
+          },
+          "author": "tireddy2",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-13T08:06:34Z",
+          "updatedAt": "2025-06-13T08:06:34Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDOOsIF4s6aSwVB",
+      "title": "Remove irrelevant reference to Exported Authenticators from scope",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/15",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses https://github.com/hannestschofenig/tls-dual-certs/issues/7",
+      "createdAt": "2025-06-12T22:17:50Z",
+      "updatedAt": "2025-06-13T14:58:46Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a21e49c2bb462ce4689c3a14f1c5967564a7588c",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "proposal",
+      "headRefOid": "667f51c35a8b1d8201c2b23fa0002ea5206333cb",
+      "closedAt": "2025-06-13T14:58:46Z",
+      "mergedAt": "2025-06-13T14:58:46Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "008ed83d501069d4451448fe67298168816b3447"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6uNtgg",
+          "commit": {
+            "abbreviatedOid": "667f51c"
+          },
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-12T22:44:58Z",
+          "updatedAt": "2025-06-12T22:44:58Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "PR_kwDOOsIF4s6aS0Bu",
+      "title": "Minor updates to references",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/16",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Added ECDSA and ML-DSA informative references. Updated reference to TLS",
+      "createdAt": "2025-06-12T22:30:19Z",
+      "updatedAt": "2025-06-13T14:58:58Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a21e49c2bb462ce4689c3a14f1c5967564a7588c",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "references",
+      "headRefOid": "01f452f8bebb1cbbd03dda75e934dc3fff6ced3f",
+      "closedAt": "2025-06-13T14:58:58Z",
+      "mergedAt": "2025-06-13T14:58:58Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "e0bca6091cc65daa9c455559dfaf024e25f9c708"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6uNsvj",
+          "commit": {
+            "abbreviatedOid": "01f452f"
+          },
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-12T22:44:00Z",
+          "updatedAt": "2025-06-12T22:44:00Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "PR_kwDOOsIF4s6aS5NS",
+      "title": "Updated CertificateEntry diagram and clarified delimiter encoding",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/17",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Perhaps there is a better way to express updated CertificateEntry structure, but at least this one should be correct.",
+      "createdAt": "2025-06-12T22:47:51Z",
+      "updatedAt": "2025-06-13T14:59:08Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a21e49c2bb462ce4689c3a14f1c5967564a7588c",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "delimiter",
+      "headRefOid": "d0f65c4f564c6866252f3ccedf456f110768d7eb",
+      "closedAt": "2025-06-13T14:59:08Z",
+      "mergedAt": "2025-06-13T14:59:08Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "5bf4d9bd04f8dc617284a255ad62aea9c66e4a43"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 18,
+      "id": "PR_kwDOOsIF4s6aTIGE",
+      "title": "Added Client-Driven Authentication Requirements section",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/18",
+      "state": "CLOSED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This describes how this specification is supposed to be applied in practice",
+      "createdAt": "2025-06-12T23:44:09Z",
+      "updatedAt": "2025-06-13T14:59:51Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a21e49c2bb462ce4689c3a14f1c5967564a7588c",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "clientauthentication",
+      "headRefOid": "0ba38bf4a73fecbef1ef5a3fefd8ab23cbfb3ff4",
+      "closedAt": "2025-06-13T14:59:51Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Closing this one for now. Will revisit this topic after removing the flag as discussed",
+          "createdAt": "2025-06-13T14:59:51Z",
+          "updatedAt": "2025-06-13T14:59:51Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 19,
+      "id": "PR_kwDOOsIF4s6aXjzA",
+      "title": "Updates to the draft",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/19",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-13T10:38:05Z",
+      "updatedAt": "2025-06-13T15:01:08Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "a21e49c2bb462ce4689c3a14f1c5967564a7588c",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "tireddy2-patch-1",
+      "headRefOid": "ddb0b112ea088012befe0235077ab5a088403d31",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6uVMY8",
+          "commit": {
+            "abbreviatedOid": "eb02e2b"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2025-06-13T13:21:04Z",
+          "updatedAt": "2025-06-13T13:26:20Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "```suggestion\r\nTo mitigate these impacts, deployments can apply certificate chain optimization techniques, such as those described in {{Section 6.1 of ?PQ-RECOMMEND=I-D.reddy-uta-pqc-app}}, to minimize transmission overhead and improve handshake robustness.\r\n```",
+              "createdAt": "2025-06-13T13:21:04Z",
+              "updatedAt": "2025-06-13T13:26:20Z"
+            },
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\r\nThe context string is used as input to the data over which the signature is computed, consistent with the `CertificateVerify` construction defined in {{Section 4.4.3 of TLS}}. The first signature uses the same context string as in the TLS 1.3 specification:\r\n```",
+              "createdAt": "2025-06-13T13:22:21Z",
+              "updatedAt": "2025-06-13T13:26:20Z"
+            },
+            {
+              "originalPosition": 33,
+              "body": "I am not sure if I agree with this addition. Let's keep applicability to its own scope section. I hope WG will chime in here.",
+              "createdAt": "2025-06-13T13:23:41Z",
+              "updatedAt": "2025-06-13T13:26:20Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "```suggestion\r\nCertificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. Operators MUST ensure that revocation checking, such as using OCSP or CRLs, is consistently applied to both chains to prevent reliance on revoked credentials.\r\n```\r\n\r\nI suppose MUST is appropriate here.\r\n\r\nI suggest dropping roots part here as in practical cases PQ and classical roots are very likely to be distinct.",
+              "createdAt": "2025-06-13T13:25:51Z",
+              "updatedAt": "2025-06-13T13:26:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6uWi9N",
+          "commit": {
+            "abbreviatedOid": "eb02e2b"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-13T15:01:08Z",
+          "updatedAt": "2025-06-13T15:01:08Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "As discussed on the call today, please remove this addition - it will be addressed by removing the `dual_certificate_required` flag.",
+              "createdAt": "2025-06-13T15:01:08Z",
+              "updatedAt": "2025-06-13T15:01:08Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
