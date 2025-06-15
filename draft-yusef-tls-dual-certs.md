@@ -277,7 +277,7 @@ Distinct context strings are REQUIRED for the two signatures to prevent cross-pr
 
 ## Dual Certificate Policy Enforcement
 
-When the `dual_certificate_required` flag is set by a peer, failure to provide two certificate chains and two corresponding signatures MUST result in handshake failure. This enforcement MUST NOT be bypassed by falling back to a single-certificate configuration. Implementations MUST emit a `dual_certificate_required` alert when this requirement is violated. 
+When the `dual_certificate_required` flag is set by a peer, failure to provide two certificate chains and two corresponding signatures MUST result in handshake failure. This enforcement MUST NOT be bypassed by falling back to a single-certificate configuration. Implementations MUST emit a `dual_certificate_required` alert when this requirement is violated.
 
 ## Cryptographic Independence
 
