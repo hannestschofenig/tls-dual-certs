@@ -6,7 +6,7 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 15 December 2025                                   M. Ounsworth
+Expires: 17 December 2025                                   M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
@@ -14,7 +14,7 @@ Expires: 15 December 2025                                   M. Ounsworth
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                            13 June 2025
+                                                            15 June 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 December 2025.
+   This Internet-Draft will expire on 17 December 2025.
 
 Copyright Notice
 
@@ -90,21 +90,22 @@ Table of Contents
        5.3.1.  Delimiter
      5.4.  CertificateVerify Message
        5.4.1.  Context Strings
-   6.  Security Considerations
-     6.1.  Signature Association and Parsing Robustness
-     6.2.  Signature Validation Requirements
-     6.3.  Side-Channel Resistance
-     6.4.  Dual Certificate Policy Enforcement
-     6.5.  Cryptographic Independence
-     6.6.  Certificate Usage and Trust
-   7.  IANA Considerations
-     7.1.  TLS extension
-     7.2.  TLS flag
-     7.3.  TLS alert
-   8.  Acknowledgments
-   9.  References
-     9.1.  Normative References
-     9.2.  Informative References
+   6.  Performance Considerations
+   7.  Security Considerations
+     7.1.  Signature Association and Parsing Robustness
+     7.2.  Signature Validation Requirements
+     7.3.  Side-Channel Resistance
+     7.4.  Dual Certificate Policy Enforcement
+     7.5.  Cryptographic Independence
+     7.6.  Certificate Usage and Trust
+   8.  IANA Considerations
+     8.1.  TLS extension
+     8.2.  TLS flag
+     8.3.  TLS alert
+   9.  Acknowledgments
+   10. References
+     10.1.  Normative References
+     10.2.  Informative References
    Appendix A.  Informal Requirements for Dual TLS Certificate Support
      A.1.  General TLS Semantics
        A.1.1.  Protocol Flow Consistency
@@ -425,13 +426,17 @@ Table of Contents
 
 5.4.1.  Context Strings
 
-   First signature context string is matching TLS 1.3 specification:
+   The context string is used as input to the data over which the
+   signature is computed, consistent with the CertificateVerify
+   construction defined in Section 4.4.3 of [TLS].  The first signature
+   uses the same context string as in the TLS 1.3 specification:
 
    *  for a server context string is "TLS 1.3, server CertificateVerify"
 
    *  for a client context string is "TLS 1.3, client CertificateVerify"
 
-   Second signature context string is defined as follows:
+   The second signature uses a distinct context string to bind it to the
+   secondary certificate:
 
    *  for a server, secondary context string is "TLS 1.3, server
       secondary CertificateVerify"
@@ -446,9 +451,23 @@ Table of Contents
    messages carried in Exported Authenticators with second signature
    using "Secondary Exported Authenticator" as the context string.
 
-6.  Security Considerations
+6.  Performance Considerations
 
-6.1.  Signature Association and Parsing Robustness
+   The use of dual certificates increases the size of individual
+   certificates, certificate chains, and associated signatures, which
+   can result in significantly larger TLS handshake messages.  These
+   larger payloads may cause packet fragmentation, retransmissions, and
+   handshake delays, especially in constrained or lossy network
+   environments.
+
+   To mitigate these impacts, deployments can apply certificate chain
+   optimization techniques, such as those described in Section 6.1 of
+   [PQ-RECOMMEND], to minimize transmission overhead and improve
+   handshake robustness.
+
+7.  Security Considerations
+
+7.1.  Signature Association and Parsing Robustness
 
    Implementations MUST strictly associate each CertificateVerify
    signature with the corresponding certificate chain, based on their
@@ -461,7 +480,7 @@ Table of Contents
    one zero-length delimiter, or that place the delimiter as the first
    or last entry in the certificate list.
 
-6.2.  Signature Validation Requirements
+7.2.  Signature Validation Requirements
 
    Both signatures in the CertificateVerify message MUST be validated
    successfully and correspond to their respective certificate chains.
@@ -470,7 +489,7 @@ Table of Contents
    certificate verification undermines the dual-authentication model and
    introduces downgrade risks.
 
-6.3.  Side-Channel Resistance
+7.3.  Side-Channel Resistance
 
    Since both CertificateVerify operations involve signing the
    transcript using different cryptographic primitives, care MUST be
@@ -482,7 +501,7 @@ Table of Contents
    Distinct context strings are REQUIRED for the two signatures to
    prevent cross-protocol misuse or collision attacks.
 
-6.4.  Dual Certificate Policy Enforcement
+7.4.  Dual Certificate Policy Enforcement
 
    When the dual_certificate_required flag is set by a peer, failure to
    provide two certificate chains and two corresponding signatures MUST
@@ -491,27 +510,27 @@ Table of Contents
    Implementations MUST emit a dual_certificate_required alert when this
    requirement is violated.
 
-6.5.  Cryptographic Independence
+7.5.  Cryptographic Independence
 
    To achieve the intended security guarantees, implementers and
    deployment operators MUST ensure that the two certificate chains rely
    on cryptographically independent primitives.
 
-6.6.  Certificate Usage and Trust
+7.6.  Certificate Usage and Trust
 
    Certificate chains must be validated independently, including trust
    anchors, certificate usage constraints, expiration, and revocation
-   status.  Operators should consider whether the two chains are
-   validated against the same or distinct trust roots, and what
-   implications this has for overall trust decisions.
+   status.  Operators MUST ensure that revocation checking, such as
+   using OCSP or CRLs, is consistently applied to both chains to prevent
+   reliance on revoked credentials.
 
-7.  IANA Considerations
+8.  IANA Considerations
 
    This specification registers the secondary_signature_algorithms TLS
    extension, dual_certificate_required TLS Flag and
    dual_certificate_required TLS alert.
 
-7.1.  TLS extension
+8.1.  TLS extension
 
    IANA is requested to assign a new value from the TLS ExtensionType
    Values registry:
@@ -526,7 +545,7 @@ Table of Contents
 
    *  Reference: [[This document]]
 
-7.2.  TLS flag
+8.2.  TLS flag
 
    IANA is requested to add the following entry to the "TLS Flags"
    extension registry:
@@ -541,7 +560,7 @@ Table of Contents
 
    *  Reference: [[This document]]
 
-7.3.  TLS alert
+8.3.  TLS alert
 
    IANA is requested to add the following entry to the "TLS Alerts"
    registry:
@@ -556,13 +575,13 @@ Table of Contents
 
    *  Comment: None
 
-8.  Acknowledgments
+9.  Acknowledgments
 
    We would like to thank ... for their comments.
 
-9.  References
+10.  References
 
-9.1.  Normative References
+10.1.  Normative References
 
    [EXPORTED-AUTH]
               Sullivan, N., "Exported Authenticators in TLS", RFC 9261,
@@ -590,7 +609,7 @@ Table of Contents
               March 2025, <https://datatracker.ietf.org/doc/html/draft-
               ietf-tls-tlsflags-15>.
 
-9.2.  Informative References
+10.2.  Informative References
 
    [ECDSA]    "Digital Signature Standard (DSS)", National Institute of
               Standards and Technology (U.S.),
@@ -602,6 +621,13 @@ Table of Contents
               ietf-tls-mldsa-00, 16 May 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
               mldsa-00>.
+
+   [PQ-RECOMMEND]
+              Reddy.K, T. and H. Tschofenig, "Post-Quantum Cryptography
+              Recommendations for TLS-based Applications", Work in
+              Progress, Internet-Draft, draft-reddy-uta-pqc-app-07, 25
+              February 2025, <https://datatracker.ietf.org/doc/html/
+              draft-reddy-uta-pqc-app-07>.
 
 Appendix A.  Informal Requirements for Dual TLS Certificate Support
 
