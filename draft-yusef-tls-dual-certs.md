@@ -65,7 +65,7 @@ updates: RFC9261, RFC8446
 
 --- abstract
 
-This document extends the TLS 1.3 authentication mechanism to allow the use of two certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.
+This document extends the TLS 1.3 authentication mechanism to allow the use of two certificate chains to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.
 
 --- middle
 
@@ -96,9 +96,9 @@ The proposed mechanism is fully backward compatible: traditional certificates an
 
 # Design Overview
 
-This document introduces a mechanism to enable dual-certificate authentication in TLS 1.3. The primary objective is to allow each TLS peer to present two certificate chains—typically a traditional cryptographic chain and a post-quantum (PQ) chain—thereby requiring an attacker to break both authentication algorithms to impersonate a peer.
+This document introduces a mechanism to enable dual-certificate authentication in TLS 1.3. The primary objective is to allow each TLS peer to present two certificate chains requiring an attacker to break both authentication algorithms to impersonate a peer. Typically one of the certificate chains is using a traditional cryptographic algorithms while the second leverages post-quantum (PQ) cryptography.
 
-The design builds on existing TLS 1.3 structures and introduces minimal protocol changes. It is applicable to both client and server authentication and is compatible with the Exported Authenticators mechanism.
+The design builds on existing TLS 1.3 structures and introduces minimal protocol changes. It is applicable to both client and server authentication and is compatible with the Exported Authenticators mechanism {{!EXPORTED-AUTH=RFC9261}}.
 
 ## Signature Algorithm Negotiation
 
@@ -109,7 +109,7 @@ A new extension, `secondary_signature_algorithms`, is defined to negotiate suppo
 
 This allows both endpoints to signal independently two distinct algorithms for dual authentication.
 
-The `secondary_signature_algorithms` can also be used in `extensions` of `CertificateRequest` and `ClientCertificateRequest` structures of Authenticator Request message of Exported Authenticators as defined in {{Section 4 of !EXPORTED-AUTH=RFC9261}}.
+The `secondary_signature_algorithms` can also be used in `extensions` of `CertificateRequest` and `ClientCertificateRequest` structures of Authenticator Request message of Exported Authenticators as defined in {{Section 4 of EXPORTED-AUTH}}.
 
 ## Certificate Chain Encoding
 
@@ -117,7 +117,14 @@ TLS 1.3 defines the `Certificate` message to carry a list of certificate entries
 
 A zero-length certificate is defined as a `CertificateEntry` with an empty `cert_data` field and omitted `extensions` field. TLS 1.3 prohibits the use of empty certificate entries, making this delimiter unambiguous. Implementations MUST treat all entries before the zero-length delimiter as the first certificate chain (typically classic), and all entries after it as the second certificate chain (typically post-quantum).
 
-This encoding applies equally to the `CompressedCertificate` message and to the `Certificate` message of Exported Authenticators as defined in {{Section 5.2.1 of EXPORTED-AUTH}}.
+This encoding applies equally to the `CompressedCertificate` message defined in {{?COMPRESS-CERT=RFC8879}} and to the `Certificate` message of Exported Authenticators as defined in {{Section 5.2.1 of EXPORTED-AUTH}}.
+
+Since TLS 1.3 supports only a single certificate type in each direction, both certificate chains MUST either contain X.509 certificates or certificates of type specified in:
+
+- `server_certificate_type` extension in a `EncryptedExtensions` message for Server certificates
+- `client_certificate_type` extension in a `EncryptedExtensions` message for Client certificates
+
+Note that according to {{Section 5.2.1 of EXPORTED-AUTH}} Exported Authenticators support only X.509 certificates.
 
 ## CertificateVerify Signatures
 
@@ -132,18 +139,9 @@ This encoding applies equally to the `CertificateVerify` message of Exported Aut
 
 The order of the signatures in the message MUST correspond to the order of the certificate chains in the Certificate message.
 
-## Enforcement Policy
-
-A new TLS flag, `dual_certificate_required`, is defined using the {{!TLS-FLAGS=I-D.ietf-tls-tlsflags}} extension. This flag may be set in either direction:
-
-- When set by the client in `ClientHello`, it indicates that the server MUST provide both certificate chains and both signatures.
-- When set by the server in `CertificateRequest`, it indicates that the client MUST do the same.
-
-If the flag is not set, the peer MAY choose to send either one or two certificate chains, depending on local policy and capabilities. This flexibility supports incremental deployment of dual-certificate authentication.
-
 # Protocol Changes
 
-This section defines the normative changes to TLS 1.3 required to support dual-certificate authentication. These changes extend existing handshake messages and introduce one new extension and one new TLS flag.
+This section defines the normative changes to TLS 1.3 required to support dual-certificate authentication. These changes extend existing handshake messages and introduce the new extension.
 
 ## `secondary_signature_algorithms` Extension
 
@@ -160,7 +158,7 @@ struct {
 ~~~~~~~~~~
 {: title="Contents of secondary_signature_algorithms extension"}
 
-Each `SignatureScheme` is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry.
+Each `SignatureScheme` is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry. `secondary_signature_algorithms` MUST NOT contain signature algorithms present in `signature_algorithms` or `signature_algorithms_cert` extensions. TLS endpoint observing such overlap between primary and secondary supported signature lists MUST terminate the connection with `illegal_parameter` alert.
 
 ### Use in Handshake and Exported Authenticator Messages
 
@@ -170,23 +168,9 @@ This extension MUST NOT be used unless the `signature_algorithms` extension is a
 
 If the extension is present in `ClientHello`, `CertificateRequest` or Authenticator Request, the peer MAY respond with a dual-certificate authentication structure. If the extension is absent, the peer MUST NOT send a second certificate chain or a second signature.
 
-The presence of this extension alone does not mandate dual authentication; enforcement is controlled by the `dual_certificate_required` TLS flag.
+The presence of this extension alone does not mandate dual authentication. It is up to the peer to determine whether one or two certificate chains and signatures are required based on local policy and validation logic.
 
-## `dual_certificate_required` TLS Flag
-
-The dual_certificate_required flag is conveyed using the {{TLS-FLAGS}} extension.
-
-### Semantics
-
-When set in `ClientHello`, it indicates that the client requires the server to present both certificate chains and both signatures. When set in `CertificateRequest`, it indicates that the server requires the client to present both certificate chains and both signatures if the client is authenticating itself during TLS handshake.
-
-If the flag is set and the peer provides only one chain or one signature, the handshake MUST be aborted with an `dual_certificate_required` alert.
-
-This flag MAY be included in TLS flags extension of Authenticator Request message of Exported Authenticators.
-
-If the flag is not set, the peer MAY provide either one or two certificate chains, depending on local policy and negotiated capabilities.
-
-## Certificate Message Encoding
+## Certificate Message Encoding {#certificate}
 
 TLS 1.3 defines the `Certificate` message as follows:
 
@@ -225,13 +209,13 @@ struct {
 ~~~~~~~~~~
 {: title="Updated CertificateEntry structure definition"}
 
-All entries before the delimiter are treated as the first certificate chain, all entries after the delimiter are treated as the second certificate chain.
+All entries before the delimiter are treated as the first certificate chain, all entries after the delimiter are treated as the second certificate chain. As specified in {{Section 4.4.2 of TLS}}, end-entity certificate MUST be the first in both chains.
 
 A peer receiving this structure MUST validate each chain independently according to its corresponding signature algorithm. The end-entity certificate MUST be the first entry in both the first and second certificate chains. The first certificate chain MUST contain certificates whose public key is compatible with one of the algorithms listed in the `signature_algorithms` or `signature_algorithms_cert` extension, if present. The second certificate chain MUST contain certificates whose public key is compatible with one of the algorithms listed in the `secondary_signature_algorithms` extension.
 
 This encoding applies equally to the `CompressedCertificate` message and to `Certificate` message of Exported Authenticators.
 
-## CertificateVerify Message
+## CertificateVerify Message {#certificate-verify}
 
 The `CertificateVerify` message is extended to carry two independent signatures. Its modified structure is as follows:
 
@@ -263,11 +247,101 @@ Implementations MUST verify both signatures and MUST associate each with its cor
 
 This dual-signature structure applies equally to `CertificateVerify` messages carried in Exported Authenticators with second signature using "Secondary Exported Authenticator" as the context string.
 
+## Dual Certificate Policy Enforcement
+
+Policy enforcement regarding the use of dual certificates is implementation-defined and driven by the authenticating peer. When dual certificate authentication is required by local policy, such as during high-assurance sessions or post-quantum transition periods, the authenticating endpoint MUST abort a handshake where only one signature or one certificate chain is present with an `dual_certificate_required` alert. Implementations MUST ensure that both certificates and both signatures are processed together and MUST NOT accept fallback to single-certificate authentication when dual-authentication is expected.
+
+A single composite certificate chain and signature such as defined by {{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}} MAY be an acceptable alternative during post-quantum transition period.
+
 # Performance Considerations
 
 The use of dual certificates increases the size of individual certificates, certificate chains, and associated signatures, which can result in significantly larger TLS handshake messages. These larger payloads may cause packet fragmentation, retransmissions, and handshake delays, especially in constrained or lossy network environments.
 
 To mitigate these impacts, deployments can apply certificate chain optimization techniques, such as those described in {{Section 6.1 of ?PQ-RECOMMEND=I-D.reddy-uta-pqc-app}}, to minimize transmission overhead and improve handshake robustness.
+
+# Client-Driven Authentication Requirements
+
+The scenarios in this section describe server authentication behavior based on client policy. Each case reflects a different client capability and authentication policy, based on how the client populates the `signature_algorithms`, `signature_algorithms_cert`, and `secondary_signature_algorithms` extensions.
+
+For client authentication, the same principles apply with roles reversed: the server drives authentication requirements by sending a `CertificateRequest` message that includes appropriate extensions.
+
+## Type 1: Classic-Only Clients
+
+Client supports only traditional signature algorithms (e.g., RSA, ECDSA).
+
+Client behavior:
+
+- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Does not include `secondary_signature_algorithms`.
+
+To satisfy this client, the server MUST send a single certificate chain with compatible classical algorithms and include a single signature in CertificateVerify.
+
+## Type 2: Dual-Compatible, PQ Optional (Classic Primary)
+
+Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.
+
+Client behavior:
+
+- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported PQ algorithms in `secondary_signature_algorithms`.
+
+To satisfy this client, the server MUST either:
+
+- Provide a single certificate chain with compatible classical algorithms and include a single signature in CertificateVerify
+- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in CertificateVerify as described in {{certificate-verify}}
+
+## Type 3: Strict Dual
+
+Client requires both classical and PQ authentication to be performed simultaneously.
+
+Client behavior:
+
+- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported PQ algorithms in `secondary_signature_algorithms`.
+
+To satisfy this client, the server MUST provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in CertificateVerify as described in {{certificate-verify}}
+
+## Type 4: Dual-Compatible, Classic Optional (PQ Primary)
+
+Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.
+
+Client behavior:
+
+- Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported classical algorithms in `secondary_signature_algorithms`.
+
+To satisfy this client, the server MUST either:
+
+- Provide a single certificate chain with compatible PQ algorithms and include a single signature in CertificateVerify
+- Provide a PQ certificate chain followed by a classical certificate chain as described in {{certificate}} and two signatures in CertificateVerify as described in {{certificate-verify}}
+
+## Type 5: PQ-Only Clients
+
+Client supports only PQ signature algorithms (e.g., ML-DSA).
+
+Client behavior:
+
+- Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Does not include `secondary_signature_algorithms`.
+
+To satisfy this client, the server MUST send a single certificate chain with compatible PQ algorithms and include a single signature in CertificateVerify.
+
+## Type 6: Flexible
+
+Client supports either classical or PQ authentication and accepts any supported certificate type without requiring both simultaneously.
+
+Client behavior:
+
+- Includes supported classical and PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Does not include `secondary_signature_algorithms`.
+
+To satisfy this client, the server MUST send a single certificate chain with compatible classical or PQ algorithms and include a single signature in CertificateVerify.
+
+## Compatibility with composite certificates
+
+Clients and servers may choose to support composite certificate schemes, such as those defined in {{TLS-COMPOSITE-MLDSA}}. In these schemes, a single certificate contains a composite public keys, and the associated signature proves knowledge of private keys of all components.
+
+If a composite signature algorithm appears in the `signature_algorithms` extension, it can fulfill the client's requirements for both classical and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.
 
 #  Security Considerations
 
@@ -287,10 +361,6 @@ Since both `CertificateVerify` operations involve signing the transcript using d
 
 Distinct context strings are REQUIRED for the two signatures to prevent cross-protocol misuse or collision attacks.
 
-## Dual Certificate Policy Enforcement
-
-When the `dual_certificate_required` flag is set by a peer, failure to provide two certificate chains and two corresponding signatures MUST result in handshake failure. This enforcement MUST NOT be bypassed by falling back to a single-certificate configuration. Implementations MUST emit a `dual_certificate_required` alert when this requirement is violated.
-
 ## Cryptographic Independence
 
 To achieve the intended security guarantees, implementers and deployment operators MUST ensure that the two certificate chains rely on cryptographically independent primitives.
@@ -301,7 +371,7 @@ Certificate chains must be validated independently, including trust anchors, cer
 
 #  IANA Considerations
 
-This specification registers the `secondary_signature_algorithms` TLS extension, `dual_certificate_required` TLS Flag and `dual_certificate_required` TLS alert.
+This specification registers the `secondary_signature_algorithms` TLS extension and `dual_certificate_required` TLS alert.
 
 ## TLS extension
 
@@ -310,16 +380,6 @@ IANA is requested to assign a new value from the TLS ExtensionType Values regist
  *  Extension Name: secondary_signature_algorithms
  *  TLS 1.3: CH, CR
  *  DTLS-Only: N
- *  Recommended: Y
- *  Reference: [[This document]]
-
-## TLS flag
-
-IANA is requested to add the following entry to the "TLS Flags" extension registry:
-
- *  Value: TBD
- *  Flag Name: dual_certificate_required
- *  Messages: CH, CR
  *  Recommended: Y
  *  Reference: [[This document]]
 
