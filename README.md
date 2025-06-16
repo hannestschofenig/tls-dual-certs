@@ -4,10 +4,10 @@
 
 This is the working area for the individual Internet-Draft, "Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3".
 
-* [Editor's Copy](https://hannestschofenig.github.io/tls-dual-certs/#go.draft-yusef-tls-dual-certs.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-yusef-tls-dual-certs)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-yusef-tls-dual-certs)
-* [Compare Editor's Copy to Individual Draft](https://hannestschofenig.github.io/tls-dual-certs/#go.draft-yusef-tls-dual-certs.diff)
+* [Editor's Copy](https://hannestschofenig.github.io/tls-dual-certs/#go.draft-yusef-tls-pqt-dual-certs.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-yusef-tls-pqt-dual-certs)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-yusef-tls-pqt-dual-certs)
+* [Compare Editor's Copy to Individual Draft](https://hannestschofenig.github.io/tls-dual-certs/#go.draft-yusef-pqt-tls-dual-certs.diff)
 
 
 ## Contributing
