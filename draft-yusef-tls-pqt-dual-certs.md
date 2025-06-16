@@ -296,7 +296,7 @@ Client requires both classical and PQ authentication to be performed simultaneou
 Client behavior:
 
 - Includes an empty list in `signature_algorithms`.
-- Includes supported classical algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms`.
+- Includes supported classical algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `pq_signature_algorithms` list of `dual_signature_algorithms`.
 
 To satisfy this client, the server MUST provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
 
@@ -307,7 +307,7 @@ Client supports both classical and PQ authentication. It allows the server to se
 Client behavior:
 
 - Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
-- Includes supported classical algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms`.
+- Includes supported classical algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `pq_signature_algorithms` list of `dual_signature_algorithms`.
 
 To satisfy this client, the server MUST either:
 
