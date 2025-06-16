@@ -133,7 +133,7 @@ The `CertificateVerify` message is extended to include two digital signatures:
 1. One computed using a signature algorithm selected from the first list of the `dual_signature_algorithms` extension.
 1. One computed using a signature algorithm selected from the second list of the `dual_signature_algorithms` extension.
 
-Each signature is computed over the transcript hash as specified in TLS 1.3, but with distinct context strings to domain-separate the two operations. This approach prevents attackers from comparing timing characteristics or reusing one signature in place of the other.
+Each signature is computed over the transcript hash as specified in TLS 1.3, but with distinct context strings to domain-separate the two operations.
 
 This encoding applies equally to the `CertificateVerify` message of Exported Authenticators as defined in {{Section 5.2.2 of EXPORTED-AUTH}}.
 
@@ -334,7 +334,7 @@ Both signatures in the `CertificateVerify` message MUST be validated successfull
 
 ## Side-Channel Resistance
 
-Since both `CertificateVerify` operations involve signing the transcript using different cryptographic primitives, care MUST be taken to avoid leaking timing or other side-channel information. Implementers MUST ensure constant-time execution and avoid conditional branching that could reveal whether one or both signatures are present or valid.
+Since both `CertificateVerify` operations involve signing the transcript using different cryptographic primitives, care MUST be taken to avoid leaking side-channel information. Implementers MUST ensure constant-time execution and avoid conditional branching that could reveal whether one or both signatures are present or valid.
 
 Distinct context strings are REQUIRED for the two signatures to prevent cross-protocol misuse or collision attacks.
 
