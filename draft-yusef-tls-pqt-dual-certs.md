@@ -221,9 +221,9 @@ The `CertificateVerify` message is extended to carry two independent signatures.
 ~~~~~~~~~~ ascii-art
 struct {
     SignatureScheme first_algorithm;
-    opaque classic_signature<0..2^16-1>;
+    opaque first_signature<0..2^16-1>;
     SignatureScheme second_algorithm;
-    opaque pq_signature<0..2^16-1>;
+    opaque second_signature<0..2^16-1>;
 } CertificateVerify;
 ~~~~~~~~~~
 {: title="CertificateVerify message"}
