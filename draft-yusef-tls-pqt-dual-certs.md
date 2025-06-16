@@ -334,7 +334,7 @@ Both signatures in the `CertificateVerify` message MUST be validated successfull
 
 ## Side-Channel Resistance
 
-Since both `CertificateVerify` operations involve signing the transcript using different cryptographic primitives, care MUST be taken to avoid side-channel information. Implementers MUST ensure constant-time execution and avoid conditional branching that could reveal whether one or both signatures are present or valid.
+Since both `CertificateVerify` operations involve signing the transcript using different cryptographic primitives, care MUST be taken to avoid leaking side-channel information. Implementers MUST ensure constant-time execution and avoid conditional branching that could reveal whether one or both signatures are present or valid.
 
 Distinct context strings are REQUIRED for the two signatures to prevent cross-protocol misuse or collision attacks.
 
