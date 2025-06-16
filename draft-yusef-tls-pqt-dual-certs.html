@@ -1457,7 +1457,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         </ol>
 <p id="section-4.3-3">Each signature is computed over the transcript hash as specified in TLS 1.3, but with distinct context strings to domain-separate the two operations. This approach prevents attackers from comparing timing characteristics or reusing one signature in place of the other.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 <p id="section-4.3-4">This encoding applies equally to the <code>CertificateVerify</code> message of Exported Authenticators as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5.2.2" class="relref">Section 5.2.2</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
-<p id="section-4.3-5">The order of the signatures in the message <span class="bcp14">MUST</span> correspond to the order of the certificate chains in the Certificate message: the first signature <span class="bcp14">MUST</span> correspond to a classical algorithm from <code>classical_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, while the second signature <span class="bcp14">MUST</span> correspond to a PQ algorithm from <code>pq_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+<p id="section-4.3-5">The order of the signatures in the message <span class="bcp14">MUST</span> correspond to the order of the certificate chains in the Certificate message: the first signature <span class="bcp14">MUST</span> correspond to a classical algorithm from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, while the second signature <span class="bcp14">MUST</span> correspond to a PQ algorithm from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1484,15 +1484,15 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
             <div class="alignLeft art-ascii-art art-text artwork" id="section-5.1.1-2.1">
 <pre>
 struct {
-    SignatureScheme classical_signature_algorithms&lt;2..2^16-2&gt;;
-    SignatureScheme pq_signature_algorithms&lt;2..2^16-2&gt;;
+    SignatureScheme first_signature_algorithms&lt;2..2^16-2&gt;;
+    SignatureScheme second_signature_algorithms&lt;2..2^16-2&gt;;
 } DualSignatureSchemeList;
 </pre>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-contents-of-dual_signature_" class="selfRef">Contents of dual_signature_algorithms extension</a>
             </figcaption></figure>
-<p id="section-5.1.1-3">SignatureScheme is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry. <code>classical_signature_algorithms</code> and <code>pq_signature_algorithms</code> list <span class="bcp14">MUST NOT</span> contain common elements. TLS endpoint observing such overlap between primary and secondary supported signature lists <span class="bcp14">MUST</span> terminate the connection with <code>illegal_parameter</code> alert.<a href="#section-5.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1.1-3">SignatureScheme is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry. <code>first_signature_algorithms</code> and <code>second_signature_algorithms</code> list <span class="bcp14">MUST NOT</span> contain common elements. TLS endpoint observing such overlap between primary and secondary supported signature lists <span class="bcp14">MUST</span> terminate the connection with <code>illegal_parameter</code> alert.<a href="#section-5.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="use-in-handshake-and-exported-authenticator-messages">
@@ -1556,8 +1556,8 @@ struct {
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-updated-certificateentry-st" class="selfRef">Updated CertificateEntry structure definition</a>
             </figcaption></figure>
-<p id="section-5.2.1-4">All entries before the delimiter are treated as the first certificate chain and <span class="bcp14">MUST</span> use classical algorithms from <code>classical_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, all entries after the delimiter are treated as the second certificate chain and <span class="bcp14">MUST</span> use PQ algorithms from <code>pq_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension. As specified in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>, end-entity certificate <span class="bcp14">MUST</span> be the first in both chains.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-5">A peer receiving this structure <span class="bcp14">MUST</span> validate each chain independently according to its corresponding signature algorithm. The end-entity certificate <span class="bcp14">MUST</span> be the first entry in both the first and second certificate chains. The first certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>classical_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. The second certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>pq_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-4">All entries before the delimiter are treated as the first certificate chain and <span class="bcp14">MUST</span> use classical algorithms from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, all entries after the delimiter are treated as the second certificate chain and <span class="bcp14">MUST</span> use PQ algorithms from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension. As specified in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>, end-entity certificate <span class="bcp14">MUST</span> be the first in both chains.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-5">A peer receiving this structure <span class="bcp14">MUST</span> validate each chain independently according to its corresponding signature algorithm. The end-entity certificate <span class="bcp14">MUST</span> be the first entry in both the first and second certificate chains. The first certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>first_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. The second certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>second_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.2.1-6">This encoding applies equally to the <code>CompressedCertificate</code> message and to <code>Certificate</code> message of Exported Authenticators.<a href="#section-5.2.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1670,7 +1670,7 @@ struct {
             <p id="section-7.2-3.1.1">Includes supported classical algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#section-7.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.2-3.2">
-            <p id="section-7.2-3.2.1">Includes supported classical algorithms in <code>classical_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>pq_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.2-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.2-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-7.2-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
@@ -1696,7 +1696,7 @@ struct {
             <p id="section-7.3-3.1.1">Includes an empty list in <code>signature_algorithms</code>.<a href="#section-7.3-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.3-3.2">
-            <p id="section-7.3-3.2.1">Includes supported classical algorithms in <code>classical_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>pq_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.3-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.3-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.3-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-7.3-4">To satisfy this client, the server <span class="bcp14">MUST</span> provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#section-7.3-4" class="pilcrow">¶</a></p>
@@ -1714,7 +1714,7 @@ struct {
             <p id="section-7.4-3.1.1">Includes supported PQ algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#section-7.4-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.4-3.2">
-            <p id="section-7.4-3.2.1">Includes supported classical algorithms in <code>classical_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>pq_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.4-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.4-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.4-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-7.4-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#section-7.4-4" class="pilcrow">¶</a></p>

@@ -284,9 +284,9 @@ Table of Contents
    The order of the signatures in the message MUST correspond to the
    order of the certificate chains in the Certificate message: the first
    signature MUST correspond to a classical algorithm from
-   classical_signature_algorithms list of dual_signature_algorithms
+   first_signature_algorithms list of dual_signature_algorithms
    extension, while the second signature MUST correspond to a PQ
-   algorithm from pq_signature_algorithms list of
+   algorithm from second_signature_algorithms list of
    dual_signature_algorithms extension.
 
 5.  Protocol Changes
@@ -306,15 +306,15 @@ Table of Contents
    The structure of the extension as follows:
 
    struct {
-       SignatureScheme classical_signature_algorithms<2..2^16-2>;
-       SignatureScheme pq_signature_algorithms<2..2^16-2>;
+       SignatureScheme first_signature_algorithms<2..2^16-2>;
+       SignatureScheme second_signature_algorithms<2..2^16-2>;
    } DualSignatureSchemeList;
 
          Figure 1: Contents of dual_signature_algorithms extension
 
    SignatureScheme is a 2-octet value identifying a supported signature
    algorithm as defined in TLS SignatureScheme IANA registry.
-   classical_signature_algorithms and pq_signature_algorithms list MUST
+   first_signature_algorithms and second_signature_algorithms list MUST
    NOT contain common elements.  TLS endpoint observing such overlap
    between primary and secondary supported signature lists MUST
    terminate the connection with illegal_parameter alert.
@@ -389,22 +389,22 @@ Table of Contents
 
    All entries before the delimiter are treated as the first certificate
    chain and MUST use classical algorithms from
-   classical_signature_algorithms list of dual_signature_algorithms
+   first_signature_algorithms list of dual_signature_algorithms
    extension, all entries after the delimiter are treated as the second
    certificate chain and MUST use PQ algorithms from
-   pq_signature_algorithms list of dual_signature_algorithms extension.
-   As specified in Section 4.4.2 of [TLS], end-entity certificate MUST
-   be the first in both chains.
+   second_signature_algorithms list of dual_signature_algorithms
+   extension.  As specified in Section 4.4.2 of [TLS], end-entity
+   certificate MUST be the first in both chains.
 
    A peer receiving this structure MUST validate each chain
    independently according to its corresponding signature algorithm.
    The end-entity certificate MUST be the first entry in both the first
    and second certificate chains.  The first certificate chain MUST
    contain certificates whose public key is compatible with one of the
-   algorithms listed in the classical_signature_algorithms section of
+   algorithms listed in the first_signature_algorithms section of
    dual_signature_algorithms extension.  The second certificate chain
    MUST contain certificates whose public key is compatible with one of
-   the algorithms listed in the pq_signature_algorithms section of
+   the algorithms listed in the second_signature_algorithms section of
    dual_signature_algorithms extension.
 
    This encoding applies equally to the CompressedCertificate message
@@ -525,8 +525,8 @@ Table of Contents
       and optionally signature_algorithms_cert.
 
    *  Includes supported classical algorithms in
-      classical_signature_algorithms list of dual_signature_algorithms
-      and supported PQ algorithms in pq_signature_algorithms list of
+      first_signature_algorithms list of dual_signature_algorithms and
+      supported PQ algorithms in second_signature_algorithms list of
       dual_signature_algorithms.
 
    To satisfy this client, the server MUST either:
@@ -548,8 +548,8 @@ Table of Contents
    *  Includes an empty list in signature_algorithms.
 
    *  Includes supported classical algorithms in
-      classical_signature_algorithms list of dual_signature_algorithms
-      and supported PQ algorithms in pq_signature_algorithms list of
+      first_signature_algorithms list of dual_signature_algorithms and
+      supported PQ algorithms in second_signature_algorithms list of
       dual_signature_algorithms.
 
    To satisfy this client, the server MUST provide a classical
@@ -568,8 +568,8 @@ Table of Contents
       optionally signature_algorithms_cert.
 
    *  Includes supported classical algorithms in
-      classical_signature_algorithms list of dual_signature_algorithms
-      and supported PQ algorithms in pq_signature_algorithms list of
+      first_signature_algorithms list of dual_signature_algorithms and
+      supported PQ algorithms in second_signature_algorithms list of
       dual_signature_algorithms.
 
    To satisfy this client, the server MUST either:
