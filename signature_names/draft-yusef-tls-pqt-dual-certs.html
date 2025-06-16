@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3</title>
+<meta content="Rifaat Shekh-Yusef" name="author">
+<meta content="Hannes Tschofenig" name="author">
+<meta content="Mike Ounsworth" name="author">
+<meta content="Yaron Sheffer" name="author">
+<meta content="Tirumaleswar Reddy" name="author">
+<meta content="Yaroslav Rosomakho" name="author">
+<meta content="
+       This document extends the TLS 1.3 authentication mechanism to allow the negotiation and use of two signature algorithms to enable dual-algorithm hybrid authentication, ensuring that an attacker would need to break both algorithms to compromise the session. The two signature algorithms come from two independent certificates that together produce a single  Certificate  and  CertificateVerify  message. 
+    " name="description">
+<meta content="xml2rfc 3.28.1" name="generator">
+<meta content="PKI" name="keyword">
+<meta content="Post-Quantum Traditional (PQ/T) Hybrid Authentication" name="keyword">
+<meta content="PQC" name="keyword">
+<meta content="TLS" name="keyword">
+<meta content="draft-yusef-tls-pqt-dual-certs-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.28.1
+    Python 3.12.11
+    ConfigArgParse 1.7
+    google-i18n-address 3.1.1
+    intervaltree 3.1.0
+    Jinja2 3.1.6
+    lxml 5.3.1
+    platformdirs 4.3.8
+    pycountry 24.6.1
+    PyYAML 6.0.2
+    requests 2.32.4
+    setuptools 80.9.0
+    wcwidth 0.2.13
+-->
+<link href="draft-yusef-tls-pqt-dual-certs.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+    }
+  }
+  &.olPercent > dt {
+    float: none;
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+}
+dl:not(.dlNewline) > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+}
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+/* Comments */
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc nav {
+    font-family: var(--font-title);
+    font-weight: 360;
+    & > ul { margin-bottom: 2em; }
+    & ul {
+      margin: 0 0 0 4px;
+      & :is(p, li) {
+        margin: 2px 0;
+      }
+    }
+  }
+  #toc a.toplink {
+    float: right;
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+    &::before { /* css hamburger */
+      float: right;
+      position: relative;
+      width: 1em;
+      height: 1px;
+      left: -164px;
+      margin: 8px 0 0 0;
+      background: white none repeat scroll 0 0;
+      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+      content: "";
+    }
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active {
+    opacity: 1;
+    & nav { display: block; }
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:is(:link, :focus, :hover),
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin: 2px 0.5em 0;
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+  #toc a.toplink {
+    margin: 8px 0.5em 0;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">PQ/T Dual Certs in TLS</td>
+<td class="right">June 2025</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Shekh-Yusef, et al.</td>
+<td class="center">Expires 18 December 2025</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">TLS Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-yusef-tls-pqt-dual-certs-latest</dd>
+<dt class="label-updates">Updates:</dt>
+<dd class="updates">
+<a href="https://www.rfc-editor.org/rfc/rfcRFC9261" class="eref">RFC9261</a>, <a href="https://www.rfc-editor.org/rfc/rfcRFC8446" class="eref">RFC8446</a> (if approved)</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2025-06-16" class="published">16 June 2025</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2025-12-18">18 December 2025</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">R. Shekh-Yusef</div>
+<div class="org">Ciena</div>
+</div>
+<div class="author">
+      <div class="author-name">H. Tschofenig</div>
+<div class="org">H-BRS</div>
+</div>
+<div class="author">
+      <div class="author-name">M. Ounsworth</div>
+<div class="org">Entrust</div>
+</div>
+<div class="author">
+      <div class="author-name">Y. Sheffer</div>
+<div class="org">Intuit</div>
+</div>
+<div class="author">
+      <div class="author-name">T. Reddy</div>
+<div class="org">Nokia</div>
+</div>
+<div class="author">
+      <div class="author-name">Y. Rosomakho</div>
+<div class="org">Zscaler</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual Certificates in TLS 1.3</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document extends the TLS 1.3 authentication mechanism to allow the negotiation and use of two signature algorithms to enable dual-algorithm hybrid authentication, ensuring that an attacker would need to break both algorithms to compromise the session. The two signature algorithms come from two independent certificates that together produce a single <code>Certificate</code> and <code>CertificateVerify</code> message.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-discussion-venues">
+<a href="#name-discussion-venues" class="section-name selfRef">Discussion Venues</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">Discussion of this document takes place on the
+    Transport Layer Security  mailing list (tls@ietf.org),
+    which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/tls/">https://mailarchive.ietf.org/arch/browse/tls/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
+    <span><a href="https://github.com/hannestschofenig/tls-dual-certs">https://github.com/hannestschofenig/tls-dual-certs</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 18 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2025 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-scope" class="internal xref">Scope</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-design-overview" class="internal xref">Design Overview</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-signature-algorithms-negoti" class="internal xref">Signature Algorithms Negotiation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-certificate-chain-encoding" class="internal xref">Certificate Chain Encoding</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-certificateverify-signature" class="internal xref">CertificateVerify Signatures</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-protocol-changes" class="internal xref">Protocol Changes</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-dual_signature_algorithms-e" class="internal xref"><code>dual_signature_algorithms</code> Extension</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.1">
+                    <p id="section-toc.1-1.5.2.1.2.1.1"><a href="#section-5.1.1" class="auto internal xref">5.1.1</a>.  <a href="#name-structure" class="internal xref">Structure</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.2">
+                    <p id="section-toc.1-1.5.2.1.2.2.1"><a href="#section-5.1.2" class="auto internal xref">5.1.2</a>.  <a href="#name-use-in-handshake-and-export" class="internal xref">Use in Handshake and Exported Authenticator Messages</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-certificate-message-encodin" class="internal xref">Certificate Message Encoding</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-delimiter" class="internal xref">Delimiter</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-certificateverify-message" class="internal xref">CertificateVerify Message</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3.2.1">
+                    <p id="section-toc.1-1.5.2.3.2.1.1"><a href="#section-5.3.1" class="auto internal xref">5.3.1</a>.  <a href="#name-context-strings" class="internal xref">Context Strings</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-dual-certificate-policy-enf" class="internal xref">Dual Certificate Policy Enforcement</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-performance-considerations" class="internal xref">Performance Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-client-driven-authenticatio" class="internal xref">Client-Driven Authentication Requirements</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-type-1-single-certificate" class="internal xref">Type 1: Single-certificate</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-type-2-dual-compatible-pq-o" class="internal xref">Type 2: Dual-Compatible, PQ Optional (Classic Primary)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-type-3-strict-dual" class="internal xref">Type 3: Strict Dual</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-type-4-dual-compatible-clas" class="internal xref">Type 4: Dual-Compatible, Classic Optional (PQ Primary)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-compatibility-with-composit" class="internal xref">Compatibility with composite certificates</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-signature-association-and-p" class="internal xref">Signature Association and Parsing Robustness</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-signature-validation-requir" class="internal xref">Signature Validation Requirements</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-side-channel-resistance" class="internal xref">Side-Channel Resistance</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
+                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-cryptographic-independence" class="internal xref">Cryptographic Independence</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
+                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-certificate-usage-and-trust" class="internal xref">Certificate Usage and Trust</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-tls-extension" class="internal xref">TLS extension</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-tls-alert" class="internal xref">TLS alert</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-informal-requirements-for-d" class="internal xref">Informal Requirements for Dual TLS Certificate Support</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-general-tls-semantics" class="internal xref">General TLS Semantics</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.1">
+                    <p id="section-toc.1-1.12.2.1.2.1.1"><a href="#appendix-A.1.1" class="auto internal xref">A.1.1</a>.  <a href="#name-protocol-flow-consistency" class="internal xref">Protocol Flow Consistency</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.2">
+                    <p id="section-toc.1-1.12.2.1.2.2.1"><a href="#appendix-A.1.2" class="auto internal xref">A.1.2</a>.  <a href="#name-minimal-protocol-changes" class="internal xref">Minimal Protocol Changes</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.3">
+                    <p id="section-toc.1-1.12.2.1.2.3.1"><a href="#appendix-A.1.3" class="auto internal xref">A.1.3</a>.  <a href="#name-mtls-support" class="internal xref">mTLS support</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.4">
+                    <p id="section-toc.1-1.12.2.1.2.4.1"><a href="#appendix-A.1.4" class="auto internal xref">A.1.4</a>.  <a href="#name-exported-authenticators-com" class="internal xref">Exported Authenticators Compatibility</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-certificate-handling-semant" class="internal xref">Certificate Handling Semantics</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.1">
+                    <p id="section-toc.1-1.12.2.2.2.1.1"><a href="#appendix-A.2.1" class="auto internal xref">A.2.1</a>.  <a href="#name-independent-chain-usability" class="internal xref">Independent Chain Usability</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.2">
+                    <p id="section-toc.1-1.12.2.2.2.2.1"><a href="#appendix-A.2.2" class="auto internal xref">A.2.2</a>.  <a href="#name-unambiguous-chain-separatio" class="internal xref">Unambiguous Chain Separation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.3">
+                    <p id="section-toc.1-1.12.2.2.2.3.1"><a href="#appendix-A.2.3" class="auto internal xref">A.2.3</a>.  <a href="#name-chain-specific-signature-al" class="internal xref">Chain-Specific Signature Algorithms</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.4">
+                    <p id="section-toc.1-1.12.2.2.2.4.1"><a href="#appendix-A.2.4" class="auto internal xref">A.2.4</a>.  <a href="#name-multiple-chains-support-gen" class="internal xref">Multiple Chains Support (Generalisation)</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
+                <p id="section-toc.1-1.12.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-use-case-and-deployment-fle" class="internal xref">Use Case and Deployment Flexibility</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.1">
+                    <p id="section-toc.1-1.12.2.3.2.1.1"><a href="#appendix-A.3.1" class="auto internal xref">A.3.1</a>.  <a href="#name-backward-compatibility" class="internal xref">Backward Compatibility</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.2">
+                    <p id="section-toc.1-1.12.2.3.2.2.1"><a href="#appendix-A.3.2" class="auto internal xref">A.3.2</a>.  <a href="#name-policy-signalling" class="internal xref">Policy Signalling</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.3">
+                    <p id="section-toc.1-1.12.2.3.2.3.1"><a href="#appendix-A.3.3" class="auto internal xref">A.3.3</a>.  <a href="#name-future-extendability-to-non" class="internal xref">Future extendability to Non-PQC Multi-Cert Use cases</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.4">
+                    <p id="section-toc.1-1.12.2.3.2.4.1"><a href="#appendix-A.3.4" class="auto internal xref">A.3.4</a>.  <a href="#name-mitigation-of-side-channels" class="internal xref">Mitigation of Side Channels</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.5">
+                    <p id="section-toc.1-1.12.2.3.2.5.1"><a href="#appendix-A.3.5" class="auto internal xref">A.3.5</a>.  <a href="#name-transparency-in-signature-v" class="internal xref">Transparency in Signature Validation</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">There are several potential mechanisms to address concerns related to the anticipated emergence of cryptographically relevant quantum computers (CRQCs). While the encryption-related aspects are covered in other documents, this document focuses on the authentication component of the <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> handshake.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">One approach is the use of dual certificates: issuing two distinct certificates for the same end entity — one using a traditional algorithm (e.g., <span>[<a href="#ECDSA" class="cite xref">ECDSA</a>]</span>), and the other using a post-quantum (PQ) algorithm (e.g., <span>[<a href="#ML-DSA" class="cite xref">ML-DSA</a>]</span>).<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document defines how TLS 1.3 can utilize such certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">It also addresses the challenges of integrating hybrid authentication in TLS 1.3 while balancing backward compatibility, forward security, and deployment practicality.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">This document defines a new extension <code>dual_signature_algorithms</code> to negotiate support for two categories of signature algorithms, typically one set of classic schemes and one set of PQ schemes. It also makes changes to the <code>Certificate</code> and <code>CertificateVerify</code> messages to take advantage of both certificates when authenticating the end entity.<a href="#section-1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="scope">
+<section id="section-3">
+      <h2 id="name-scope">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-scope" class="section-name selfRef">Scope</a>
+      </h2>
+<p id="section-3-1">The approach described herein is also compatible with FIPS-compliant deployments, as it supports the continued use of FIPS-approved traditional signature algorithms during the TLS handshake.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">The proposed mechanism is fully backward compatible: traditional certificates and authentication methods remain functional with existing TLS 1.3 implementations. As cryptographically relevant quantum computers (CRQCs) emerge, deployments can transition by gradually disabling traditional authentication and enabling post-quantum–only authentication. This strategy offers a smooth migration path, ensuring long-term cryptographic agility, regulatory compliance, and operational continuity without disrupting existing infrastructure.<a href="#section-3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="design-overview">
+<section id="section-4">
+      <h2 id="name-design-overview">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-design-overview" class="section-name selfRef">Design Overview</a>
+      </h2>
+<p id="section-4-1">This document introduces a mechanism to enable dual-certificate authentication in TLS 1.3. The primary objective is to allow each TLS peer to present two certificate chains requiring an attacker to break both authentication algorithms to impersonate a peer. Typically one of the certificate chains is using a traditional cryptographic algorithms while the second leverages post-quantum (PQ) cryptography.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">The design builds on existing TLS 1.3 structures and introduces minimal protocol changes. It is applicable to both client and server authentication and is compatible with the Exported Authenticators mechanism <span>[<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<div id="signature-algorithms-negotiation">
+<section id="section-4.1">
+        <h3 id="name-signature-algorithms-negoti">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-signature-algorithms-negoti" class="section-name selfRef">Signature Algorithms Negotiation</a>
+        </h3>
+<p id="section-4.1-1">A new extension, <code>dual_signature_algorithms</code>, is defined to negotiate support for two distinct categories of signature algorithms. The extension carries two disjoint lists: one for classical signature algorithms and one for post-quantum signature algorithms.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.1-2.1">
+            <p id="section-4.1-2.1.1">In the <code>ClientHello</code>, this extension indicates the client's supported classical and PQ signature algorithms for dual certificate server authentication.<a href="#section-4.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.1-2.2">
+            <p id="section-4.1-2.2.1">In the <code>CertificateRequest</code>, this extension indicates the server's supported classical and PQ signature algorithms for dual certificate client authentication.<a href="#section-4.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.1-3">This allows both endpoints to signal independently two distinct algorithms for dual authentication.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">The <code>dual_signature_algorithms</code> can also be used in <code>extensions</code> of <code>CertificateRequest</code> and <code>ClientCertificateRequest</code> structures of Authenticator Request message of Exported Authenticators as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-4" class="relref">Section 4</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">The <code>dual_signature_algorithms</code> extension does not replace <code>signature_algorithms</code>. TLS peers <span class="bcp14">MUST</span> include the <code>signature_algorithms</code> extension regardless of whether <code>dual_signature_algorithms</code> is used. The <code>signature_algorithms</code> extension indicates algorithms acceptable for single-certificate authentication and <span class="bcp14">MUST</span> contain either a non-empty list of such algorithms or be empty if only dual-certificate authentication is acceptable.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="certificate-chain-encoding">
+<section id="section-4.2">
+        <h3 id="name-certificate-chain-encoding">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-certificate-chain-encoding" class="section-name selfRef">Certificate Chain Encoding</a>
+        </h3>
+<p id="section-4.2-1">TLS 1.3 defines the <code>Certificate</code> message to carry a list of certificate entries representing a single chain. This document reuses the same structure to convey two certificate chains by concatenating them and inserting a delimiter in the form of a zero-length certificate entry.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">A zero-length certificate is defined as a <code>CertificateEntry</code> with an empty <code>cert_data</code> field and omitted <code>extensions</code> field. TLS 1.3 prohibits the use of empty certificate entries, making this delimiter unambiguous. Implementations <span class="bcp14">MUST</span> treat all entries before the zero-length delimiter as the first certificate chain (typically classic), and all entries after it as the second certificate chain (typically post-quantum).<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">This encoding applies equally to the <code>CompressedCertificate</code> message defined in <span>[<a href="#COMPRESS-CERT" class="cite xref">COMPRESS-CERT</a>]</span> and to the <code>Certificate</code> message of Exported Authenticators as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5.2.1" class="relref">Section 5.2.1</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">Since TLS 1.3 supports only a single certificate type in each direction, both certificate chains <span class="bcp14">MUST</span> either contain X.509 certificates or certificates of type specified in:<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-5.1">
+            <p id="section-4.2-5.1.1"><code>server_certificate_type</code> extension in a <code>EncryptedExtensions</code> message for Server certificates<a href="#section-4.2-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.2-5.2">
+            <p id="section-4.2-5.2.1"><code>client_certificate_type</code> extension in a <code>EncryptedExtensions</code> message for Client certificates<a href="#section-4.2-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.2-6">Note that according to <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5.2.1" class="relref">Section 5.2.1</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span> Exported Authenticators support only X.509 certificates.<a href="#section-4.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="certificateverify-signatures">
+<section id="section-4.3">
+        <h3 id="name-certificateverify-signature">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-certificateverify-signature" class="section-name selfRef">CertificateVerify Signatures</a>
+        </h3>
+<p id="section-4.3-1">The <code>CertificateVerify</code> message is extended to include two digital signatures:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.3-2">
+<li id="section-4.3-2.1">
+            <p id="section-4.3-2.1.1">One computed using a signature algorithm selected from the first list of the <code>dual_signature_algorithms</code> extension.<a href="#section-4.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-4.3-2.2">
+            <p id="section-4.3-2.2.1">One computed using a signature algorithm selected from the second list of the <code>dual_signature_algorithms</code> extension.<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-4.3-3">Each signature is computed over the transcript hash as specified in TLS 1.3, but with distinct context strings to domain-separate the two operations.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<p id="section-4.3-4">This encoding applies equally to the <code>CertificateVerify</code> message of Exported Authenticators as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5.2.2" class="relref">Section 5.2.2</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+<p id="section-4.3-5">The order of the signatures in the message <span class="bcp14">MUST</span> correspond to the order of the certificate chains in the Certificate message: the first signature <span class="bcp14">MUST</span> correspond to a classical algorithm from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, while the second signature <span class="bcp14">MUST</span> correspond to a PQ algorithm from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="protocol-changes">
+<section id="section-5">
+      <h2 id="name-protocol-changes">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-protocol-changes" class="section-name selfRef">Protocol Changes</a>
+      </h2>
+<p id="section-5-1">This section defines the normative changes to TLS 1.3 required to support dual-certificate authentication. These changes extend existing handshake messages and introduce the new extension.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div id="dualsignaturealgorithms-extension">
+<section id="section-5.1">
+        <h3 id="name-dual_signature_algorithms-e">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-dual_signature_algorithms-e" class="section-name selfRef"><code>dual_signature_algorithms</code> Extension</a>
+        </h3>
+<p id="section-5.1-1">A new extension, <code>dual_signature_algorithms</code>, is defined to allow peers to advertise support for two distinct categories of signature algorithms: classical and post-quantum.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<div id="structure">
+<section id="section-5.1.1">
+          <h4 id="name-structure">
+<a href="#section-5.1.1" class="section-number selfRef">5.1.1. </a><a href="#name-structure" class="section-name selfRef">Structure</a>
+          </h4>
+<p id="section-5.1.1-1">The structure of the extension as follows:<a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
+<span id="name-contents-of-dual_signature_"></span><figure id="figure-1">
+            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.1.1-2.1">
+<pre>
+struct {
+    SignatureScheme first_signature_algorithms&lt;2..2^16-2&gt;;
+    SignatureScheme second_signature_algorithms&lt;2..2^16-2&gt;;
+} DualSignatureSchemeList;
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-contents-of-dual_signature_" class="selfRef">Contents of dual_signature_algorithms extension</a>
+            </figcaption></figure>
+<p id="section-5.1.1-3">SignatureScheme is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry. <code>first_signature_algorithms</code> and <code>second_signature_algorithms</code> list <span class="bcp14">MUST NOT</span> contain common elements. TLS endpoint observing such overlap between primary and secondary supported signature lists <span class="bcp14">MUST</span> terminate the connection with <code>illegal_parameter</code> alert.<a href="#section-5.1.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="use-in-handshake-and-exported-authenticator-messages">
+<section id="section-5.1.2">
+          <h4 id="name-use-in-handshake-and-export">
+<a href="#section-5.1.2" class="section-number selfRef">5.1.2. </a><a href="#name-use-in-handshake-and-export" class="section-name selfRef">Use in Handshake and Exported Authenticator Messages</a>
+          </h4>
+<p id="section-5.1.2-1">The client <span class="bcp14">MAY</span> include this extension in <code>ClientHello</code> message to indicate classical and PQ algorithms it supports for verifying the server's signature. The server <span class="bcp14">MAY</span> include this extension in <code>CertificateRequest</code> message to classical and PQ algorithms it supports for verifying the client's signature. This extension <span class="bcp14">MAY</span> be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.<a href="#section-5.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.1.2-2">If the extension is present in <code>ClientHello</code>, <code>CertificateRequest</code> or Authenticator Request, the peer <span class="bcp14">MAY</span> respond with a dual-certificate authentication structure. If the extension is absent, the peer <span class="bcp14">MUST NOT</span> send a two certificate chains or two signatures.<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.1.2-3">The presence of this extension alone does not mandate dual authentication. It is up to the peer to determine whether one or two certificate chains and signatures are required based on local policy and validation logic. A single certificate and a single signature encoded in <code>Certificate</code> and <code>CertificateVerify</code> messages remain valid as long as the certificate and its corresponding signature algorithm comply with the values in the <code>signature_algorithms</code> or <code>signature_algorithms_cert</code> extension.<a href="#section-5.1.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="certificate">
+<section id="section-5.2">
+        <h3 id="name-certificate-message-encodin">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-certificate-message-encodin" class="section-name selfRef">Certificate Message Encoding</a>
+        </h3>
+<p id="section-5.2-1">TLS 1.3 defines the <code>Certificate</code> message as follows:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<span id="name-tls-13-certificate-message"></span><figure id="figure-2">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-5.2-2.1">
+<pre>
+struct {
+    opaque certificate_request_context&lt;0..2^8-1&gt;;
+    CertificateEntry certificate_list&lt;0..2^24-1&gt;;
+} Certificate;
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-tls-13-certificate-message" class="selfRef">TLS 1.3 Certificate message</a>
+          </figcaption></figure>
+<p id="section-5.2-3">This document extends the semantics of <code>certificate_list</code> to support two logically distinct certificate chains, encoded sequentially and separated by a delimiter.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<div id="delimiter">
+<section id="section-5.2.1">
+          <h4 id="name-delimiter">
+<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-delimiter" class="section-name selfRef">Delimiter</a>
+          </h4>
+<p id="section-5.2.1-1">The delimiter is a zero-length certificate entry encoded as 3 bytes of 0x00. TLS 1.3 prohibits empty certificate entries, so this delimiter is unambiguous. The delimiter <span class="bcp14">MUST NOT</span> be sent to peers that did not indicated support for dual certificates by including <code>dual_signature_algorithms</code> extension.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-2">This specification expands CertificateEntry structure from <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span> in the following way:<a href="#section-5.2.1-2" class="pilcrow">¶</a></p>
+<span id="name-updated-certificateentry-st"></span><figure id="figure-3">
+            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.2.1-3.1">
+<pre>
+struct {
+    select (is_delimiter) {
+        case Delimiter: uint24 delimiter = 0;
+        case Non_Delimiter:
+          select (certificate_type) {
+              case RawPublicKey:
+                /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
+                opaque ASN1_subjectPublicKeyInfo&lt;1..2^24-1&gt;;
+
+              case X509:
+                opaque cert_data&lt;1..2^24-1&gt;;
+          };
+          Extension extensions&lt;0..2^16-1&gt;;
+    };
+} CertificateEntry;
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-updated-certificateentry-st" class="selfRef">Updated CertificateEntry structure definition</a>
+            </figcaption></figure>
+<p id="section-5.2.1-4">All entries before the delimiter are treated as the first certificate chain and <span class="bcp14">MUST</span> use classical algorithms from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, all entries after the delimiter are treated as the second certificate chain and <span class="bcp14">MUST</span> use PQ algorithms from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension. As specified in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>, end-entity certificate <span class="bcp14">MUST</span> be the first in both chains.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-5">A peer receiving this structure <span class="bcp14">MUST</span> validate each chain independently according to its corresponding signature algorithm. The end-entity certificate <span class="bcp14">MUST</span> be the first entry in both the first and second certificate chains. The first certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>first_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. The second certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>second_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-6">This encoding applies equally to the <code>CompressedCertificate</code> message and to <code>Certificate</code> message of Exported Authenticators.<a href="#section-5.2.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="certificate-verify">
+<section id="section-5.3">
+        <h3 id="name-certificateverify-message">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-certificateverify-message" class="section-name selfRef">CertificateVerify Message</a>
+        </h3>
+<p id="section-5.3-1">The <code>CertificateVerify</code> message is extended to carry two independent signatures. Its modified structure is as follows:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<span id="name-certificateverify-message-2"></span><figure id="figure-4">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-5.3-2.1">
+<pre>
+struct {
+    SignatureScheme first_algorithm;
+    opaque first_signature&lt;0..2^16-1&gt;;
+    SignatureScheme second_algorithm;
+    opaque second_signature&lt;0..2^16-1&gt;;
+} CertificateVerify;
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-certificateverify-message-2" class="selfRef">CertificateVerify message</a>
+          </figcaption></figure>
+<p id="section-5.3-3">Each signature covers the transcript hash as in TLS 1.3, but with a distinct context string for domain separation.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<div id="context-strings">
+<section id="section-5.3.1">
+          <h4 id="name-context-strings">
+<a href="#section-5.3.1" class="section-number selfRef">5.3.1. </a><a href="#name-context-strings" class="section-name selfRef">Context Strings</a>
+          </h4>
+<p id="section-5.3.1-1">The context string is used as input to the data over which the signature is computed, consistent with the <code>CertificateVerify</code> construction defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.3" class="relref">Section 4.4.3</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>. The first signature uses the same context string as in the TLS 1.3 specification:<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.3.1-2.1">
+              <p id="section-5.3.1-2.1.1">for a server context string is "TLS 1.3, server CertificateVerify"<a href="#section-5.3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-5.3.1-2.2">
+              <p id="section-5.3.1-2.2.1">for a client context string is "TLS 1.3, client CertificateVerify"<a href="#section-5.3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-5.3.1-3">The second signature uses a distinct context string to bind it to the secondary certificate:<a href="#section-5.3.1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.3.1-4.1">
+              <p id="section-5.3.1-4.1.1">for a server, secondary context string is "TLS 1.3, server secondary CertificateVerify"<a href="#section-5.3.1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-5.3.1-4.2">
+              <p id="section-5.3.1-4.2.1">for a client, secondary context string is "TLS 1.3, client secondary CertificateVerify"<a href="#section-5.3.1-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-5.3.1-5">Implementations <span class="bcp14">MUST</span> verify both signatures and <span class="bcp14">MUST</span> associate each with its corresponding certificate chain.<a href="#section-5.3.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.3.1-6">This dual-signature structure applies equally to <code>CertificateVerify</code> messages carried in Exported Authenticators with second signature using "Secondary Exported Authenticator" as the context string.<a href="#section-5.3.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="dual-certificate-policy-enforcement">
+<section id="section-5.4">
+        <h3 id="name-dual-certificate-policy-enf">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-dual-certificate-policy-enf" class="section-name selfRef">Dual Certificate Policy Enforcement</a>
+        </h3>
+<p id="section-5.4-1">Policy enforcement regarding the use of dual certificates is implementation-defined and driven by the authenticating peer. When dual certificate authentication is required by local policy, such as during high-assurance sessions or post-quantum transition periods, the authenticating endpoint <span class="bcp14">MUST</span> abort a handshake where only one signature or one certificate chain is present with an <code>dual_certificate_required</code> alert. Implementations <span class="bcp14">MUST</span> ensure that both certificates and both signatures are processed together and <span class="bcp14">MUST NOT</span> accept fallback to single-certificate authentication when dual-authentication is expected.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">A single composite certificate chain and signature such as defined by <span>[<a href="#TLS-COMPOSITE-MLDSA" class="cite xref">TLS-COMPOSITE-MLDSA</a>]</span> <span class="bcp14">MAY</span> be an acceptable alternative during post-quantum transition period as long as corresponding signature scheme is listed in <code>signature_algorithms</code> extension.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="performance-considerations">
+<section id="section-6">
+      <h2 id="name-performance-considerations">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-performance-considerations" class="section-name selfRef">Performance Considerations</a>
+      </h2>
+<p id="section-6-1">The use of dual certificates increases the size of individual certificates, certificate chains, and associated signatures, which can result in significantly larger TLS handshake messages. These larger payloads may cause packet fragmentation, retransmissions, and handshake delays, especially in constrained or lossy network environments.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">To mitigate these impacts, deployments can apply certificate chain optimization techniques, such as those described in <span><a href="https://datatracker.ietf.org/doc/html/draft-reddy-uta-pqc-app-07#section-6.1" class="relref">Section 6.1</a> of [<a href="#PQ-RECOMMEND" class="cite xref">PQ-RECOMMEND</a>]</span>, to minimize transmission overhead and improve handshake robustness.<a href="#section-6-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-driven-authentication-requirements">
+<section id="section-7">
+      <h2 id="name-client-driven-authenticatio">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-client-driven-authenticatio" class="section-name selfRef">Client-Driven Authentication Requirements</a>
+      </h2>
+<p id="section-7-1">The scenarios in this section describe server authentication behavior based on client policy. Each case reflects a different client capability and authentication policy, based on how the client populates the <code>signature_algorithms</code>, <code>signature_algorithms_cert</code>, and <code>dual_signature_algorithms</code> extensions.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">For client authentication, the same principles apply with roles reversed: the server drives authentication requirements by sending a <code>CertificateRequest</code> message that includes appropriate extensions.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<div id="type-1-single-certificate">
+<section id="section-7.1">
+        <h3 id="name-type-1-single-certificate">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-type-1-single-certificate" class="section-name selfRef">Type 1: Single-certificate</a>
+        </h3>
+<p id="section-7.1-1">Client requires only one classical, pq or a composite signature. Client does not support dual certificates.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">Client behavior:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.1-3.1">
+            <p id="section-7.1-3.1.1">Includes supported algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#section-7.1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.1-3.2">
+            <p id="section-7.1-3.2.1">Does not include <code>dual_signature_algorithms</code>.<a href="#section-7.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.1-4">To satisfy this client, the server <span class="bcp14">MUST</span> send a single certificate chain with compatible algorithms and include a single signature in <code>CertificateVerify</code>.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="type-2-dual-compatible-pq-optional-classic-primary">
+<section id="section-7.2">
+        <h3 id="name-type-2-dual-compatible-pq-o">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-type-2-dual-compatible-pq-o" class="section-name selfRef">Type 2: Dual-Compatible, PQ Optional (Classic Primary)</a>
+        </h3>
+<p id="section-7.2-1">Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">Client behavior:<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.2-3.1">
+            <p id="section-7.2-3.1.1">Includes supported classical algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#section-7.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-3.2">
+            <p id="section-7.2-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.2-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.2-5.1">
+            <p id="section-7.2-5.1.1">Provide a single certificate chain with compatible classical algorithms and include a single signature in <code>CertificateVerify</code><a href="#section-7.2-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-5.2">
+            <p id="section-7.2-5.2.1">Provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#section-7.2-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="type-3-strict-dual">
+<section id="section-7.3">
+        <h3 id="name-type-3-strict-dual">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-type-3-strict-dual" class="section-name selfRef">Type 3: Strict Dual</a>
+        </h3>
+<p id="section-7.3-1">Client requires both classical and PQ authentication to be performed simultaneously. It does not support composite certificates.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-2">Client behavior:<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.3-3.1">
+            <p id="section-7.3-3.1.1">Includes an empty list in <code>signature_algorithms</code>.<a href="#section-7.3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.3-3.2">
+            <p id="section-7.3-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.3-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.3-4">To satisfy this client, the server <span class="bcp14">MUST</span> provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#section-7.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="type-4-dual-compatible-classic-optional-pq-primary">
+<section id="section-7.4">
+        <h3 id="name-type-4-dual-compatible-clas">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-type-4-dual-compatible-clas" class="section-name selfRef">Type 4: Dual-Compatible, Classic Optional (PQ Primary)</a>
+        </h3>
+<p id="section-7.4-1">Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-2">Client behavior:<a href="#section-7.4-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.4-3.1">
+            <p id="section-7.4-3.1.1">Includes supported PQ algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#section-7.4-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.4-3.2">
+            <p id="section-7.4-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#section-7.4-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.4-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#section-7.4-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.4-5.1">
+            <p id="section-7.4-5.1.1">Provide a single certificate chain with compatible PQ algorithms and include a single signature in <code>CertificateVerify</code><a href="#section-7.4-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.4-5.2">
+            <p id="section-7.4-5.2.1">Provide a PQ certificate chain followed by a classical certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#section-7.4-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="compatibility-with-composite-certificates">
+<section id="section-7.5">
+        <h3 id="name-compatibility-with-composit">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-compatibility-with-composit" class="section-name selfRef">Compatibility with composite certificates</a>
+        </h3>
+<p id="section-7.5-1">Clients and servers may choose to support composite certificate schemes, such as those defined in <span>[<a href="#TLS-COMPOSITE-MLDSA" class="cite xref">TLS-COMPOSITE-MLDSA</a>]</span>. In these schemes, a single certificate contains a composite public keys, and the associated signature proves knowledge of private keys of all components.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">If a composite signature algorithm appears in the <code>signature_algorithms</code> extension, it can fulfill the client's requirements for both classical and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-8">
+      <h2 id="name-security-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<div id="signature-association-and-parsing-robustness">
+<section id="section-8.1">
+        <h3 id="name-signature-association-and-p">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-signature-association-and-p" class="section-name selfRef">Signature Association and Parsing Robustness</a>
+        </h3>
+<p id="section-8.1-1">Implementations <span class="bcp14">MUST</span> strictly associate each <code>CertificateVerify</code> signature with the corresponding certificate chain, based on their order relative to the zero-length delimiter in the <code>Certificate</code> message. Failure to properly align signatures with their intended certificate chains may result in incorrect validation or misattribution of authentication.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">Certificate parsing logic <span class="bcp14">MUST</span> reject messages that contain more than one zero-length delimiter, or that place the delimiter as the first or last entry in the certificate list.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="signature-validation-requirements">
+<section id="section-8.2">
+        <h3 id="name-signature-validation-requir">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-signature-validation-requir" class="section-name selfRef">Signature Validation Requirements</a>
+        </h3>
+<p id="section-8.2-1">Both signatures in the <code>CertificateVerify</code> message <span class="bcp14">MUST</span> be validated successfully and correspond to their respective certificate chains. Implementations <span class="bcp14">MUST</span> treat failure to validate either signature as a failure of the authentication process. Silent fallback to single-certificate verification undermines the dual-authentication model and introduces downgrade risks.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="side-channel-resistance">
+<section id="section-8.3">
+        <h3 id="name-side-channel-resistance">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-side-channel-resistance" class="section-name selfRef">Side-Channel Resistance</a>
+        </h3>
+<p id="section-8.3-1">Since both <code>CertificateVerify</code> operations involve signing the transcript using different cryptographic primitives, care <span class="bcp14">MUST</span> be taken to avoid leaking side-channel information. Implementers <span class="bcp14">MUST</span> ensure constant-time execution and avoid conditional branching that could reveal whether one or both signatures are present or valid.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<p id="section-8.3-2">Distinct context strings are <span class="bcp14">REQUIRED</span> for the two signatures to prevent cross-protocol misuse or collision attacks.<a href="#section-8.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cryptographic-independence">
+<section id="section-8.4">
+        <h3 id="name-cryptographic-independence">
+<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-cryptographic-independence" class="section-name selfRef">Cryptographic Independence</a>
+        </h3>
+<p id="section-8.4-1">To achieve the intended security guarantees, implementers and deployment operators <span class="bcp14">MUST</span> ensure that the two certificate chains rely on cryptographically independent primitives.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="certificate-usage-and-trust">
+<section id="section-8.5">
+        <h3 id="name-certificate-usage-and-trust">
+<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-certificate-usage-and-trust" class="section-name selfRef">Certificate Usage and Trust</a>
+        </h3>
+<p id="section-8.5-1">Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. Operators <span class="bcp14">MUST</span> ensure that revocation checking, such as using OCSP or CRLs, is consistently applied to both chains to prevent reliance on revoked credentials.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-9">
+      <h2 id="name-iana-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-9-1">This specification registers the <code>dual_signature_algorithms</code> TLS extension and <code>dual_certificate_required</code> TLS alert.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<div id="tls-extension">
+<section id="section-9.1">
+        <h3 id="name-tls-extension">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-tls-extension" class="section-name selfRef">TLS extension</a>
+        </h3>
+<p id="section-9.1-1">IANA is requested to assign a new value from the TLS ExtensionType Values registry:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.1-2.1">
+            <p id="section-9.1-2.1.1">Extension Name: dual_signature_algorithms<a href="#section-9.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.2">
+            <p id="section-9.1-2.2.1">TLS 1.3: CH, CR<a href="#section-9.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.3">
+            <p id="section-9.1-2.3.1">DTLS-Only: N<a href="#section-9.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.4">
+            <p id="section-9.1-2.4.1">Recommended: Y<a href="#section-9.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.5">
+            <p id="section-9.1-2.5.1">Reference: [[This document]]<a href="#section-9.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="tls-alert">
+<section id="section-9.2">
+        <h3 id="name-tls-alert">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-tls-alert" class="section-name selfRef">TLS alert</a>
+        </h3>
+<p id="section-9.2-1">IANA is requested to add the following entry to the "TLS Alerts" registry:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.2-2.1">
+            <p id="section-9.2-2.1.1">Value: TBD<a href="#section-9.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.2">
+            <p id="section-9.2-2.2.1">Description: dual_certificate_required<a href="#section-9.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.3">
+            <p id="section-9.2-2.3.1">DTLS-OK: Y<a href="#section-9.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.4">
+            <p id="section-9.2-2.4.1">Reference: [[This document]]<a href="#section-9.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.5">
+            <p id="section-9.2-2.5.1">Comment: None<a href="#section-9.2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="section-10">
+      <h2 id="name-acknowledgments">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="section-10-1">We would like to thank ... for their comments.<a href="#section-10-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-11">
+      <h2 id="name-references">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-11.1">
+        <h3 id="name-normative-references">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="EXPORTED-AUTH">[EXPORTED-AUTH]</dt>
+        <dd>
+<span class="refAuthor">Sullivan, N.</span>, <span class="refTitle">"Exported Authenticators in TLS"</span>, <span class="seriesInfo">RFC 9261</span>, <span class="seriesInfo">DOI 10.17487/RFC9261</span>, <time datetime="2022-07" class="refDate">July 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9261">https://www.rfc-editor.org/rfc/rfc9261</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TLS">[TLS]</dt>
+      <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-rfc8446bis-12</span>, <time datetime="2025-02-17" class="refDate">17 February 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12">https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-11.2">
+        <h3 id="name-informative-references">
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="COMPRESS-CERT">[COMPRESS-CERT]</dt>
+        <dd>
+<span class="refAuthor">Ghedini, A.</span> and <span class="refAuthor">V. Vasiliev</span>, <span class="refTitle">"TLS Certificate Compression"</span>, <span class="seriesInfo">RFC 8879</span>, <span class="seriesInfo">DOI 10.17487/RFC8879</span>, <time datetime="2020-12" class="refDate">December 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8879">https://www.rfc-editor.org/rfc/rfc8879</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ECDSA">[ECDSA]</dt>
+        <dd>
+<span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023-02" class="refDate">February 2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ML-DSA">[ML-DSA]</dt>
+        <dd>
+<span class="refAuthor">Hollebeek, T.</span>, <span class="refAuthor">Schmieg, S.</span>, and <span class="refAuthor">B. Westerbaan</span>, <span class="refTitle">"Use of ML-DSA in TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-mldsa-00</span>, <time datetime="2025-05-16" class="refDate">16 May 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-mldsa-00">https://datatracker.ietf.org/doc/html/draft-ietf-tls-mldsa-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PQ-RECOMMEND">[PQ-RECOMMEND]</dt>
+        <dd>
+<span class="refAuthor">Reddy.K, T.</span> and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"Post-Quantum Cryptography Recommendations for TLS-based Applications"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-reddy-uta-pqc-app-07</span>, <time datetime="2025-02-25" class="refDate">25 February 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-reddy-uta-pqc-app-07">https://datatracker.ietf.org/doc/html/draft-reddy-uta-pqc-app-07</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TLS-COMPOSITE-MLDSA">[TLS-COMPOSITE-MLDSA]</dt>
+      <dd>
+<span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Hollebeek, T.</span>, <span class="refAuthor">Gray, J.</span>, and <span class="refAuthor">S. Fluhrer</span>, <span class="refTitle">"Use of Composite ML-DSA in TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-tls-reddy-composite-mldsa-00</span>, <time datetime="2024-11-02" class="refDate">2 November 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-tls-reddy-composite-mldsa-00">https://datatracker.ietf.org/doc/html/draft-tls-reddy-composite-mldsa-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="informal-requirements-for-dual-tls-certificate-support">
+<section id="appendix-A">
+      <h2 id="name-informal-requirements-for-d">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-informal-requirements-for-d" class="section-name selfRef">Informal Requirements for Dual TLS Certificate Support</a>
+      </h2>
+<div id="general-tls-semantics">
+<section id="appendix-A.1">
+        <h3 id="name-general-tls-semantics">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-general-tls-semantics" class="section-name selfRef">General TLS Semantics</a>
+        </h3>
+<div id="protocol-flow-consistency">
+<section id="appendix-A.1.1">
+          <h4 id="name-protocol-flow-consistency">
+<a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-protocol-flow-consistency" class="section-name selfRef">Protocol Flow Consistency</a>
+          </h4>
+<p id="appendix-A.1.1-1">Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with <code>Certificate</code>, <code>CertificateVerify</code>, and <code>Finished</code> messages.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="minimal-protocol-changes">
+<section id="appendix-A.1.2">
+          <h4 id="name-minimal-protocol-changes">
+<a href="#appendix-A.1.2" class="section-number selfRef">A.1.2. </a><a href="#name-minimal-protocol-changes" class="section-name selfRef">Minimal Protocol Changes</a>
+          </h4>
+<p id="appendix-A.1.2-1">Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.<a href="#appendix-A.1.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mtls-support">
+<section id="appendix-A.1.3">
+          <h4 id="name-mtls-support">
+<a href="#appendix-A.1.3" class="section-number selfRef">A.1.3. </a><a href="#name-mtls-support" class="section-name selfRef">mTLS support</a>
+          </h4>
+<p id="appendix-A.1.3-1">The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.<a href="#appendix-A.1.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="exported-authenticators-compatibility">
+<section id="appendix-A.1.4">
+          <h4 id="name-exported-authenticators-com">
+<a href="#appendix-A.1.4" class="section-number selfRef">A.1.4. </a><a href="#name-exported-authenticators-com" class="section-name selfRef">Exported Authenticators Compatibility</a>
+          </h4>
+<p id="appendix-A.1.4-1">The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.<a href="#appendix-A.1.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="certificate-handling-semantics">
+<section id="appendix-A.2">
+        <h3 id="name-certificate-handling-semant">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-certificate-handling-semant" class="section-name selfRef">Certificate Handling Semantics</a>
+        </h3>
+<div id="independent-chain-usability">
+<section id="appendix-A.2.1">
+          <h4 id="name-independent-chain-usability">
+<a href="#appendix-A.2.1" class="section-number selfRef">A.2.1. </a><a href="#name-independent-chain-usability" class="section-name selfRef">Independent Chain Usability</a>
+          </h4>
+<p id="appendix-A.2.1-1">Each certificate chain (e.g., classic and PQ) must be independently usable for authentication, allowing endpoints to fall back to classic or PQ-only validation if necessary.<a href="#appendix-A.2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="unambiguous-chain-separation">
+<section id="appendix-A.2.2">
+          <h4 id="name-unambiguous-chain-separatio">
+<a href="#appendix-A.2.2" class="section-number selfRef">A.2.2. </a><a href="#name-unambiguous-chain-separatio" class="section-name selfRef">Unambiguous Chain Separation</a>
+          </h4>
+<p id="appendix-A.2.2-1">The mechanism must clearly distinguish and delimit multiple certificate chains to prevent ambiguity or misinterpretation.<a href="#appendix-A.2.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="chain-specific-signature-algorithms">
+<section id="appendix-A.2.3">
+          <h4 id="name-chain-specific-signature-al">
+<a href="#appendix-A.2.3" class="section-number selfRef">A.2.3. </a><a href="#name-chain-specific-signature-al" class="section-name selfRef">Chain-Specific Signature Algorithms</a>
+          </h4>
+<p id="appendix-A.2.3-1">Each certificate chain must be associated with its own set of supported signature algorithms, allowing negotiation of appropriate algorithms for classic and PQ use cases.<a href="#appendix-A.2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="multiple-chains-support-generalisation">
+<section id="appendix-A.2.4">
+          <h4 id="name-multiple-chains-support-gen">
+<a href="#appendix-A.2.4" class="section-number selfRef">A.2.4. </a><a href="#name-multiple-chains-support-gen" class="section-name selfRef">Multiple Chains Support (Generalisation)</a>
+          </h4>
+<p id="appendix-A.2.4-1">The mechanism must be designed in a way that could support more than two certificate chains in the future, not just hardcoded to classic + PQ.<a href="#appendix-A.2.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="use-case-and-deployment-flexibility">
+<section id="appendix-A.3">
+        <h3 id="name-use-case-and-deployment-fle">
+<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-use-case-and-deployment-fle" class="section-name selfRef">Use Case and Deployment Flexibility</a>
+        </h3>
+<div id="backward-compatibility">
+<section id="appendix-A.3.1">
+          <h4 id="name-backward-compatibility">
+<a href="#appendix-A.3.1" class="section-number selfRef">A.3.1. </a><a href="#name-backward-compatibility" class="section-name selfRef">Backward Compatibility</a>
+          </h4>
+<p id="appendix-A.3.1-1">When only one certificate chain is used, the mechanism must remain compatible with existing TLS 1.3 endpoints unaware of dual-certificate support or willing to use only a single certificate.<a href="#appendix-A.3.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="policy-signalling">
+<section id="appendix-A.3.2">
+          <h4 id="name-policy-signalling">
+<a href="#appendix-A.3.2" class="section-number selfRef">A.3.2. </a><a href="#name-policy-signalling" class="section-name selfRef">Policy Signalling</a>
+          </h4>
+<p id="appendix-A.3.2-1">A mechanism must exist for one party (client or server) to signal whether dual certificate presentation is required, optional, or not supported, to coordinate authentication expectations.<a href="#appendix-A.3.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="future-extendability-to-non-pqc-multi-cert-use-cases">
+<section id="appendix-A.3.3">
+          <h4 id="name-future-extendability-to-non">
+<a href="#appendix-A.3.3" class="section-number selfRef">A.3.3. </a><a href="#name-future-extendability-to-non" class="section-name selfRef">Future extendability to Non-PQC Multi-Cert Use cases</a>
+          </h4>
+<p id="appendix-A.3.3-1">The mechanism must be extendable to other multi-certificate use cases<a href="#appendix-A.3.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mitigation-of-side-channels">
+<section id="appendix-A.3.4">
+          <h4 id="name-mitigation-of-side-channels">
+<a href="#appendix-A.3.4" class="section-number selfRef">A.3.4. </a><a href="#name-mitigation-of-side-channels" class="section-name selfRef">Mitigation of Side Channels</a>
+          </h4>
+<p id="appendix-A.3.4-1">The mechanism should avoid constructions that enable side-channel attacks by observing how distinct algorithms are applied to the same message.<a href="#appendix-A.3.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="transparency-in-signature-validation">
+<section id="appendix-A.3.5">
+          <h4 id="name-transparency-in-signature-v">
+<a href="#appendix-A.3.5" class="section-number selfRef">A.3.5. </a><a href="#name-transparency-in-signature-v" class="section-name selfRef">Transparency in Signature Validation</a>
+          </h4>
+<p id="appendix-A.3.5-1">The order and pairing between certificates and their corresponding signatures must be explicit, so verifiers can unambiguously match them.<a href="#appendix-A.3.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Rifaat Shekh-Yusef</span></div>
+<div dir="auto" class="left"><span class="org">Ciena</span></div>
+<div dir="auto" class="left"><span class="country-name">Canada</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:rifaat.s.ietf@gmail.com" class="email">rifaat.s.ietf@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Hannes Tschofenig</span></div>
+<div dir="auto" class="left"><span class="org">University of Applied Sciences Bonn-Rhein-Sieg</span></div>
+<div dir="auto" class="left"><span class="country-name">Germany</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:hannes.tschofenig@gmx.net" class="email">hannes.tschofenig@gmx.net</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Mike Ounsworth</span></div>
+<div dir="auto" class="left"><span class="org">Entrust</span></div>
+<div dir="auto" class="left"><span class="country-name">Canada</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:mike.ounsworth@entrust.com" class="email">mike.ounsworth@entrust.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Yaron Sheffer</span></div>
+<div dir="auto" class="left"><span class="org">Intuit</span></div>
+<div dir="auto" class="left"><span class="country-name">Israel</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:yaronf.ietf@gmail.com" class="email">yaronf.ietf@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Tirumaleswar Reddy</span></div>
+<div dir="auto" class="left"><span class="org">Nokia</span></div>
+<div dir="auto" class="left"><span class="country-name">India</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:kondtir@gmail.com" class="email">kondtir@gmail.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Yaroslav Rosomakho</span></div>
+<div dir="auto" class="left"><span class="org">Zscaler</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:yrosomakho@zscaler.com" class="email">yrosomakho@zscaler.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
