@@ -98,6 +98,8 @@ This document introduces a mechanism to enable dual-certificate authentication i
 
 The design builds on existing TLS 1.3 structures and introduces minimal protocol changes. It is applicable to both client and server authentication and is compatible with the Exported Authenticators mechanism {{!EXPORTED-AUTH=RFC9261}}.
 
+A full set of informal design requirements for this specification can be found in {{sec-design-requirements}}.
+
 ## Signature Algorithms Negotiation
 
 A new extension, `dual_signature_algorithms`, is defined to negotiate support for two distinct categories of signature algorithms. The extension carries two disjoint lists: one for classical signature algorithms and one for post-quantum signature algorithms.
@@ -376,27 +378,20 @@ We would like to thank ... for their comments.
 
 --- back
 
-# Informal Requirements for Dual TLS Certificate Support
+# Informal Requirements for Dual TLS Certificate Support {#sec-design-requirements}
 
-## General TLS Semantics
+This section documents the design requirements that drove the development of this specification.
 
-### Protocol Flow Consistency
+This section is primarily intended to easy WG review and could be removed or simplified prior to RFC publication.
 
-Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with `Certificate`, `CertificateVerify`, and `Finished` messages.
+## Dual-Algorithm Security
 
-### Minimal Protocol Changes
+### Weak Non-Separability
 
-Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.
+The dual certificate authentication achieves, at least, Weak Non-Separability {{?Signature-Spectrums=I-D.ietf-pquip-hybrid-signature-spectrums-06}} at the time of verification of the `CertificateVerify` message.
 
-### mTLS support
 
-The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.
-
-### Exported Authenticators Compatibility
-
-The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.
-
-## Certificate Handling Semantics
+## Dual Certificate Semantics
 
 ### Independent Chain Usability
 
@@ -410,9 +405,13 @@ The mechanism must clearly distinguish and delimit multiple certificate chains t
 
 Each certificate chain must be associated with its own set of supported signature algorithms, allowing negotiation of appropriate algorithms for classic and PQ use cases.
 
+_MikeO: I don't know what this means. We are currently not providing a mechanism to negotiate two independent sets of `signature_algorithms_cert`. So are we failing this design goal? We had better not build in an assumption that leaf certs and their chains use the same algorithm, that would be bad. Personally, I would just delete this because I don't think it's adding value._
+
 ### Multiple Chains Support (Generalisation)
 
 The mechanism must be designed in a way that could support more than two certificate chains in the future, not just hardcoded to classic + PQ.
+
+_MikeO: I disagree with this goal and I think it should be removed._
 
 ## Use Case and Deployment Flexibility
 
@@ -420,18 +419,54 @@ The mechanism must be designed in a way that could support more than two certifi
 
 When only one certificate chain is used, the mechanism must remain compatible with existing TLS 1.3 endpoints unaware of dual-certificate support or willing to use only a single certificate.
 
-### Policy Signalling
+### Forward Compatibility
 
-A mechanism must exist for one party (client or server) to signal whether dual certificate presentation is required, optional, or not supported, to coordinate authentication expectations.
+The mechanism must be capable of negotiating algorithms requiring dual certificates as well as algorithms that are acceptable standalone.
 
-### Future extendability to Non-PQC Multi-Cert Use cases
+As an example, the mechanism must be capable of expressing the following algorithm preference:
 
-The mechanism must be extendable to other multi-certificate use cases
+> I would accept SLH-DSA-128s, Composite_MLDSA65_RSA2048 Composite_MLDSA65_ECDSA-P256, or ML-DSA-87 by themselves, or a dual-cert hybrid with one of \[ML-DSA-44, ML-DSA-65\] with one of \[RSA, ECDSA-P256, ECDSA-P384\].
+
+### Negotiation Expressiveness
+
+Signature algorithm negotiation, whether single or dual, must arrive at a unique selection of algorithms if and only if there is at least one configuration that is mutually-acceptable to client and server. Specifically, the negotiation mechanism must be expressive enough that clients can list all valid configurations that they would accept. Conversely, the negotiation mechanism must be specific enough that the client is not forced, through clumsiness of the negotiation mechanism to list configurations that in fact it does not support and thus rely on failures and retries to arrive at an acceptable algorithm selection.
 
 ### Mitigation of Side Channels
 
 The mechanism should avoid constructions that enable side-channel attacks by observing how distinct algorithms are applied to the same message.
 
-### Transparency in Signature Validation
+_MikeO: I have never seen this particular side-channel attack described in the literature, so I think a reference is needed. Also, side-channels is a very wide field, so it seems odd to pick out only a very specific type of side-channels to mention. I suggest removing this section._
+
+### Non-ambiguity of Message Formats
 
 The order and pairing between certificates and their corresponding signatures must be explicit, so verifiers can unambiguously match them.
+
+## Interaction With Existing TLS Semantics
+
+### Protocol Flow Consistency
+
+Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with `Certificate`, `CertificateVerify`, and `Finished` messages.
+
+### mTLS support
+
+The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.
+
+### Exported Authenticators Compatibility
+
+The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.
+
+
+### Minimal Protocol Changes
+
+Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.
+
+This requirement favours a design which minimizes interaction with other TLS extensions -- ie where all other extensions related to certificates will transfer their semantics from a single-certificate to a dual-certificate setting in a trivial and obvious way and no special processing rules need to be described. Ditto for existing IANA registries relating to the TLS protocol.
+
+
+## Non-Goals
+
+The following are listed as non-goals; i.e. they are out-of-scope and will not be considered in the design of dual certificate authentication.
+
+### Multiple Identities
+
+This mechanism is specific to cryptographic algorithm migration. It is not a generic mechanism for using multiple identities in a single TLS handshake. In particular, this mechanism does not allow for negotiating two certificates with the same algorithm but containing different identifiers, or for negotiating two independent sets of `certificate_authorities`.
