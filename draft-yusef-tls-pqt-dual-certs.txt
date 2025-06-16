@@ -274,8 +274,7 @@ Table of Contents
 
    Each signature is computed over the transcript hash as specified in
    TLS 1.3, but with distinct context strings to domain-separate the two
-   operations.  This approach prevents attackers from comparing timing
-   characteristics or reusing one signature in place of the other.
+   operations.
 
    This encoding applies equally to the CertificateVerify message of
    Exported Authenticators as defined in Section 5.2.2 of
@@ -625,10 +624,9 @@ Table of Contents
 
    Since both CertificateVerify operations involve signing the
    transcript using different cryptographic primitives, care MUST be
-   taken to avoid leaking timing or other side-channel information.
-   Implementers MUST ensure constant-time execution and avoid
-   conditional branching that could reveal whether one or both
-   signatures are present or valid.
+   taken to avoid leaking side-channel information.  Implementers MUST
+   ensure constant-time execution and avoid conditional branching that
+   could reveal whether one or both signatures are present or valid.
 
    Distinct context strings are REQUIRED for the two signatures to
    prevent cross-protocol misuse or collision attacks.
