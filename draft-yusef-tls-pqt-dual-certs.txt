@@ -416,9 +416,9 @@ Table of Contents
 
    struct {
        SignatureScheme first_algorithm;
-       opaque classic_signature<0..2^16-1>;
+       opaque first_signature<0..2^16-1>;
        SignatureScheme second_algorithm;
-       opaque pq_signature<0..2^16-1>;
+       opaque second_signature<0..2^16-1>;
    } CertificateVerify;
 
                     Figure 4: CertificateVerify message

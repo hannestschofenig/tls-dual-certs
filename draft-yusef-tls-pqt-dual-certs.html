@@ -1574,9 +1574,9 @@ struct {
 <pre>
 struct {
     SignatureScheme first_algorithm;
-    opaque classic_signature&lt;0..2^16-1&gt;;
+    opaque first_signature&lt;0..2^16-1&gt;;
     SignatureScheme second_algorithm;
-    opaque pq_signature&lt;0..2^16-1&gt;;
+    opaque second_signature&lt;0..2^16-1&gt;;
 } CertificateVerify;
 </pre>
 </div>
