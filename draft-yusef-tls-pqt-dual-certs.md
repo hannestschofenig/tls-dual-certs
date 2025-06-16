@@ -282,7 +282,7 @@ Client supports both classical and PQ authentication. It allows the server to se
 Client behavior:
 
 - Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
-- Includes supported classical algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms`.
+- Includes supported classical algorithms in `classical_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `pq_signature_algorithms` list of `dual_signature_algorithms`.
 
 To satisfy this client, the server MUST either:
 
