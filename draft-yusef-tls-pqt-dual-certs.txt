@@ -684,7 +684,10 @@ Table of Contents
 
 10.  Acknowledgments
 
-   TODO
+   We would like to thank Suzanne Wibada (Université de Sherbrooke) for
+   her reviews and comments during the work on the initial version of
+   this document, and her willingness to implement the recommendation of
+   this document.
 
 11.  References
 
