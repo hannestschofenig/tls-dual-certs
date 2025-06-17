@@ -1056,7 +1056,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Shekh-Yusef, et al.</td>
-<td class="center">Expires 18 December 2025</td>
+<td class="center">Expires 19 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1072,12 +1072,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="https://www.rfc-editor.org/rfc/rfcRFC9261" class="eref">RFC9261</a>, <a href="https://www.rfc-editor.org/rfc/rfcRFC8446" class="eref">RFC8446</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-16" class="published">16 June 2025</time>
+<time datetime="2025-06-17" class="published">17 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-18">18 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-19">19 December 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1142,7 +1142,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1473,7 +1473,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <h3 id="name-dual_signature_algorithms-e">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-dual_signature_algorithms-e" class="section-name selfRef"><code>dual_signature_algorithms</code> Extension</a>
         </h3>
-<p id="section-5.1-1">A new extension, <code>dual_signature_algorithms</code>, is defined to allow peers to advertise support for two distinct categories of signature algorithms: classical and post-quantum.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">A new extension, <code>dual_signature_algorithms</code>, is defined to allow peers to advertise support for two distinct categories of signature algorithms, for example, classical and post-quantum.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <div id="structure">
 <section id="section-5.1.1">
           <h4 id="name-structure">
@@ -1500,7 +1500,7 @@ struct {
           <h4 id="name-use-in-handshake-and-export">
 <a href="#section-5.1.2" class="section-number selfRef">5.1.2. </a><a href="#name-use-in-handshake-and-export" class="section-name selfRef">Use in Handshake and Exported Authenticator Messages</a>
           </h4>
-<p id="section-5.1.2-1">The client <span class="bcp14">MAY</span> include this extension in <code>ClientHello</code> message to indicate classical and PQ algorithms it supports for verifying the server's signature. The server <span class="bcp14">MAY</span> include this extension in <code>CertificateRequest</code> message to classical and PQ algorithms it supports for verifying the client's signature. This extension <span class="bcp14">MAY</span> be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.<a href="#section-5.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.1.2-1">The client <span class="bcp14">MAY</span> include this extension in <code>ClientHello</code> message to indicate the different categories of algorithms it supports for verifying the server's signature. The server <span class="bcp14">MAY</span> include this extension in <code>CertificateRequest</code> message to indicate the different categories of algorithms it supports for verifying the client's signature. This extension <span class="bcp14">MAY</span> be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.<a href="#section-5.1.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.1.2-2">If the extension is present in <code>ClientHello</code>, <code>CertificateRequest</code> or Authenticator Request, the peer <span class="bcp14">MAY</span> respond with a dual-certificate authentication structure. If the extension is absent, the peer <span class="bcp14">MUST NOT</span> send a two certificate chains or two signatures.<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.1.2-3">The presence of this extension alone does not mandate dual authentication. It is up to the peer to determine whether one or two certificate chains and signatures are required based on local policy and validation logic. A single certificate and a single signature encoded in <code>Certificate</code> and <code>CertificateVerify</code> messages remain valid as long as the certificate and its corresponding signature algorithm comply with the values in the <code>signature_algorithms</code> or <code>signature_algorithms_cert</code> extension.<a href="#section-5.1.2-3" class="pilcrow">¶</a></p>
 </section>
@@ -1556,7 +1556,7 @@ struct {
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-updated-certificateentry-st" class="selfRef">Updated CertificateEntry structure definition</a>
             </figcaption></figure>
-<p id="section-5.2.1-4">All entries before the delimiter are treated as the first certificate chain and <span class="bcp14">MUST</span> use classical algorithms from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, all entries after the delimiter are treated as the second certificate chain and <span class="bcp14">MUST</span> use PQ algorithms from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension. As specified in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>, end-entity certificate <span class="bcp14">MUST</span> be the first in both chains.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-4">All entries before the delimiter are treated as the first certificate chain and <span class="bcp14">MUST</span> use algorithms from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension (for example classical algorithms), all entries after the delimiter are treated as the second certificate chain and <span class="bcp14">MUST</span> use algorithms from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension (for example PQC algorithms). As specified in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>, end-entity certificate <span class="bcp14">MUST</span> be the first in both chains.<a href="#section-5.2.1-4" class="pilcrow">¶</a></p>
 <p id="section-5.2.1-5">A peer receiving this structure <span class="bcp14">MUST</span> validate each chain independently according to its corresponding signature algorithm. The end-entity certificate <span class="bcp14">MUST</span> be the first entry in both the first and second certificate chains. The first certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>first_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. The second certificate chain <span class="bcp14">MUST</span> contain certificates whose public key is compatible with one of the algorithms listed in the <code>second_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
 <p id="section-5.2.1-6">This encoding applies equally to the <code>CompressedCertificate</code> message and to <code>Certificate</code> message of Exported Authenticators.<a href="#section-5.2.1-6" class="pilcrow">¶</a></p>
 </section>

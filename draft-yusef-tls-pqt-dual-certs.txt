@@ -6,7 +6,7 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 18 December 2025                                   M. Ounsworth
+Expires: 19 December 2025                                   M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
@@ -14,7 +14,7 @@ Expires: 18 December 2025                                   M. Ounsworth
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                            16 June 2025
+                                                            17 June 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 December 2025.
+   This Internet-Draft will expire on 19 December 2025.
 
 Copyright Notice
 
@@ -298,7 +298,7 @@ Table of Contents
 
    A new extension, dual_signature_algorithms, is defined to allow peers
    to advertise support for two distinct categories of signature
-   algorithms: classical and post-quantum.
+   algorithms, for example, classical and post-quantum.
 
 5.1.1.  Structure
 
@@ -321,12 +321,13 @@ Table of Contents
 5.1.2.  Use in Handshake and Exported Authenticator Messages
 
    The client MAY include this extension in ClientHello message to
-   indicate classical and PQ algorithms it supports for verifying the
-   server's signature.  The server MAY include this extension in
-   CertificateRequest message to classical and PQ algorithms it supports
-   for verifying the client's signature.  This extension MAY be included
-   in an Authenticator Request by the requestor to signal support for
-   dual certificates in the response.
+   indicate the different categories of algorithms it supports for
+   verifying the server's signature.  The server MAY include this
+   extension in CertificateRequest message to indicate the different
+   categories of algorithms it supports for verifying the client's
+   signature.  This extension MAY be included in an Authenticator
+   Request by the requestor to signal support for dual certificates in
+   the response.
 
    If the extension is present in ClientHello, CertificateRequest or
    Authenticator Request, the peer MAY respond with a dual-certificate
@@ -387,13 +388,14 @@ Table of Contents
           Figure 3: Updated CertificateEntry structure definition
 
    All entries before the delimiter are treated as the first certificate
-   chain and MUST use classical algorithms from
-   first_signature_algorithms list of dual_signature_algorithms
-   extension, all entries after the delimiter are treated as the second
-   certificate chain and MUST use PQ algorithms from
+   chain and MUST use algorithms from first_signature_algorithms list of
+   dual_signature_algorithms extension (for example classical
+   algorithms), all entries after the delimiter are treated as the
+   second certificate chain and MUST use algorithms from
    second_signature_algorithms list of dual_signature_algorithms
-   extension.  As specified in Section 4.4.2 of [TLS], end-entity
-   certificate MUST be the first in both chains.
+   extension (for example PQC algorithms).  As specified in
+   Section 4.4.2 of [TLS], end-entity certificate MUST be the first in
+   both chains.
 
    A peer receiving this structure MUST validate each chain
    independently according to its corresponding signature algorithm.
