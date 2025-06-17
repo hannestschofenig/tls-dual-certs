@@ -349,7 +349,7 @@ To achieve the intended security guarantees, implementers and deployment operato
 
 Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status. Operators MUST ensure that revocation checking, such as using OCSP or CRLs, is consistently applied to both chains to prevent reliance on revoked credentials.
 
-## Preventing Downgrade Attacks 
+## Preventing Downgrade Attacks
 
 TLS clients that are capable of accepting both traditional-only certificates and dual certificate configurations may remain vulnerable to downgrade attacks. In such a scenario, an attacker with access to a CRQC could forge a valid traditional certificate to impersonate the server and it does not indicate support for dual certificates. To mitigate this risk, clients should progressively phase out acceptance of traditional-only certificate chains once dual certificate deployment is widespread and interoperability with legacy servers is no longer necessary. During the transition period, accepting traditional-only certificate chains may remain necessary to maintain backward compatibility with servers that have not yet deployed dual certificates.
 
