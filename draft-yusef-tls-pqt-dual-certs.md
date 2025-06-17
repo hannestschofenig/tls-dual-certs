@@ -373,6 +373,7 @@ IANA is requested to add the following entry to the "TLS Alerts" registry:
 # Acknowledgments
 
 We would like to thank Suzanne Wibada (Université de Sherbrooke) for her reviews and comments during the work on the initial version of this document, and her willingness to implement the recommendation of this document.
+
 --- back
 
 # Informal Requirements for Dual TLS Certificate Support
