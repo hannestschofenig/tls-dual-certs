@@ -401,18 +401,6 @@ Each certificate chain (e.g., classic and PQ) must be independently usable for a
 
 The mechanism must clearly distinguish and delimit multiple certificate chains to prevent ambiguity or misinterpretation.
 
-### Chain-Specific Signature Algorithms
-
-Each certificate chain must be associated with its own set of supported signature algorithms, allowing negotiation of appropriate algorithms for classic and PQ use cases.
-
-_MikeO: I don't know what this means. We are currently not providing a mechanism to negotiate two independent sets of `signature_algorithms_cert`. So are we failing this design goal? We had better not build in an assumption that leaf certs and their chains use the same algorithm, that would be bad. Personally, I would just delete this because I don't think it's adding value._
-
-### Multiple Chains Support (Generalisation)
-
-The mechanism must be designed in a way that could support more than two certificate chains in the future, not just hardcoded to classic + PQ.
-
-_MikeO: I disagree with this goal and I think it should be removed._
-
 ## Use Case and Deployment Flexibility
 
 ### Backward Compatibility
