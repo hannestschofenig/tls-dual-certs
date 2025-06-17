@@ -179,7 +179,7 @@ When parsing `DualSignatureSchemeList`, implementations MUST NOT make assumption
 
 The client MAY include this extension in `ClientHello` message to indicate combinations of dual algorithms it supports for verifying the server's signature. The server MAY include this extension in `CertificateRequest` message indicate combinations of dual algorithms it supports for verifying the client's signature. This extension MAY be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.
 
-If the extension is present in `ClientHello`, `CertificateRequest` {{!RFC8446}} or Authenticator Request {{!RFC9261}}, the peer MAY respond with a dual-certificate authentication structure. If the extension is absent, the peer MUST NOT send a two certificate chains or two signatures.
+If the extension is present in `ClientHello`, `CertificateRequest` of {{TLS}} or Authenticator Request defined in {{Section 4 of EXPORTED-AUTH}}, the peer MAY respond with a dual-certificate authentication structure. If the extension is absent, the peer MUST NOT send a two certificate chains or two signatures.
 
 The presence or absence of the `dual_signature_algorithms` indicates whether dual authentication is supported, but does not mandate it. The peer MAY select an authenticator advertised in a different extension, such as selecting a single algorithm from `signature_algorithms` and proceeding with single-algorithm `Certificate` and `CertificateVerify` messages as usual.
 
