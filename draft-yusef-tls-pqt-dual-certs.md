@@ -109,7 +109,7 @@ This allows both endpoints to signal independently two distinct algorithms for d
 
 The `dual_signature_algorithms` can also be used in `extensions` of `CertificateRequest` and `ClientCertificateRequest` structures of Authenticator Request message of Exported Authenticators as defined in {{Section 4 of EXPORTED-AUTH}}.
 
-The `dual_signature_algorithms` extension does not replace `signature_algorithms`. Since `signature_algorithms` is required any time that certificate-based authentication is requested {{Section 4.2.3 of RFC8446}}, TLS peers MUST include the `signature_algorithms` extension regardless of whether `dual_signature_algorithms` is used. The `signature_algorithms` extension indicates algorithms acceptable for single-certificate authentication and MUST contain either a non-empty list of such algorithms or be empty if only dual-certificate authentication is acceptable.
+The `dual_signature_algorithms` extension does not replace `signature_algorithms`. Since `signature_algorithms` is required any time that certificate-based authentication is requested according to {{Section 4.2.3 of TLS}}, TLS peers MUST include the `signature_algorithms` extension regardless of whether `dual_signature_algorithms` is used. The `signature_algorithms` extension indicates algorithms acceptable for single-certificate authentication and MUST contain either a non-empty list of such algorithms or be empty if only dual-certificate authentication is acceptable.
 
 ## Certificate Chain Encoding
 
