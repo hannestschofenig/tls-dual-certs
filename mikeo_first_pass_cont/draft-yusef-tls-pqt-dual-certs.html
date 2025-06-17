@@ -1518,7 +1518,7 @@ struct {
 <a href="#section-5.1.2" class="section-number selfRef">5.1.2. </a><a href="#name-use-in-handshake-and-export" class="section-name selfRef">Use in Handshake and Exported Authenticator Messages</a>
           </h4>
 <p id="section-5.1.2-1">The client <span class="bcp14">MAY</span> include this extension in <code>ClientHello</code> message to indicate combinations of dual algorithms it supports for verifying the server's signature. The server <span class="bcp14">MAY</span> include this extension in <code>CertificateRequest</code> message indicate combinations of dual algorithms it supports for verifying the client's signature. This extension <span class="bcp14">MAY</span> be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.<a href="#section-5.1.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.1.2-2">If the extension is present in <code>ClientHello</code>, <code>CertificateRequest</code> <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> or Authenticator Request <span>[<a href="#RFC9261" class="cite xref">RFC9261</a>]</span>, the peer <span class="bcp14">MAY</span> respond with a dual-certificate authentication structure. If the extension is absent, the peer <span class="bcp14">MUST NOT</span> send a two certificate chains or two signatures.<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.1.2-2">If the extension is present in <code>ClientHello</code>, <code>CertificateRequest</code> of <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> or Authenticator Request defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-4" class="relref">Section 4</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>, the peer <span class="bcp14">MAY</span> respond with a dual-certificate authentication structure. If the extension is absent, the peer <span class="bcp14">MUST NOT</span> send a two certificate chains or two signatures.<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.1.2-3">The presence or absence of the <code>dual_signature_algorithms</code> indicates whether dual authentication is supported, but does not mandate it. The peer <span class="bcp14">MAY</span> select an authenticator advertised in a different extension, such as selecting a single algorithm from <code>signature_algorithms</code> and proceeding with single-algorithm <code>Certificate</code> and <code>CertificateVerify</code> messages as usual.<a href="#section-5.1.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1925,10 +1925,6 @@ struct {
 <dt id="RFC8446">[RFC8446]</dt>
         <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC9261">[RFC9261]</dt>
-        <dd>
-<span class="refAuthor">Sullivan, N.</span>, <span class="refTitle">"Exported Authenticators in TLS"</span>, <span class="seriesInfo">RFC 9261</span>, <span class="seriesInfo">DOI 10.17487/RFC9261</span>, <time datetime="2022-07" class="refDate">July 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9261">https://www.rfc-editor.org/rfc/rfc9261</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TLS">[TLS]</dt>
       <dd>
