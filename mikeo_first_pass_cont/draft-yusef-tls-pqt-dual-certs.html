@@ -1792,7 +1792,7 @@ struct {
             <p id="section-8.1-2.1.1">the guarantee that an adversary cannot simply “remove” one of the component signatures without evidence left behind.<a href="#section-8.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-8.1-3">As defined in TLS 1.3 <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.4" class="relref">Section 4.4</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>, CertificateVerify (and therefore by extension DualCertificateVerify) contain signatures over the value <code>Transcript-Hash(Handshake Context, Certificate)</code>. In the dual certificate context, <code>Certificate</code> will contain both certificate chains, which is sufficient to cause the client to abort and therefore achieves Weak Non-Separability.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+<p id="section-8.1-3">As defined in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4" class="relref">Section 4.4</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>, <code>CertificateVerify</code> (and therefore by extension <code>DualCertificateVerify</code>) contains signatures over the value <code>Transcript-Hash(Handshake Context, Certificate)</code>. In the dual certificate context, <code>Certificate</code> will contain both certificate chains, which is sufficient to cause the client to abort and therefore achieves Weak Non-Separability.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="signature-validation-requirements">
