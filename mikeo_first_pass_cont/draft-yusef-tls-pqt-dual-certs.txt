@@ -307,8 +307,8 @@ Table of Contents
 
 5.1.1.  Structure
 
-   TLS 1.3 defines SignatureSchemeList Section 4.2.3 of [RFC8446], which
-   is reproduced here:
+   SignatureSchemeList is defined in Section 4.2.3 of [TLS], which is
+   reproduced here:
 
    struct {
         SignatureScheme supported_signature_algorithms<2..2^16-2>;
