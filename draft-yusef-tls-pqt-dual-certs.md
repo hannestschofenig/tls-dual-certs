@@ -145,7 +145,7 @@ This section defines the normative changes to TLS 1.3 required to support dual-c
 
 ## `dual_signature_algorithms` Extension
 
-A new extension, `dual_signature_algorithms`, is defined to allow peers to advertise support for two distinct categories of signature algorithms: classical and post-quantum.
+A new extension, `dual_signature_algorithms`, is defined to allow peers to advertise support for two distinct categories of signature algorithms, for example, classical and post-quantum.
 
 ### Structure
 
@@ -163,7 +163,7 @@ SignatureScheme is a 2-octet value identifying a supported signature algorithm a
 
 ### Use in Handshake and Exported Authenticator Messages
 
-The client MAY include this extension in `ClientHello` message to indicate classical and PQ algorithms it supports for verifying the server's signature. The server MAY include this extension in `CertificateRequest` message to classical and PQ algorithms it supports for verifying the client's signature. This extension MAY be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.
+The client MAY include this extension in `ClientHello` message to indicate the different categories of algorithms it supports for verifying the server's signature. The server MAY include this extension in `CertificateRequest` message to indicate the different categories of algorithms it supports for verifying the client's signature. This extension MAY be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.
 
 If the extension is present in `ClientHello`, `CertificateRequest` or Authenticator Request, the peer MAY respond with a dual-certificate authentication structure. If the extension is absent, the peer MUST NOT send a two certificate chains or two signatures.
 
@@ -208,7 +208,7 @@ struct {
 ~~~~~~~~~~
 {: title="Updated CertificateEntry structure definition"}
 
-All entries before the delimiter are treated as the first certificate chain and MUST use classical algorithms from `first_signature_algorithms` list of `dual_signature_algorithms` extension, all entries after the delimiter are treated as the second certificate chain and MUST use PQ algorithms from `second_signature_algorithms` list of `dual_signature_algorithms` extension. As specified in {{Section 4.4.2 of TLS}}, end-entity certificate MUST be the first in both chains.
+All entries before the delimiter are treated as the first certificate chain and MUST use algorithms from `first_signature_algorithms` list of `dual_signature_algorithms` extension (for example classical algorithms), all entries after the delimiter are treated as the second certificate chain and MUST use algorithms from `second_signature_algorithms` list of `dual_signature_algorithms` extension (for example PQC algorithms). As specified in {{Section 4.4.2 of TLS}}, end-entity certificate MUST be the first in both chains.
 
 A peer receiving this structure MUST validate each chain independently according to its corresponding signature algorithm. The end-entity certificate MUST be the first entry in both the first and second certificate chains. The first certificate chain MUST contain certificates whose public key is compatible with one of the algorithms listed in the `first_signature_algorithms` section of `dual_signature_algorithms` extension. The second certificate chain MUST contain certificates whose public key is compatible with one of the algorithms listed in the `second_signature_algorithms` section of `dual_signature_algorithms` extension.
 
