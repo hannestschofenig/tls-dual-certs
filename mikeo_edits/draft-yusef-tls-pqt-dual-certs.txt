@@ -6,7 +6,7 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 18 December 2025                                   M. Ounsworth
+Expires: 19 December 2025                                   M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
@@ -14,7 +14,7 @@ Expires: 18 December 2025                                   M. Ounsworth
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                            16 June 2025
+                                                            17 June 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 December 2025.
+   This Internet-Draft will expire on 19 December 2025.
 
 Copyright Notice
 
@@ -116,8 +116,6 @@ Table of Contents
      A.2.  Dual Certificate Semantics
        A.2.1.  Independent Chain Usability
        A.2.2.  Unambiguous Chain Separation
-       A.2.3.  Chain-Specific Signature Algorithms
-       A.2.4.  Multiple Chains Support (Generalisation)
      A.3.  Use Case and Deployment Flexibility
        A.3.1.  Backward Compatibility
        A.3.2.  Forward Compatibility
@@ -782,27 +780,6 @@ A.2.2.  Unambiguous Chain Separation
 
    The mechanism must clearly distinguish and delimit multiple
    certificate chains to prevent ambiguity or misinterpretation.
-
-A.2.3.  Chain-Specific Signature Algorithms
-
-   Each certificate chain must be associated with its own set of
-   supported signature algorithms, allowing negotiation of appropriate
-   algorithms for classic and PQ use cases.
-
-   _MikeO: I don't know what this means.  We are currently not providing
-   a mechanism to negotiate two independent sets of
-   signature_algorithms_cert.  So are we failing this design goal?  We
-   had better not build in an assumption that leaf certs and their
-   chains use the same algorithm, that would be bad.  Personally, I
-   would just delete this because I don't think it's adding value._
-
-A.2.4.  Multiple Chains Support (Generalisation)
-
-   The mechanism must be designed in a way that could support more than
-   two certificate chains in the future, not just hardcoded to classic +
-   PQ.
-
-   _MikeO: I disagree with this goal and I think it should be removed._
 
 A.3.  Use Case and Deployment Flexibility
 
