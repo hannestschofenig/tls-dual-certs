@@ -290,77 +290,6 @@ To mitigate these impacts, deployments can apply certificate chain optimization 
 
 One implication of the design of this dual-algorithm negotiation mechanism is that the peer MUST honour any combination of algorithms from the `first_signature_algorithms` and `second_signature_algorithms` lists that the other peer chooses, even if it chooses the two largest or the two slowest algorithms. In constrained environments, it is important for TLS implementations to be configured with this in mind.
 
-# Client-Driven Authentication Requirements {#sec-policy-examples}
-
-_MikeO: I don't see anything normative in this section that is not already covered normatively above. I would move it to an appendix and rename it "Policy Examples". I would rename "Type X" to "Example X"._
-
-This section provides examples of cryptographic policies and examples of how to set `signature_algorithms` and `dual_signature_algorithms` in order to implement that policy. This section is non-normative, and other ways of implementing the same policy are possible; in particular the first and second lists within a `dual_signature_algorithms` extension MAY be swapped in any of the examples below without changing the semantics.
-
-The scenarios in this section describe server authentication behavior based on client policy. Each case reflects a different client capability and authentication policy, based on how the client populates the `signature_algorithms`, `signature_algorithms_cert`, and `dual_signature_algorithms` extensions.
-
-For client authentication, the same principles apply with roles reversed: the server drives authentication requirements by sending a `CertificateRequest` message that includes appropriate extensions.
-
-## Type 1: Single-certificate
-
-Client requires only one classical, pq or a composite signature. Client either does not support or is not configured to accept dual certificates.
-
-Client behavior:
-
-- Includes supported algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
-- Does not include `dual_signature_algorithms`.
-
-To satisfy this client, the server MUST send a single certificate chain with compatible algorithms and include a single signature in `CertificateVerify`.
-
-## Type 2: Dual-Compatible, Classic Primary, PQ Optional
-
-Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.
-
-Client behavior:
-
-- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
-- Includes supported classical algorithms again in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
-
-To satisfy this client, the server MUST either:
-
-- Provide a single certificate chain with compatible classical algorithms and include a single signature in `CertificateVerify`, or
-- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `DualCertificateVerify` as described in {{certificate-verify}}
-
-## Type 3: Strict Dual
-
-Client requires both classical and PQ authentication to be performed simultaneously. It does not support composite certificates.
-
-Client behavior:
-
-- Includes an empty list in `signature_algorithms` (since this extension is required by [RFC8446] whenever certificate authentication is desired).
-- Includes supported classical algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
-
-To satisfy this client, the server MUST provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
-
-## Type 4: Dual-Compatible, PQ Primary, Classic Optional
-
-Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.
-
-Client behavior:
-
-- Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
-- Includes supported classical algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms again in `second_signature_algorithms` list of `dual_signature_algorithms`.
-
-To satisfy this client, the server MUST either:
-
-- Provide a single certificate chain with compatible PQ algorithms and include a single signature in `CertificateVerify`, or
-- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
-
-## Compatibility with composite certificates
-
-Clients and servers may choose to support composite certificate schemes, such as those defined in {{TLS-COMPOSITE-MLDSA}}. In these schemes, a single certificate contains a composite public key, and the associated signature proves knowledge of private keys of all components. However, from the perspective of the TLS protocol, this is a single certificate producing a single signature and so use of `dual_signature_algorithms` is not required.
-
-If a composite signature algorithm appears in the `signature_algorithms` extension, it can fulfill the client's requirements for both classical and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.
-
-The advantages of dual certificates over composites is operational flexibility for both Certification Authority operators and TLS server and client operators because two CAs and end-entity certificates, one classical and one PQ, allows for backwards compatible and dynamic negotiation of pure classical, pure PQ, or dual.
-
-The advantages of composites over dual certificates is that the certificate chains themselves are protected by dual-algorithms, which can be of great importance in use cases where trust stores are not easily updatable.
-
-It is worth noting that composites present as simply another signature algorithm, and as such nothing prevents them from being used as a component within a `dual_signature_algorithm`.
 
 #  Security Considerations
 
@@ -494,3 +423,76 @@ This section gives a non-normative suggestion for a mechanism for configuration 
 {{sec-structure}} requires that any supported algorithm MAY appear in either the first or second list within a `DualSignatureSchemeList`, however it leaves open the policy for selecting a pair.
 
 The suggested implementation enforces server-preference by allowing an operator to rank the provisioned certificates from most-preferred to least-preferred. Beginning with the most-preferred, if this algorithm appears in either list, then this is selected and selection continues down the list of provisioned certificates until one is found that appears on the other list. Implementations MUST NOT select two algorithms from the same list. Regardless of which algorithm was select first according to this preference selection routine, the certificates and signatures MUST be returned in the first and second slot according to which list they appeared in. This preference selection routine has the benefit that the algorithm selection is not affected by swapping the first and second lists, which allows for greater configuration flexibility and therefore greater overall interoperability.
+
+# Compatibility with composite certificates
+
+Clients and servers may choose to support composite certificate schemes, such as those defined in {{TLS-COMPOSITE-MLDSA}}. In these schemes, a single certificate contains a composite public key, and the associated signature proves knowledge of private keys of all components. However, from the perspective of the TLS protocol, this is a single certificate producing a single signature and so use of `dual_signature_algorithms` is not required.
+
+If a composite signature algorithm appears in the `signature_algorithms` extension, it can fulfill the client's requirements for both classical and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.
+
+The advantages of dual certificates over composites is operational flexibility for both Certification Authority operators and TLS server and client operators because two CAs and end-entity certificates, one classical and one PQ, allows for backwards compatible and dynamic negotiation of pure classical, pure PQ, or dual.
+
+The advantages of composites over dual certificates is that the certificate chains themselves are protected by dual-algorithms, which can be of great importance in use cases where trust stores are not easily updatable.
+
+It is worth noting that composites present as simply another signature algorithm, and as such nothing prevents them from being used as a component within a `dual_signature_algorithm`.
+
+
+
+# Policy Examples {#sec-policy-examples}
+
+This section provides examples of cryptographic policies and examples of how to set `signature_algorithms` and `dual_signature_algorithms` in order to implement that policy. This section is non-normative, and other ways of implementing the same policy are possible; in particular the first and second lists within a `dual_signature_algorithms` extension MAY be swapped in any of the examples below without changing the semantics.
+
+The scenarios in this section describe server authentication behavior based on client policy. Each case reflects a different client capability and authentication policy, based on how the client populates the `signature_algorithms`, `signature_algorithms_cert`, and `dual_signature_algorithms` extensions.
+
+For client authentication, the same principles apply with roles reversed: the server drives authentication requirements by sending a `CertificateRequest` message that includes appropriate extensions.
+
+## Example 1: Single-certificate
+
+Client requires only one classical, pq or a composite signature. Client either does not support or is not configured to accept dual certificates.
+
+Client behavior:
+
+- Includes supported algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Does not include `dual_signature_algorithms`.
+
+To satisfy this client, the server MUST send a single certificate chain with compatible algorithms and include a single signature in `CertificateVerify`.
+
+## Example 2: Dual-Compatible, Classic Primary, PQ Optional
+
+Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.
+
+Client behavior:
+
+- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported classical algorithms again in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
+
+To satisfy this client, the server MUST either:
+
+- Provide a single certificate chain with compatible classical algorithms and include a single signature in `CertificateVerify`, or
+- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `DualCertificateVerify` as described in {{certificate-verify}}
+
+## Example 3: Strict Dual
+
+Client requires both classical and PQ authentication to be performed simultaneously. It does not support composite certificates.
+
+Client behavior:
+
+- Includes an empty list in `signature_algorithms` (since this extension is required by [RFC8446] whenever certificate authentication is desired).
+- Includes supported classical algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
+
+To satisfy this client, the server MUST provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
+
+## Example 4: Dual-Compatible, PQ Primary, Classic Optional
+
+Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.
+
+Client behavior:
+
+- Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported classical algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms again in `second_signature_algorithms` list of `dual_signature_algorithms`.
+
+To satisfy this client, the server MUST either:
+
+- Provide a single certificate chain with compatible PQ algorithms and include a single signature in `CertificateVerify`, or
+- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
+
