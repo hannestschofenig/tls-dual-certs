@@ -149,7 +149,7 @@ A new extension, `dual_signature_algorithms`, is defined to allow peers to adver
 
 ### Structure {#sec-structure}
 
-TLS 1.3 defines `SignatureSchemeList` {{Section 4.2.3 of RFC8446}}, which is reproduced here:
+`SignatureSchemeList` is defined in {{Section 4.2.3 of TLS}}, which is reproduced here:
 
 ~~~
 struct {
