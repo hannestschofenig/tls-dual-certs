@@ -1699,8 +1699,6 @@ struct {
 <a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-side-channel-resistance" class="section-name selfRef">Side-Channel Resistance</a>
         </h3>
 <p id="section-7.3-1">Some implementations <span class="bcp14">MAY</span> wish to treat a dual signature as an atomic signing oracle and thus hide side-channels that would allow an attacker to distinguish the first algorithm from the second algorithm, for example if the first signature fails, still perform the second signature before returning an alert. However, in most cases this does not have practical value, for example if all algorithms offered as dual are also offered as single.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.3-2">Distinct context strings are <span class="bcp14">REQUIRED</span> for the two signatures to prevent cross-protocol misuse or collision attacks.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
-<p id="section-7.3-3"><em>MikeO: I think this section needs to be expanded and beefed up with literature references, because I'm not convinced that these are real and justified attacks. If you can get a cross-protocol or collision attack between ML-DSA and ECDSA, I'll be impressed. What does that even mean?</em><a href="#section-7.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="cryptographic-independence-of-the-two-chains">

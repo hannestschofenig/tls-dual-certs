@@ -612,15 +612,6 @@ Table of Contents
    cases this does not have practical value, for example if all
    algorithms offered as dual are also offered as single.
 
-   Distinct context strings are REQUIRED for the two signatures to
-   prevent cross-protocol misuse or collision attacks.
-
-   _MikeO: I think this section needs to be expanded and beefed up with
-   literature references, because I'm not convinced that these are real
-   and justified attacks.  If you can get a cross-protocol or collision
-   attack between ML-DSA and ECDSA, I'll be impressed.  What does that
-   even mean?_
-
 7.4.  Cryptographic Independence Of The Two Chains
 
    This specification does not provide a mechanism to negotiate separate
