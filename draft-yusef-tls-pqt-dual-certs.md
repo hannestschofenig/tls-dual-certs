@@ -311,10 +311,6 @@ Both signatures in the `DualCertificateVerify` message MUST be validated success
 
 Some implementations MAY wish to treat a dual signature as an atomic signing oracle and thus hide side-channels that would allow an attacker to distinguish the first algorithm from the second algorithm, for example if the first signature fails, still perform the second signature before returning an alert. However, in most cases this does not have practical value, for example if all algorithms offered as dual are also offered as single.
 
-Distinct context strings are REQUIRED for the two signatures to prevent cross-protocol misuse or collision attacks.
-
-_MikeO: I think this section needs to be expanded and beefed up with literature references, because I'm not convinced that these are real and justified attacks. If you can get a cross-protocol or collision attack between ML-DSA and ECDSA, I'll be impressed. What does that even mean?_
-
 ## Cryptographic Independence Of The Two Chains
 
 This specification does not provide a mechanism to negotiate separate `signature_algorithms_cert` lists. Therefore while the two selected end-entity certificates will contain keys of different algorithms, it is possible for them to have certificate chains that use the same algorithm. In some cases this could be perfectly acceptable, for example if both chains are rooted in a hash-based signature or a composite, or if it is intentional for both end-entity certificates chain to the same root.
