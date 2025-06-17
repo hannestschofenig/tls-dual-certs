@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-15T01:10:17.704313+00:00",
+  "timestamp": "2025-06-17T01:03:31.096733+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -86,9 +86,17 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-05-29T17:24:08Z",
-      "updatedAt": "2025-05-29T17:24:08Z",
+      "updatedAt": "2025-06-16T20:51:25Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I hope we do not need to say anything about this.\nI hope we have designed this mechanism in a way that it does not interfere in any way with existing extensions, and they continue to work in the obvious way -- in this case: if the client advertises support for only some CAs, then the server must choose two certs that chain to those CAs.\n\nIf we have designed our mechanism in a way that we need to list out every other TLS 1.3 extension and describe custom logic, then God help us when ekr gets to the microphone.",
+          "createdAt": "2025-06-16T20:50:37Z",
+          "updatedAt": "2025-06-16T20:51:25Z"
+        }
+      ]
     },
     {
       "number": 7,
@@ -174,7 +182,7 @@
       "labels": [],
       "body": " we may want to clarify on how clients should behave if one of the certificates is revoked ?",
       "createdAt": "2025-06-10T09:25:56Z",
-      "updatedAt": "2025-06-12T22:10:25Z",
+      "updatedAt": "2025-06-16T20:47:45Z",
       "closedAt": null,
       "comments": [
         {
@@ -183,6 +191,20 @@
           "body": "The current wording is\n\n> Certificate chains must be validated independently, including trust anchors, certificate usage constraints, expiration, and revocation status.\n\nDo you want to expand or strengthen it?",
           "createdAt": "2025-06-12T22:09:59Z",
           "updatedAt": "2025-06-12T22:10:25Z"
+        },
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Perhaps the wording that is missing is \n\n> If either certificate or certificate chain fails validation, then a TLS Alert MUST be returned exactly the same way as if the same error had occurred in a single-certificate setting; i.e. there is no difference in certificate processing logic between single and dual-certificate TLS handshakes. Since certificates are public information and anyone can validate them, there are no timing attacks to consider, so if an error is encountered while processing the first certificate chain, implementations MAY fail early without processing the second.",
+          "createdAt": "2025-06-16T20:44:10Z",
+          "updatedAt": "2025-06-16T20:44:10Z"
+        },
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is basically the same as #11 ",
+          "createdAt": "2025-06-16T20:47:45Z",
+          "updatedAt": "2025-06-16T20:47:45Z"
         }
       ]
     },
@@ -191,15 +213,15 @@
       "id": "I_kwDOOsIF4s67Yw6V",
       "title": "Mention interaction with Certificate_types",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/20",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ounsworth",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "We believe that you cannot negotiate multiple certificate_types, so both certificates would be required to be of the same type. We should add text to make this clear.",
       "createdAt": "2025-06-13T14:50:13Z",
-      "updatedAt": "2025-06-13T14:50:13Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-16T19:19:10Z",
+      "closedAt": "2025-06-16T19:19:10Z",
       "comments": []
     },
     {
@@ -803,24 +825,26 @@
       "id": "PR_kwDOOsIF4s6aXjzA",
       "title": "Updates to the draft",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/19",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "tireddy2",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-06-13T10:38:05Z",
-      "updatedAt": "2025-06-13T15:01:08Z",
+      "updatedAt": "2025-06-15T16:39:20Z",
       "baseRepository": "hannestschofenig/tls-dual-certs",
       "baseRefName": "main",
       "baseRefOid": "a21e49c2bb462ce4689c3a14f1c5967564a7588c",
       "headRepository": "hannestschofenig/tls-dual-certs",
       "headRefName": "tireddy2-patch-1",
-      "headRefOid": "ddb0b112ea088012befe0235077ab5a088403d31",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "4c31ffe63c0edcfc37a24c46a827867fd84abb6d",
+      "closedAt": "2025-06-15T16:39:20Z",
+      "mergedAt": "2025-06-15T16:39:20Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "46af8a50420166aa7e5a6a714143843cec26f53a"
+      },
       "comments": [],
       "reviews": [
         {
@@ -882,6 +906,401 @@
           ]
         }
       ]
+    },
+    {
+      "number": 23,
+      "id": "PR_kwDOOsIF4s6am9CW",
+      "title": "Removed TLS flag and brought back scenarios",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/23",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "On top of that:\r\n- added a bit of text about certificate types to resolve https://github.com/hannestschofenig/tls-dual-certs/issues/20\r\n- added relevant references to composite TLS certificates\r\n- clarified that primary and secondary signature lists must not overlap",
+      "createdAt": "2025-06-15T18:01:55Z",
+      "updatedAt": "2025-06-16T19:19:09Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "46af8a50420166aa7e5a6a714143843cec26f53a",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "main",
+      "headRefOid": "672da86c698acc99c879c81761be12b6b2745088",
+      "closedAt": "2025-06-16T19:19:09Z",
+      "mergedAt": "2025-06-16T19:19:09Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "74c15b234c66366ed05af97418cb0df2983dc2c1"
+      },
+      "comments": [
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Looks good.\r\nI don't know how to easily pull and build Yaroslav's fork locally.\r\nPlease merge this to main, and I'll review the merged version top-to-bottom.",
+          "createdAt": "2025-06-16T16:40:03Z",
+          "updatedAt": "2025-06-16T16:40:03Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6uqrNY",
+          "commit": {
+            "abbreviatedOid": "193a2a0"
+          },
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T01:05:19Z",
+          "updatedAt": "2025-06-16T01:05:20Z",
+          "comments": [
+            {
+              "originalPosition": 235,
+              "body": "> and supported PQ algorithms in `classical_signature_algorithms`\r\n\r\nThis should be 'pq_signature_algorithms'\r\n",
+              "createdAt": "2025-06-16T01:05:20Z",
+              "updatedAt": "2025-06-16T01:05:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6uqrQn",
+          "commit": {
+            "abbreviatedOid": "193a2a0"
+          },
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T01:05:39Z",
+          "updatedAt": "2025-06-16T01:05:39Z",
+          "comments": [
+            {
+              "originalPosition": 249,
+              "body": "> and supported PQ algorithms in `classical_signature_algorithms`\r\n\r\nThis should be 'pq_signature_algorithms'",
+              "createdAt": "2025-06-16T01:05:39Z",
+              "updatedAt": "2025-06-16T01:05:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6uqrU4",
+          "commit": {
+            "abbreviatedOid": "193a2a0"
+          },
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T01:06:02Z",
+          "updatedAt": "2025-06-16T01:06:02Z",
+          "comments": [
+            {
+              "originalPosition": 260,
+              "body": "> and supported PQ algorithms in `classical_signature_algorithms`\r\n\r\nThis should be 'pq_signature_algorithms'",
+              "createdAt": "2025-06-16T01:06:02Z",
+              "updatedAt": "2025-06-16T01:06:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6utvjU",
+          "commit": {
+            "abbreviatedOid": "193a2a0"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T09:02:51Z",
+          "updatedAt": "2025-06-16T09:02:51Z",
+          "comments": [
+            {
+              "originalPosition": 260,
+              "body": "Thanks for noticing. Updated PR.",
+              "createdAt": "2025-06-16T09:02:51Z",
+              "updatedAt": "2025-06-16T09:02:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6utvsS",
+          "commit": {
+            "abbreviatedOid": "193a2a0"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T09:02:59Z",
+          "updatedAt": "2025-06-16T09:03:00Z",
+          "comments": [
+            {
+              "originalPosition": 249,
+              "body": "Thanks for noticing. Updated PR.",
+              "createdAt": "2025-06-16T09:02:59Z",
+              "updatedAt": "2025-06-16T09:03:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6utwgx",
+          "commit": {
+            "abbreviatedOid": "193a2a0"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T09:04:03Z",
+          "updatedAt": "2025-06-16T09:04:03Z",
+          "comments": [
+            {
+              "originalPosition": 235,
+              "body": "Fixed. Thanks!",
+              "createdAt": "2025-06-16T09:04:03Z",
+              "updatedAt": "2025-06-16T09:04:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6uzwpf",
+          "commit": {
+            "abbreviatedOid": "672da86"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-16T16:36:11Z",
+          "updatedAt": "2025-06-16T16:36:11Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "id": "PR_kwDOOsIF4s6anYAm",
+      "title": "MikeO Initial Pass",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/24",
+      "state": "CLOSED",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I started writing out a more formal set of design goals, but then I got to Section 5 and realized that this document is not accomplishing what I believe is a core design requirement, which is the ability to express the following:\r\n\r\n> \"I would accept any SLH-DSA by itself, and ML-DSA-44 and ML-DSA-65 only in a dual-cert hybrid with RSA, ECDSA P-256 or ECDSA P-384.\"\r\n> or\r\n> \"I would accept the composite algorithms MLDSA65_RSA2048 or MLDSA65_ECDSA-P256 by themselves or ML-DSA-65 in a dual-cert hybrid with RSA or ECDSA P-256.\"\r\n\r\n\r\nI also made other editorial impromevents, and I added a few in-line questions / comments.",
+      "createdAt": "2025-06-15T20:05:20Z",
+      "updatedAt": "2025-06-16T17:10:57Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "46af8a50420166aa7e5a6a714143843cec26f53a",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "mikeo_initial_thoughts",
+      "headRefOid": "92b5d22586c39c1afed032a747d0cdcfbe6a2659",
+      "closedAt": "2025-06-16T17:10:00Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The question is: what is the minimum design complexity that would accomplish this goal?\r\n\r\nHere is a different design direction:\r\n\r\n```\r\nNew extension: dual_certificate_algorithms\r\n\r\nstruct {\r\n    SignatureScheme supported_signature_algorithms1<2..2^16-2>;\r\n    SignatureScheme supported_signature_algorithms2<2..2^16-2>;\r\n} DualSignatureSchemeList;\r\n```\r\n\r\nThat way you leave `signature_algorithms` un-touched; those retain their meaning today, which is \"these are algorithms acceptable by themselves with the usual Certificate and CertificateVerify messages\". This list could be empty. And also you add a new extension dual_certificate_algorithms, and if a pair is selected from there, then it uses the modified Certificate and CertificateVerify messages.\r\n\r\nI think this would also interact cleanly with `signature_algorithms_certs` in that it doesn't interact with it at all. We should RECOMMEND that `signature_algorithms_certs` contain the union of all three `signature_algorithms` lists.",
+          "createdAt": "2025-06-15T20:25:46Z",
+          "updatedAt": "2025-06-15T21:31:50Z"
+        },
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I believe Yavoslav has manually imported these changes into #23, and this can be closed?",
+          "createdAt": "2025-06-16T16:40:43Z",
+          "updatedAt": "2025-06-16T16:40:43Z"
+        },
+        {
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "body": "As Mike mentioned, Yavoslav has manually imported these changes into https://github.com/hannestschofenig/tls-dual-certs/pull/23",
+          "createdAt": "2025-06-16T17:10:57Z",
+          "updatedAt": "2025-06-16T17:10:57Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 25,
+      "id": "PR_kwDOOsIF4s6axgaN",
+      "title": "Renamed dual_signature_algorithms components",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/25",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As suggested by @ounsworth renamed `classical_signature_algorithms` to `first_signature_algorithms` and `pq_signature_algorithms` to `second_signature_algorithms`",
+      "createdAt": "2025-06-16T19:24:10Z",
+      "updatedAt": "2025-06-16T19:30:33Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "74c15b234c66366ed05af97418cb0df2983dc2c1",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "main",
+      "headRefOid": "b38f95555a51240870c973d859081bafd6ad707f",
+      "closedAt": "2025-06-16T19:30:33Z",
+      "mergedAt": "2025-06-16T19:30:33Z",
+      "mergedBy": "rifaat-ietf",
+      "mergeCommit": {
+        "oid": "8ebd40d3d7ad948a4cd7cc1767437d51a997141c"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 26,
+      "id": "PR_kwDOOsIF4s6axikw",
+      "title": "Removed specific mentioning of timing attacks",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/26",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As suggested by @ounsworth ",
+      "createdAt": "2025-06-16T19:27:40Z",
+      "updatedAt": "2025-06-16T20:10:31Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "74c15b234c66366ed05af97418cb0df2983dc2c1",
+      "headRepository": "yaroslavros/tls-dual-certs",
+      "headRefName": "remove_timing",
+      "headRefOid": "b50eb4bb0fc36f72d4028900394c615d0784b402",
+      "closedAt": "2025-06-16T20:10:31Z",
+      "mergedAt": "2025-06-16T20:10:31Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "07cd862405e3cdc1ab038e5a7e56f9b0011d7b64"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6u1oor",
+          "commit": {
+            "abbreviatedOid": "cc9b5e9"
+          },
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T19:41:54Z",
+          "updatedAt": "2025-06-16T19:41:54Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": ">to avoid side-channel information\r\n\r\nI guess this should be: \r\nto avoid **leaking** side-channel information.",
+              "createdAt": "2025-06-16T19:41:54Z",
+              "updatedAt": "2025-06-16T19:41:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6u17oz",
+          "commit": {
+            "abbreviatedOid": "cc9b5e9"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T20:10:25Z",
+          "updatedAt": "2025-06-16T20:10:25Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Fixed. Thanks!",
+              "createdAt": "2025-06-16T20:10:25Z",
+              "updatedAt": "2025-06-16T20:10:25Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "id": "PR_kwDOOsIF4s6ayffF",
+      "title": "Adjusted signature names",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/27",
+      "state": "MERGED",
+      "author": "yaroslavros",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As suggested by @rifaat-ietf ",
+      "createdAt": "2025-06-16T21:11:04Z",
+      "updatedAt": "2025-06-16T21:12:27Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "07cd862405e3cdc1ab038e5a7e56f9b0011d7b64",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "signature_names",
+      "headRefOid": "28be29d091f5bbd7c4644f16c70b854c04a70ccf",
+      "closedAt": "2025-06-16T21:12:26Z",
+      "mergedAt": "2025-06-16T21:12:26Z",
+      "mergedBy": "rifaat-ietf",
+      "mergeCommit": {
+        "oid": "29b6392a39ae0d13d73ad1d2ac975ed223f6d910"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 28,
+      "id": "PR_kwDOOsIF4s6ay3H4",
+      "title": "MikeO re-working of Design Goals",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/28",
+      "state": "OPEN",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-16T22:01:51Z",
+      "updatedAt": "2025-06-16T22:01:51Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "29b6392a39ae0d13d73ad1d2ac975ed223f6d910",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "mikeo_edits",
+      "headRefOid": "9fa3f7fded9c526486e02662497d647b72e81b53",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 29,
+      "id": "PR_kwDOOsIF4s6azqFd",
+      "title": "MikeO first pass continued",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/29",
+      "state": "OPEN",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "up to the end of section 7\r\n\r\n... taking a break, I'll continue later.",
+      "createdAt": "2025-06-17T00:39:58Z",
+      "updatedAt": "2025-06-17T00:40:02Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "29b6392a39ae0d13d73ad1d2ac975ed223f6d910",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "mikeo_first_pass_cont",
+      "headRefOid": "db5e344b1abdac18e87a2e09aa6fecc6d8a2598c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
