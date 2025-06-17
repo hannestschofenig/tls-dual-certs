@@ -370,7 +370,7 @@ This dual certificate scheme achieves Weak Non-Separability as defined in {{?I-D
 
 > the guarantee that an adversary cannot simply “remove” one of the component signatures without evidence left behind.
 
-As defined in TLS 1.3 {{Section 4.4 of RFC8446}}, CertificateVerify (and therefore by extension DualCertificateVerify) contain signatures over the value `Transcript-Hash(Handshake Context, Certificate)`. In the dual certificate context, `Certificate` will contain both certificate chains, which is sufficient to cause the client to abort and therefore achieves Weak Non-Separability.
+As defined in {{Section 4.4 of TLS}}, `CertificateVerify` (and therefore by extension `DualCertificateVerify`) contains signatures over the value `Transcript-Hash(Handshake Context, Certificate)`. In the dual certificate context, `Certificate` will contain both certificate chains, which is sufficient to cause the client to abort and therefore achieves Weak Non-Separability.
 
 ## Signature Validation Requirements
 
