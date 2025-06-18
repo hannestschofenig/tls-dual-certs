@@ -6,7 +6,7 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 19 December 2025                                   M. Ounsworth
+Expires: 20 December 2025                                   M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
@@ -14,7 +14,7 @@ Expires: 19 December 2025                                   M. Ounsworth
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                            17 June 2025
+                                                            18 June 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 December 2025.
+   This Internet-Draft will expire on 20 December 2025.
 
 Copyright Notice
 
@@ -159,14 +159,19 @@ Table of Contents
    entity.
 
    This method exemplifies a PQ/T hybrid protocol with non-composite
-   authentication defined in Section 4 of {I-D.ietf-pquip-pqt-hybrid-
+   authentication as defined in Section 4 of {I-D.ietf-pquip-pqt-hybrid-
    terminology}, where two single-algorithm schemes are used in
-   parallel: each certificate chain uses the same format as in standard
-   PKI, and both chains together provide hybrid assurance without
-   modifying the X.509 certificate structure.  While this approach does
-   not produce a single cryptographic hybrid signature, it ensures that
-   both certificates are presented, validated, and cryptographically
-   bound to the TLS handshake transcript.
+   parallel: when the certificate type is X.509, each certificate chain
+   uses the same format as in standard PKI, and both chains together
+   provide hybrid assurance without modifying the X.509 certificate
+   structure.  While this approach does not produce a single
+   cryptographic hybrid signature, it ensures that both certificates are
+   presented, validated, and cryptographically bound to the TLS
+   handshake transcript.  This specification is also compatible with
+   other certificate types defined in the TLS Certificate Types registry
+   [?RFC8447] provided that both components of the dual are of the same
+   type.  This document assumes X.509 certificates for all explanatory
+   text.
 
 2.  Conventions and Definitions
 
