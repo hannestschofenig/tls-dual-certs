@@ -14,14 +14,14 @@
 <meta content="
        This document extends the TLS 1.3 authentication mechanism to allow the negotiation and use of two signature algorithms to enable dual-algorithm hybrid authentication, ensuring that an attacker would need to break both algorithms to compromise the session. The two signature algorithms come from two independent certificates that together produce a single  Certificate  and  CertificateVerify  message. 
     " name="description">
-<meta content="xml2rfc 3.28.1" name="generator">
+<meta content="xml2rfc 3.29.0" name="generator">
 <meta content="PKI" name="keyword">
 <meta content="Post-Quantum Traditional (PQ/T) Hybrid Authentication" name="keyword">
 <meta content="PQC" name="keyword">
 <meta content="TLS" name="keyword">
 <meta content="draft-yusef-tls-pqt-dual-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.1
+  xml2rfc 3.29.0
     Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
@@ -1172,24 +1172,13 @@ svg :is([fill="white"], [fill^="#fff"]) {
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
-                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-open-design-issues" class="internal xref">Open Design Issues</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
-                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-allow-mixed-certificate-cha" class="internal xref">Allow mixed certificate chains?</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3">
-                <p id="section-toc.1-1.1.2.3.1" class="keepWithNext"><a href="#section-1.3" class="auto internal xref">1.3</a>.  <a href="#name-can-the-client-fail-if-it-d" class="internal xref">Can the client fail if it doesn't like the server's choice?</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-scope" class="internal xref">Scope</a></p>
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-scope" class="internal xref">Scope</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-design-overview" class="internal xref">Design Overview</a></p>
@@ -1202,6 +1191,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
                 <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-certificateverify-signature" class="internal xref">CertificateVerify Signatures</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-common-chains" class="internal xref">Common Chains</a></p>
 </li>
             </ul>
 </li>
@@ -1289,89 +1281,100 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-informal-requirements-for-d" class="internal xref">Informal Requirements for Dual TLS Certificate Support</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-open-design-issues" class="internal xref">Open Design Issues</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-general-tls-semantics" class="internal xref">General TLS Semantics</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1.2.1">
-                    <p id="section-toc.1-1.11.2.1.2.1.1"><a href="#appendix-A.1.1" class="auto internal xref">A.1.1</a>.  <a href="#name-protocol-flow-consistency" class="internal xref">Protocol Flow Consistency</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1.2.2">
-                    <p id="section-toc.1-1.11.2.1.2.2.1"><a href="#appendix-A.1.2" class="auto internal xref">A.1.2</a>.  <a href="#name-minimal-protocol-changes" class="internal xref">Minimal Protocol Changes</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1.2.3">
-                    <p id="section-toc.1-1.11.2.1.2.3.1"><a href="#appendix-A.1.3" class="auto internal xref">A.1.3</a>.  <a href="#name-mtls-support" class="internal xref">mTLS support</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1.2.4">
-                    <p id="section-toc.1-1.11.2.1.2.4.1"><a href="#appendix-A.1.4" class="auto internal xref">A.1.4</a>.  <a href="#name-exported-authenticators-com" class="internal xref">Exported Authenticators Compatibility</a></p>
-</li>
-                </ul>
+                <p id="section-toc.1-1.11.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-allow-mixed-certificate-cha" class="internal xref">Allow mixed certificate chains?</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
-                <p id="section-toc.1-1.11.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-certificate-handling-semant" class="internal xref">Certificate Handling Semantics</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2.2.1">
-                    <p id="section-toc.1-1.11.2.2.2.1.1"><a href="#appendix-A.2.1" class="auto internal xref">A.2.1</a>.  <a href="#name-independent-chain-usability" class="internal xref">Independent Chain Usability</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2.2.2">
-                    <p id="section-toc.1-1.11.2.2.2.2.1"><a href="#appendix-A.2.2" class="auto internal xref">A.2.2</a>.  <a href="#name-unambiguous-chain-separatio" class="internal xref">Unambiguous Chain Separation</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2.2.3">
-                    <p id="section-toc.1-1.11.2.2.2.3.1"><a href="#appendix-A.2.3" class="auto internal xref">A.2.3</a>.  <a href="#name-chain-specific-signature-al" class="internal xref">Chain-Specific Signature Algorithms</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2.2.4">
-                    <p id="section-toc.1-1.11.2.2.2.4.1"><a href="#appendix-A.2.4" class="auto internal xref">A.2.4</a>.  <a href="#name-multiple-chains-support-gen" class="internal xref">Multiple Chains Support (Generalisation)</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
-                <p id="section-toc.1-1.11.2.3.1"><a href="#appendix-A.3" class="auto internal xref">A.3</a>.  <a href="#name-use-case-and-deployment-fle" class="internal xref">Use Case and Deployment Flexibility</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3.2.1">
-                    <p id="section-toc.1-1.11.2.3.2.1.1"><a href="#appendix-A.3.1" class="auto internal xref">A.3.1</a>.  <a href="#name-backward-compatibility" class="internal xref">Backward Compatibility</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3.2.2">
-                    <p id="section-toc.1-1.11.2.3.2.2.1"><a href="#appendix-A.3.2" class="auto internal xref">A.3.2</a>.  <a href="#name-policy-signalling" class="internal xref">Policy Signalling</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3.2.3">
-                    <p id="section-toc.1-1.11.2.3.2.3.1"><a href="#appendix-A.3.3" class="auto internal xref">A.3.3</a>.  <a href="#name-future-extendability-to-non" class="internal xref">Future extendability to Non-PQC Multi-Cert Use cases</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3.2.4">
-                    <p id="section-toc.1-1.11.2.3.2.4.1"><a href="#appendix-A.3.4" class="auto internal xref">A.3.4</a>.  <a href="#name-mitigation-of-side-channels" class="internal xref">Mitigation of Side Channels</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3.2.5">
-                    <p id="section-toc.1-1.11.2.3.2.5.1"><a href="#appendix-A.3.5" class="auto internal xref">A.3.5</a>.  <a href="#name-transparency-in-signature-v" class="internal xref">Transparency in Signature Validation</a></p>
-</li>
-                </ul>
+                <p id="section-toc.1-1.11.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-can-the-client-fail-if-it-d" class="internal xref">Can the client fail if it doesn't like the server's choice?</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-suggested-configuration-mec" class="internal xref">Suggested Configuration Mechanism</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-compatibility-with-composit" class="internal xref">Compatibility with composite certificates</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-D" class="auto internal xref">Appendix D</a>.  <a href="#name-policy-examples" class="internal xref">Policy Examples</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-informal-requirements-for-d" class="internal xref">Informal Requirements for Dual TLS Certificate Support</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
-                <p id="section-toc.1-1.14.2.1.1"><a href="#appendix-D.1" class="auto internal xref">D.1</a>.  <a href="#name-example-1-single-certificat" class="internal xref">Example 1: Single-certificate</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-general-tls-semantics" class="internal xref">General TLS Semantics</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.1">
+                    <p id="section-toc.1-1.12.2.1.2.1.1"><a href="#appendix-B.1.1" class="auto internal xref">B.1.1</a>.  <a href="#name-protocol-flow-consistency" class="internal xref">Protocol Flow Consistency</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
-                <p id="section-toc.1-1.14.2.2.1"><a href="#appendix-D.2" class="auto internal xref">D.2</a>.  <a href="#name-example-2-dual-compatible-c" class="internal xref">Example 2: Dual-Compatible, Classic Primary, PQ Optional</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.2">
+                    <p id="section-toc.1-1.12.2.1.2.2.1"><a href="#appendix-B.1.2" class="auto internal xref">B.1.2</a>.  <a href="#name-minimal-protocol-changes" class="internal xref">Minimal Protocol Changes</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.3">
-                <p id="section-toc.1-1.14.2.3.1"><a href="#appendix-D.3" class="auto internal xref">D.3</a>.  <a href="#name-example-3-strict-dual" class="internal xref">Example 3: Strict Dual</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.3">
+                    <p id="section-toc.1-1.12.2.1.2.3.1"><a href="#appendix-B.1.3" class="auto internal xref">B.1.3</a>.  <a href="#name-mtls-support" class="internal xref">mTLS support</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.4">
-                <p id="section-toc.1-1.14.2.4.1"><a href="#appendix-D.4" class="auto internal xref">D.4</a>.  <a href="#name-example-4-dual-compatible-p" class="internal xref">Example 4: Dual-Compatible, PQ Primary, Classic Optional</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1.2.4">
+                    <p id="section-toc.1-1.12.2.1.2.4.1"><a href="#appendix-B.1.4" class="auto internal xref">B.1.4</a>.  <a href="#name-exported-authenticators-com" class="internal xref">Exported Authenticators Compatibility</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-certificate-handling-semant" class="internal xref">Certificate Handling Semantics</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.1">
+                    <p id="section-toc.1-1.12.2.2.2.1.1"><a href="#appendix-B.2.1" class="auto internal xref">B.2.1</a>.  <a href="#name-independent-chain-usability" class="internal xref">Independent Chain Usability</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.2">
+                    <p id="section-toc.1-1.12.2.2.2.2.1"><a href="#appendix-B.2.2" class="auto internal xref">B.2.2</a>.  <a href="#name-unambiguous-chain-separatio" class="internal xref">Unambiguous Chain Separation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.3">
+                    <p id="section-toc.1-1.12.2.2.2.3.1"><a href="#appendix-B.2.3" class="auto internal xref">B.2.3</a>.  <a href="#name-chain-specific-signature-al" class="internal xref">Chain-Specific Signature Algorithms</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2.2.4">
+                    <p id="section-toc.1-1.12.2.2.2.4.1"><a href="#appendix-B.2.4" class="auto internal xref">B.2.4</a>.  <a href="#name-multiple-chains-support-gen" class="internal xref">Multiple Chains Support (Generalisation)</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
+                <p id="section-toc.1-1.12.2.3.1"><a href="#appendix-B.3" class="auto internal xref">B.3</a>.  <a href="#name-use-case-and-deployment-fle" class="internal xref">Use Case and Deployment Flexibility</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.1">
+                    <p id="section-toc.1-1.12.2.3.2.1.1"><a href="#appendix-B.3.1" class="auto internal xref">B.3.1</a>.  <a href="#name-backward-compatibility" class="internal xref">Backward Compatibility</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.2">
+                    <p id="section-toc.1-1.12.2.3.2.2.1"><a href="#appendix-B.3.2" class="auto internal xref">B.3.2</a>.  <a href="#name-policy-signalling" class="internal xref">Policy Signalling</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.3">
+                    <p id="section-toc.1-1.12.2.3.2.3.1"><a href="#appendix-B.3.3" class="auto internal xref">B.3.3</a>.  <a href="#name-future-extendability-to-non" class="internal xref">Future extendability to Non-PQC Multi-Cert Use cases</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.4">
+                    <p id="section-toc.1-1.12.2.3.2.4.1"><a href="#appendix-B.3.4" class="auto internal xref">B.3.4</a>.  <a href="#name-mitigation-of-side-channels" class="internal xref">Mitigation of Side Channels</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3.2.5">
+                    <p id="section-toc.1-1.12.2.3.2.5.1"><a href="#appendix-B.3.5" class="auto internal xref">B.3.5</a>.  <a href="#name-transparency-in-signature-v" class="internal xref">Transparency in Signature Validation</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-suggested-configuration-mec" class="internal xref">Suggested Configuration Mechanism</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-D" class="auto internal xref">Appendix D</a>.  <a href="#name-compatibility-with-composit" class="internal xref">Compatibility with composite certificates</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#appendix-E" class="auto internal xref">Appendix E</a>.  <a href="#name-policy-examples" class="internal xref">Policy Examples</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.1">
+                <p id="section-toc.1-1.15.2.1.1"><a href="#appendix-E.1" class="auto internal xref">E.1</a>.  <a href="#name-example-1-single-certificat" class="internal xref">Example 1: Single-certificate</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.2">
+                <p id="section-toc.1-1.15.2.2.1"><a href="#appendix-E.2" class="auto internal xref">E.2</a>.  <a href="#name-example-2-dual-compatible-c" class="internal xref">Example 2: Dual-Compatible, Classic Primary, PQ Optional</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.3">
+                <p id="section-toc.1-1.15.2.3.1"><a href="#appendix-E.3" class="auto internal xref">E.3</a>.  <a href="#name-example-3-strict-dual" class="internal xref">Example 3: Strict Dual</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.4">
+                <p id="section-toc.1-1.15.2.4.1"><a href="#appendix-E.4" class="auto internal xref">E.4</a>.  <a href="#name-example-4-dual-compatible-p" class="internal xref">Example 4: Dual-Compatible, PQ Primary, Classic Optional</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-F" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1387,54 +1390,6 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <p id="section-1-3">This document defines how TLS 1.3 can utilize such certificates to enable dual-algorithm authentication, ensuring that an attacker would need to break both algorithms to compromise the session.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">It also addresses the challenges of integrating hybrid authentication in TLS 1.3 while balancing backward compatibility, forward security, and deployment practicality.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">This document defines a new extension <code>dual_signature_algorithms</code> to negotiate support for two categories of signature algorithms, typically one set of classic schemes and one set of PQ schemes. It also makes changes to the <code>Certificate</code> and <code>CertificateVerify</code> messages to take advantage of both certificates when authenticating the end entity.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<div id="open-design-issues">
-<section id="section-1.1">
-        <h3 id="name-open-design-issues">
-<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-open-design-issues" class="section-name selfRef">Open Design Issues</a>
-        </h3>
-<p id="section-1.1-1">This section documents open design questions that are not resolved in this version, and for which the authors wish Working Group input.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
-<p id="section-1.1-2">This section is for Working Group review, and to be removed before publication.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="allow-mixed-certificate-chains">
-<section id="section-1.2">
-        <h3 id="name-allow-mixed-certificate-cha">
-<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-allow-mixed-certificate-cha" class="section-name selfRef">Allow mixed certificate chains?</a>
-        </h3>
-<p id="section-1.2-1">Issue: TLS 1.3 has <code>signature_algorithms</code> to negotiate the signature used in the TLS handshake (which is the public key of the EE cert), and optionally <code>signature_algorithms_cert</code> if the peer wishes to negotiate the CA's algorithms separately. Historically, cert chains are either exclusively RSA or exclusively ECDSA and <code>signature_algorithms_certs</code> is badly supported in the wild.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
-<p id="section-1.2-2">The question is whether to continue to support negotiation of CA algs separately from EE algs in a dual context.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
-<p id="section-1.2-3">Design options:<a href="#section-1.2-3" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-1.2-4">
-<li id="section-1.2-4.1">
-            <p id="section-1.2-4.1.1">When a <code>signature_algorithms_certs</code> extension is present, then it applies to both chains of the dual, and <code>dual_signature_algorithms</code> only applies to EE certs. If not present, then <code>dual_signature_algorithms</code> applies to both EE and chain. This is the option chosen for presentation in this version of the draft, and is believed to be most consistent with the intent of 8446, though it is has bad alignment with TLS implementations in the wild and increases implementation complexity.<a href="#section-1.2-4.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-1.2-4.2">
-            <p id="section-1.2-4.2.1">Mandate that <code>dual_signature_algorithms</code> always applies to both EE and chain, and take the position that <code>signature_algorithms_cert</code> only applies to the single-certificate case. This makes it impossible to have dual certs with mixed-algorithm chains.<a href="#section-1.2-4.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ol>
-</section>
-</div>
-<div id="can-the-client-fail-if-it-doesnt-like-the-servers-choice">
-<section id="section-1.3">
-        <h3 id="name-can-the-client-fail-if-it-d">
-<a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-can-the-client-fail-if-it-d" class="section-name selfRef">Can the client fail if it doesn't like the server's choice?</a>
-        </h3>
-<p id="section-1.3-1">This design choice is about how expressive the negotiation mechanism is.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
-<p id="section-1.3-2">This version presents a scheme which presents three lists: [Single], [DualFirst], [DualSecond]. It is implicit that the full set of combinations of [DualFirst] X [DualSecond] is supported. This design does not allow for the omission of combinations that make little sense, such as RSA-2048 with a PQC Level 5 scheme.<a href="#section-1.3-2" class="pilcrow">¶</a></p>
-<p id="section-1.3-3">Design options:<a href="#section-1.3-3" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-1.3-4">
-<li id="section-1.3-4.1">
-            <p id="section-1.3-4.1.1">Make the negotiation mechanism more expressive (ie more complex) to cover this case.<a href="#section-1.3-4.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-1.3-4.2">
-            <p id="section-1.3-4.2.1">The client <span class="bcp14">MUST</span> honor any choice of pair from [DualFirst], [DualSecond]; ie if it supports the algorithms, then it supports them; it is not allowed to reject specific combinations. This option is presented in this version.<a href="#section-1.3-4.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-1.3-4.3">
-            <p id="section-1.3-4.3.1">The client <span class="bcp14">MAY</span> abort the connection if it does not accept the server's choice of combination.<a href="#section-1.3-4.3.1" class="pilcrow">¶</a></p>
-</li>
-        </ol>
-</section>
-</div>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1522,6 +1477,16 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-4.3-5">The order of the signatures in the message <span class="bcp14">MUST</span> correspond to the order of the certificate chains in the Certificate message: the first signature <span class="bcp14">MUST</span> correspond to a classical algorithm from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, while the second signature <span class="bcp14">MUST</span> correspond to a PQ algorithm from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="common-chains">
+<section id="section-4.4">
+        <h3 id="name-common-chains">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-common-chains" class="section-name selfRef">Common Chains</a>
+        </h3>
+<p id="section-4.4-1">In order to lessen operational burden on Certification Authority (CA) operators, the two certificates of the dual <span class="bcp14">MAY</span> be issued from the same CA. For example, during the PQC migration, a CA operator might wish to stand up a root CA using a Level 5 PQC algorithm or a hash-based signature, and then continue to issue RSA and ECDSA certificates off that root.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">Negotiation of such a setup requires use of the <code>signature_algorithms_cert</code> TLS 1.3 extension, which is unmodified from <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> and when present it applies equally to both chains of the dual.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4-3">In order to optimize bandwidth and avoid sending duplicate copies of the same chain, when constructing a <code>Certificate</code> message as described in <a href="#certificate" class="auto internal xref">Section 5.2</a>, the second certificate chain <span class="bcp14">MAY</span> consist of only an end-entity certificate.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="protocol-changes">
@@ -1567,8 +1532,8 @@ struct {
 <a href="#name-contents-of-dual_signature_" class="selfRef">Contents of dual_signature_algorithms extension</a>
             </figcaption></figure>
 <p id="section-5.1.1-5">SignatureScheme is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry. <code>first_signature_algorithms</code> and <code>second_signature_algorithms</code> list <span class="bcp14">MUST NOT</span> contain common elements. TLS endpoint observing such overlap between primary and secondary supported signature lists <span class="bcp14">MUST</span> terminate the connection with <code>illegal_parameter</code> alert.<a href="#section-5.1.1-5" class="pilcrow">¶</a></p>
-<p id="section-5.1.1-6">The <code>dual_signature_algorithms</code> extension <span class="bcp14">MAY</span> contain common elements with <code>signature_algorithms</code> if the peer wishes to advertize that it will accept a certain algorithm either standalone or as part of a dual signature. Listing an algorithm in <code>signature_algorithms</code> does not imply that it would be acceptable as part of a dual signature unless that algorithm also appears in one of the lists in <code>dual_signature_algorithms</code>. See <a href="#sec-policy-examples" class="auto internal xref">Appendix D</a> for examples of cryptographic policies, and how to set <code>signature_algorithms</code> and <code>dual_signature_algorithms</code> to implement those policies.<a href="#section-5.1.1-6" class="pilcrow">¶</a></p>
-<p id="section-5.1.1-7">When parsing <code>DualSignatureSchemeList</code>, implementations <span class="bcp14">MUST NOT</span> make assumptions about which sub-list a given algorithm will appear in. For example, an implementation <span class="bcp14">MUST NOT</span> assume that PQ algorithms will appear in the first list and PQ in the second. As a test, if a TLS handshake containing a <code>DualSignatureSchemeList</code> succeeds, then an equivalent TLS handshake containing an equivalent <code>DualSignatureSchemeList</code> but with the first and second lists swapped <span class="bcp14">MUST</span> also succeed. However, it is not required that these two test cases result in the same selected signature algorithm and certificate. See <a href="#appdx-config" class="auto internal xref">Appendix B</a> for a suggested configuration mechanism for selecting a preferred pair of algorithms.<a href="#section-5.1.1-7" class="pilcrow">¶</a></p>
+<p id="section-5.1.1-6">The <code>dual_signature_algorithms</code> extension <span class="bcp14">MAY</span> contain common elements with <code>signature_algorithms</code> if the peer wishes to advertize that it will accept a certain algorithm either standalone or as part of a dual signature. Listing an algorithm in <code>signature_algorithms</code> does not imply that it would be acceptable as part of a dual signature unless that algorithm also appears in one of the lists in <code>dual_signature_algorithms</code>. See <a href="#sec-policy-examples" class="auto internal xref">Appendix E</a> for examples of cryptographic policies, and how to set <code>signature_algorithms</code> and <code>dual_signature_algorithms</code> to implement those policies.<a href="#section-5.1.1-6" class="pilcrow">¶</a></p>
+<p id="section-5.1.1-7">When parsing <code>DualSignatureSchemeList</code>, implementations <span class="bcp14">MUST NOT</span> make assumptions about which sub-list a given algorithm will appear in. For example, an implementation <span class="bcp14">MUST NOT</span> assume that PQ algorithms will appear in the first list and PQ in the second. As a test, if a TLS handshake containing a <code>DualSignatureSchemeList</code> succeeds, then an equivalent TLS handshake containing an equivalent <code>DualSignatureSchemeList</code> but with the first and second lists swapped <span class="bcp14">MUST</span> also succeed. However, it is not required that these two test cases result in the same selected signature algorithm and certificate. See <a href="#appdx-config" class="auto internal xref">Appendix C</a> for a suggested configuration mechanism for selecting a preferred pair of algorithms.<a href="#section-5.1.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="use-in-handshake-and-exported-authenticator-messages">
@@ -1602,6 +1567,7 @@ struct {
 <a href="#name-tls-13-certificate-message" class="selfRef">TLS 1.3 Certificate message</a>
           </figcaption></figure>
 <p id="section-5.2-3">This document re-uses the <code>Certificate</code> structure as-is and extends the semantics of <code>certificate_list</code> to support two logically distinct certificate chains, encoded sequentially and separated by a delimiter.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">In order to support bandwidth optimization in the case that the two certificates are issued by the same CA, the second certificate chain <span class="bcp14">MAY</span> consist of only an end-entity certificate. In this case, validators <span class="bcp14">SHOULD</span> attempt to validate the second certificate using the chain provided with the first certificate.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 <div id="delimiter">
 <section id="section-5.2.1">
           <h4 id="name-delimiter">
@@ -1627,9 +1593,10 @@ struct {
 <a href="#name-updated-certificateentry-st" class="selfRef">Updated CertificateEntry structure definition</a>
             </figcaption></figure>
 <p id="section-5.2.1-5">All entries before the delimiter are treated as the first certificate chain and <span class="bcp14">MUST</span> use algorithms from <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension, all entries after the delimiter are treated as the second certificate chain and <span class="bcp14">MUST</span> use algorithms from <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code> extension. As specified in <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-rfc8446bis-12#section-4.4.2" class="relref">Section 4.4.2</a> of [<a href="#TLS" class="cite xref">TLS</a>]</span>, end-entity certificate <span class="bcp14">MUST</span> be the first in both chains.<a href="#section-5.2.1-5" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-6">A peer receiving this structure <span class="bcp14">MUST</span> validate each chain independently according to its corresponding signature algorithm. The first certificate chain <span class="bcp14">MUST</span> contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the <code>first_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. The second certificate chain <span class="bcp14">MUST</span> contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the <code>second_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. If a <code>signature_algorithms_cert</code> extension is absent, then the each certificate chain of the dual <span class="bcp14">MUST</span> use the same algorithm in the end-entity and chain certificates. Presence of the <code>signature_algorithms_cert</code> extension indicates support for mixed-algorithm chains, and it applies to both certificates. Note that there is only one <code>signature_algorithms_cert</code> extension, so algorithms for the two chains cannot be negotiated separately and both chains <span class="bcp14">MAY</span> use the same algorithm and in fact both end-entities <span class="bcp14">MAY</span> be issued by the same CA.<a href="#section-5.2.1-6" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-7">Implementers <span class="bcp14">MAY</span> wish to consider performing this verification in a timing-invariant way so as not to leak which certificate failed, for example if it failed for policy reasons rather than cryptographic reasons, however since this information is not hidden in a single-certificate TLS handshake, implementers <span class="bcp14">MAY</span> decide that this is not important.<a href="#section-5.2.1-7" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-8">This encoding applies equally to the <code>CompressedCertificate</code> message and to <code>Certificate</code> message of Exported Authenticators.<a href="#section-5.2.1-8" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-6">A peer receiving this structure <span class="bcp14">MUST</span> validate each chain independently according to its corresponding signature algorithm. The first certificate chain <span class="bcp14">MUST</span> contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the <code>first_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. The second certificate chain <span class="bcp14">MUST</span> contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the <code>second_signature_algorithms</code> section of <code>dual_signature_algorithms</code> extension. If a <code>signature_algorithms_cert</code> extension is absent, then the each certificate chain of the dual <span class="bcp14">MUST</span> also use an algorithm from the same list, but not necessarily the same one as the EE certificate. I.E. it is always allowed to do mixed-algorithm chains within the same list.<a href="#section-5.2.1-6" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-7">More advances configurations of mixed-algorithm certificate chains will require negotiation of chain algorithms outside of the respective dual list. For example, consider that a client wants to allow SLH-DSA roots to issue ML-DSA end entities but does not want to support SLH-DSA end entities as a dual (or does not want to support SLH-DSA end entities at all). Or consider that a ML-DSA-87 CA will issue both the ML-DSA-44 and RSA end entities that are used in the dual. Support for such use cases is accomplished via the <code>signature_algorithms_cert</code> extension which is used un-modified from <span>[<a href="#TLS" class="cite xref">TLS</a>]</span> and when present it applies equally to both chains of the dual. Note that there is only one <code>signature_algorithms_cert</code> extension, so algorithms for the two chains cannot be negotiated separately.<a href="#section-5.2.1-7" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-8">Implementers <span class="bcp14">MAY</span> wish to consider performing this verification in a timing-invariant way so as not to leak which certificate failed, for example if it failed for policy reasons rather than cryptographic reasons, however since this information is not hidden in a single-certificate TLS handshake, implementers <span class="bcp14">MAY</span> decide that this is not important.<a href="#section-5.2.1-8" class="pilcrow">¶</a></p>
+<p id="section-5.2.1-9">This encoding applies equally to the <code>CompressedCertificate</code> message and to <code>Certificate</code> message of Exported Authenticators.<a href="#section-5.2.1-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1706,7 +1673,7 @@ struct {
         </h3>
 <p id="section-5.4-1">Policy enforcement regarding the use of dual certificates is implementation-defined and driven by the authenticating peer. When dual certificate authentication is required by local policy, such as during high-assurance sessions or post-quantum transition periods, the authenticating endpoint <span class="bcp14">MUST</span> abort a handshake where only one signature or one certificate chain is present with an <code>dual_certificate_required</code> alert. Implementations <span class="bcp14">MUST</span> ensure that both certificates and both signatures are processed together and <span class="bcp14">MUST NOT</span> accept fallback to single-certificate authentication when dual-authentication is expected.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 <p id="section-5.4-2">A single composite certificate chain and signature such as defined by <span>[<a href="#TLS-COMPOSITE-MLDSA" class="cite xref">TLS-COMPOSITE-MLDSA</a>]</span> <span class="bcp14">MAY</span> be an acceptable alternative during post-quantum transition period as long as corresponding signature scheme is listed in <code>signature_algorithms</code> extension.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
-<p id="section-5.4-3">Additional policy examples are given in <a href="#sec-policy-examples" class="auto internal xref">Appendix D</a>.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
+<p id="section-5.4-3">Additional policy examples are given in <a href="#sec-policy-examples" class="auto internal xref">Appendix E</a>.<a href="#section-5.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1907,132 +1874,184 @@ struct {
 </div>
 </section>
 </div>
-<div id="informal-requirements-for-dual-tls-certificate-support">
+<div id="open-design-issues">
 <section id="appendix-A">
+      <h2 id="name-open-design-issues">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-open-design-issues" class="section-name selfRef">Open Design Issues</a>
+      </h2>
+<p id="appendix-A-1">This section documents open design questions that are not resolved in this version, and for which the authors wish Working Group input.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">This section is for Working Group review, and to be removed before publication.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<div id="allow-mixed-certificate-chains">
+<section id="appendix-A.1">
+        <h3 id="name-allow-mixed-certificate-cha">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-allow-mixed-certificate-cha" class="section-name selfRef">Allow mixed certificate chains?</a>
+        </h3>
+<p id="appendix-A.1-1">Issue: TLS 1.3 has <code>signature_algorithms</code> to negotiate the signature used in the TLS handshake (which is also the public key of the EE cert), and optionally <code>signature_algorithms_cert</code> if the peer wishes to negotiate the CA's algorithms separately. Historically, cert chains are either exclusively RSA or exclusively ECDSA with mixed RSA-ECDSA chains being extremely rale and therefore <code>signature_algorithms_certs</code> is extremely rarely used in the wild.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-2">One design consideration here is whether we want to allow both the PQ and traditional chains to come off the same CA in order to lower operational burden for CAs needing to maintain separate PQ and Traditional PKIs. Consider for example an ML-DSA-87 CA that issues both ML-DSA-44 and RSA EEs. Or consider an SLH-DSA CA that issus ML-DSA-44 and RSA EEs.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-3">The question is whether to continue to support negotiation of CA algs separately from EE algs in a dual context.<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-4">Design options:<a href="#appendix-A.1-4" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-A.1-5">
+<li id="appendix-A.1-5.1">
+            <p id="appendix-A.1-5.1.1">When a <code>signature_algorithms_certs</code> extension is present, then it applies to both chains of the dual, and <code>dual_signature_algorithms</code> only applies to EE certs. If not present, then <code>dual_signature_algorithms</code> applies to both EE and chain. This is the option chosen for presentation in this version of the draft, and is believed to be most consistent with the intent of 8446, though it is has bad alignment with TLS implementations in the wild and increases implementation complexity.<a href="#appendix-A.1-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="appendix-A.1-5.2">
+            <p id="appendix-A.1-5.2.1">Mandate that <code>dual_signature_algorithms</code> always applies to both EE and chain, and take the position that <code>signature_algorithms_cert</code> only applies to the single-certificate case. This makes it impossible to have dual certs with mixed-algorithm chains.<a href="#appendix-A.1-5.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="appendix-A.1-5.3">
+            <p id="appendix-A.1-5.3.1">Add a <code>dual_signature_algorithms_certs</code> so that the algs of the two chains can be negotioted separately.<a href="#appendix-A.1-5.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+<div id="can-the-client-fail-if-it-doesnt-like-the-servers-choice">
+<section id="appendix-A.2">
+        <h3 id="name-can-the-client-fail-if-it-d">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-can-the-client-fail-if-it-d" class="section-name selfRef">Can the client fail if it doesn't like the server's choice?</a>
+        </h3>
+<p id="appendix-A.2-1">This design choice is about how expressive the negotiation mechanism is.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-2">This version presents a scheme which presents three lists: [Single], [DualFirst], [DualSecond]. It is implicit that the full set of combinations of [DualFirst] X [DualSecond] is supported. This design does not allow for the omission of combinations that make little sense, such as RSA-2048 with a PQC Level 5 scheme.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-3">Design options:<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-A.2-4">
+<li id="appendix-A.2-4.1">
+            <p id="appendix-A.2-4.1.1">Make the negotiation mechanism more expressive (ie more complex) to cover this case.<a href="#appendix-A.2-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="appendix-A.2-4.2">
+            <p id="appendix-A.2-4.2.1">The client <span class="bcp14">MUST</span> honor any choice of pair from [DualFirst], [DualSecond]; ie if it supports the algorithms, then it supports them; it is not allowed to reject specific combinations. This option is presented in this version.<a href="#appendix-A.2-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="appendix-A.2-4.3">
+            <p id="appendix-A.2-4.3.1">The client <span class="bcp14">MAY</span> abort the connection if it does not accept the server's choice of combination.<a href="#appendix-A.2-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+</section>
+</div>
+<div id="informal-requirements-for-dual-tls-certificate-support">
+<section id="appendix-B">
       <h2 id="name-informal-requirements-for-d">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-informal-requirements-for-d" class="section-name selfRef">Informal Requirements for Dual TLS Certificate Support</a>
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-informal-requirements-for-d" class="section-name selfRef">Informal Requirements for Dual TLS Certificate Support</a>
       </h2>
 <div id="general-tls-semantics">
-<section id="appendix-A.1">
+<section id="appendix-B.1">
         <h3 id="name-general-tls-semantics">
-<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-general-tls-semantics" class="section-name selfRef">General TLS Semantics</a>
+<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-general-tls-semantics" class="section-name selfRef">General TLS Semantics</a>
         </h3>
 <div id="protocol-flow-consistency">
-<section id="appendix-A.1.1">
+<section id="appendix-B.1.1">
           <h4 id="name-protocol-flow-consistency">
-<a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-protocol-flow-consistency" class="section-name selfRef">Protocol Flow Consistency</a>
+<a href="#appendix-B.1.1" class="section-number selfRef">B.1.1. </a><a href="#name-protocol-flow-consistency" class="section-name selfRef">Protocol Flow Consistency</a>
           </h4>
-<p id="appendix-A.1.1-1">Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with <code>Certificate</code>, <code>CertificateVerify</code>, and <code>Finished</code> messages.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1.1-1">Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with <code>Certificate</code>, <code>CertificateVerify</code>, and <code>Finished</code> messages.<a href="#appendix-B.1.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="minimal-protocol-changes">
-<section id="appendix-A.1.2">
+<section id="appendix-B.1.2">
           <h4 id="name-minimal-protocol-changes">
-<a href="#appendix-A.1.2" class="section-number selfRef">A.1.2. </a><a href="#name-minimal-protocol-changes" class="section-name selfRef">Minimal Protocol Changes</a>
+<a href="#appendix-B.1.2" class="section-number selfRef">B.1.2. </a><a href="#name-minimal-protocol-changes" class="section-name selfRef">Minimal Protocol Changes</a>
           </h4>
-<p id="appendix-A.1.2-1">Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.<a href="#appendix-A.1.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1.2-1">Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.<a href="#appendix-B.1.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="mtls-support">
-<section id="appendix-A.1.3">
+<section id="appendix-B.1.3">
           <h4 id="name-mtls-support">
-<a href="#appendix-A.1.3" class="section-number selfRef">A.1.3. </a><a href="#name-mtls-support" class="section-name selfRef">mTLS support</a>
+<a href="#appendix-B.1.3" class="section-number selfRef">B.1.3. </a><a href="#name-mtls-support" class="section-name selfRef">mTLS support</a>
           </h4>
-<p id="appendix-A.1.3-1">The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.<a href="#appendix-A.1.3-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1.3-1">The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.<a href="#appendix-B.1.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="exported-authenticators-compatibility">
-<section id="appendix-A.1.4">
+<section id="appendix-B.1.4">
           <h4 id="name-exported-authenticators-com">
-<a href="#appendix-A.1.4" class="section-number selfRef">A.1.4. </a><a href="#name-exported-authenticators-com" class="section-name selfRef">Exported Authenticators Compatibility</a>
+<a href="#appendix-B.1.4" class="section-number selfRef">B.1.4. </a><a href="#name-exported-authenticators-com" class="section-name selfRef">Exported Authenticators Compatibility</a>
           </h4>
-<p id="appendix-A.1.4-1">The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.<a href="#appendix-A.1.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1.4-1">The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.<a href="#appendix-B.1.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="certificate-handling-semantics">
-<section id="appendix-A.2">
+<section id="appendix-B.2">
         <h3 id="name-certificate-handling-semant">
-<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-certificate-handling-semant" class="section-name selfRef">Certificate Handling Semantics</a>
+<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-certificate-handling-semant" class="section-name selfRef">Certificate Handling Semantics</a>
         </h3>
 <div id="independent-chain-usability">
-<section id="appendix-A.2.1">
+<section id="appendix-B.2.1">
           <h4 id="name-independent-chain-usability">
-<a href="#appendix-A.2.1" class="section-number selfRef">A.2.1. </a><a href="#name-independent-chain-usability" class="section-name selfRef">Independent Chain Usability</a>
+<a href="#appendix-B.2.1" class="section-number selfRef">B.2.1. </a><a href="#name-independent-chain-usability" class="section-name selfRef">Independent Chain Usability</a>
           </h4>
-<p id="appendix-A.2.1-1">Each certificate chain (e.g., classic and PQ) must be independently usable for authentication, allowing endpoints to fall back to classic or PQ-only validation if necessary.<a href="#appendix-A.2.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2.1-1">Each certificate chain (e.g., classic and PQ) must be independently usable for authentication, allowing endpoints to fall back to classic or PQ-only validation if necessary.<a href="#appendix-B.2.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="unambiguous-chain-separation">
-<section id="appendix-A.2.2">
+<section id="appendix-B.2.2">
           <h4 id="name-unambiguous-chain-separatio">
-<a href="#appendix-A.2.2" class="section-number selfRef">A.2.2. </a><a href="#name-unambiguous-chain-separatio" class="section-name selfRef">Unambiguous Chain Separation</a>
+<a href="#appendix-B.2.2" class="section-number selfRef">B.2.2. </a><a href="#name-unambiguous-chain-separatio" class="section-name selfRef">Unambiguous Chain Separation</a>
           </h4>
-<p id="appendix-A.2.2-1">The mechanism must clearly distinguish and delimit multiple certificate chains to prevent ambiguity or misinterpretation.<a href="#appendix-A.2.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2.2-1">The mechanism must clearly distinguish and delimit multiple certificate chains to prevent ambiguity or misinterpretation.<a href="#appendix-B.2.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="chain-specific-signature-algorithms">
-<section id="appendix-A.2.3">
+<section id="appendix-B.2.3">
           <h4 id="name-chain-specific-signature-al">
-<a href="#appendix-A.2.3" class="section-number selfRef">A.2.3. </a><a href="#name-chain-specific-signature-al" class="section-name selfRef">Chain-Specific Signature Algorithms</a>
+<a href="#appendix-B.2.3" class="section-number selfRef">B.2.3. </a><a href="#name-chain-specific-signature-al" class="section-name selfRef">Chain-Specific Signature Algorithms</a>
           </h4>
-<p id="appendix-A.2.3-1">Each certificate chain must be associated with its own set of supported signature algorithms, allowing negotiation of appropriate algorithms for classic and PQ use cases.<a href="#appendix-A.2.3-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2.3-1">Each certificate chain must be associated with its own set of supported signature algorithms, allowing negotiation of appropriate algorithms for classic and PQ use cases.<a href="#appendix-B.2.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="multiple-chains-support-generalisation">
-<section id="appendix-A.2.4">
+<section id="appendix-B.2.4">
           <h4 id="name-multiple-chains-support-gen">
-<a href="#appendix-A.2.4" class="section-number selfRef">A.2.4. </a><a href="#name-multiple-chains-support-gen" class="section-name selfRef">Multiple Chains Support (Generalisation)</a>
+<a href="#appendix-B.2.4" class="section-number selfRef">B.2.4. </a><a href="#name-multiple-chains-support-gen" class="section-name selfRef">Multiple Chains Support (Generalisation)</a>
           </h4>
-<p id="appendix-A.2.4-1">The mechanism must be designed in a way that could support more than two certificate chains in the future, not just hardcoded to classic + PQ.<a href="#appendix-A.2.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2.4-1">The mechanism must be designed in a way that could support more than two certificate chains in the future, not just hardcoded to classic + PQ.<a href="#appendix-B.2.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="use-case-and-deployment-flexibility">
-<section id="appendix-A.3">
+<section id="appendix-B.3">
         <h3 id="name-use-case-and-deployment-fle">
-<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-use-case-and-deployment-fle" class="section-name selfRef">Use Case and Deployment Flexibility</a>
+<a href="#appendix-B.3" class="section-number selfRef">B.3. </a><a href="#name-use-case-and-deployment-fle" class="section-name selfRef">Use Case and Deployment Flexibility</a>
         </h3>
 <div id="backward-compatibility">
-<section id="appendix-A.3.1">
+<section id="appendix-B.3.1">
           <h4 id="name-backward-compatibility">
-<a href="#appendix-A.3.1" class="section-number selfRef">A.3.1. </a><a href="#name-backward-compatibility" class="section-name selfRef">Backward Compatibility</a>
+<a href="#appendix-B.3.1" class="section-number selfRef">B.3.1. </a><a href="#name-backward-compatibility" class="section-name selfRef">Backward Compatibility</a>
           </h4>
-<p id="appendix-A.3.1-1">When only one certificate chain is used, the mechanism must remain compatible with existing TLS 1.3 endpoints unaware of dual-certificate support or willing to use only a single certificate.<a href="#appendix-A.3.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.3.1-1">When only one certificate chain is used, the mechanism must remain compatible with existing TLS 1.3 endpoints unaware of dual-certificate support or willing to use only a single certificate.<a href="#appendix-B.3.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="policy-signalling">
-<section id="appendix-A.3.2">
+<section id="appendix-B.3.2">
           <h4 id="name-policy-signalling">
-<a href="#appendix-A.3.2" class="section-number selfRef">A.3.2. </a><a href="#name-policy-signalling" class="section-name selfRef">Policy Signalling</a>
+<a href="#appendix-B.3.2" class="section-number selfRef">B.3.2. </a><a href="#name-policy-signalling" class="section-name selfRef">Policy Signalling</a>
           </h4>
-<p id="appendix-A.3.2-1">A mechanism must exist for one party (client or server) to signal whether dual certificate presentation is required, optional, or not supported, to coordinate authentication expectations.<a href="#appendix-A.3.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.3.2-1">A mechanism must exist for one party (client or server) to signal whether dual certificate presentation is required, optional, or not supported, to coordinate authentication expectations.<a href="#appendix-B.3.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="future-extendability-to-non-pqc-multi-cert-use-cases">
-<section id="appendix-A.3.3">
+<section id="appendix-B.3.3">
           <h4 id="name-future-extendability-to-non">
-<a href="#appendix-A.3.3" class="section-number selfRef">A.3.3. </a><a href="#name-future-extendability-to-non" class="section-name selfRef">Future extendability to Non-PQC Multi-Cert Use cases</a>
+<a href="#appendix-B.3.3" class="section-number selfRef">B.3.3. </a><a href="#name-future-extendability-to-non" class="section-name selfRef">Future extendability to Non-PQC Multi-Cert Use cases</a>
           </h4>
-<p id="appendix-A.3.3-1">The mechanism must be extendable to other multi-certificate use cases<a href="#appendix-A.3.3-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.3.3-1">The mechanism must be extendable to other multi-certificate use cases<a href="#appendix-B.3.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="mitigation-of-side-channels">
-<section id="appendix-A.3.4">
+<section id="appendix-B.3.4">
           <h4 id="name-mitigation-of-side-channels">
-<a href="#appendix-A.3.4" class="section-number selfRef">A.3.4. </a><a href="#name-mitigation-of-side-channels" class="section-name selfRef">Mitigation of Side Channels</a>
+<a href="#appendix-B.3.4" class="section-number selfRef">B.3.4. </a><a href="#name-mitigation-of-side-channels" class="section-name selfRef">Mitigation of Side Channels</a>
           </h4>
-<p id="appendix-A.3.4-1">The mechanism should avoid constructions that enable side-channel attacks by observing how distinct algorithms are applied to the same message.<a href="#appendix-A.3.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.3.4-1">The mechanism should avoid constructions that enable side-channel attacks by observing how distinct algorithms are applied to the same message.<a href="#appendix-B.3.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="transparency-in-signature-validation">
-<section id="appendix-A.3.5">
+<section id="appendix-B.3.5">
           <h4 id="name-transparency-in-signature-v">
-<a href="#appendix-A.3.5" class="section-number selfRef">A.3.5. </a><a href="#name-transparency-in-signature-v" class="section-name selfRef">Transparency in Signature Validation</a>
+<a href="#appendix-B.3.5" class="section-number selfRef">B.3.5. </a><a href="#name-transparency-in-signature-v" class="section-name selfRef">Transparency in Signature Validation</a>
           </h4>
-<p id="appendix-A.3.5-1">The order and pairing between certificates and their corresponding signatures must be explicit, so verifiers can unambiguously match them.<a href="#appendix-A.3.5-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.3.5-1">The order and pairing between certificates and their corresponding signatures must be explicit, so verifiers can unambiguously match them.<a href="#appendix-B.3.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2040,119 +2059,119 @@ struct {
 </section>
 </div>
 <div id="appdx-config">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-suggested-configuration-mec">
-<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-suggested-configuration-mec" class="section-name selfRef">Suggested Configuration Mechanism</a>
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-suggested-configuration-mec" class="section-name selfRef">Suggested Configuration Mechanism</a>
       </h2>
-<p id="appendix-B-1">This section gives a non-normative suggestion for a mechanism for configuration of algorithm selection preference in a dual-algorithm setting.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2"><a href="#sec-structure" class="auto internal xref">Section 5.1.1</a> requires that any supported algorithm <span class="bcp14">MAY</span> appear in either the first or second list within a <code>DualSignatureSchemeList</code>, however it leaves open the policy for selecting a pair.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
-<p id="appendix-B-3">The suggested implementation enforces server-preference by allowing an operator to rank the provisioned certificates from most-preferred to least-preferred. Beginning with the most-preferred, if this algorithm appears in either list, then this is selected and selection continues down the list of provisioned certificates until one is found that appears on the other list. Implementations <span class="bcp14">MUST NOT</span> select two algorithms from the same list. Regardless of which algorithm was select first according to this preference selection routine, the certificates and signatures <span class="bcp14">MUST</span> be returned in the first and second slot according to which list they appeared in. This preference selection routine has the benefit that the algorithm selection is not affected by swapping the first and second lists, which allows for greater configuration flexibility and therefore greater overall interoperability.<a href="#appendix-B-3" class="pilcrow">¶</a></p>
+<p id="appendix-C-1">This section gives a non-normative suggestion for a mechanism for configuration of algorithm selection preference in a dual-algorithm setting.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<p id="appendix-C-2"><a href="#sec-structure" class="auto internal xref">Section 5.1.1</a> requires that any supported algorithm <span class="bcp14">MAY</span> appear in either the first or second list within a <code>DualSignatureSchemeList</code>, however it leaves open the policy for selecting a pair.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
+<p id="appendix-C-3">The suggested implementation enforces server-preference by allowing an operator to rank the provisioned certificates from most-preferred to least-preferred. Beginning with the most-preferred, if this algorithm appears in either list, then this is selected and selection continues down the list of provisioned certificates until one is found that appears on the other list. Implementations <span class="bcp14">MUST NOT</span> select two algorithms from the same list. Regardless of which algorithm was select first according to this preference selection routine, the certificates and signatures <span class="bcp14">MUST</span> be returned in the first and second slot according to which list they appeared in. This preference selection routine has the benefit that the algorithm selection is not affected by swapping the first and second lists, which allows for greater configuration flexibility and therefore greater overall interoperability.<a href="#appendix-C-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="compatibility-with-composite-certificates">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-compatibility-with-composit">
-<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-compatibility-with-composit" class="section-name selfRef">Compatibility with composite certificates</a>
+<a href="#appendix-D" class="section-number selfRef">Appendix D. </a><a href="#name-compatibility-with-composit" class="section-name selfRef">Compatibility with composite certificates</a>
       </h2>
-<p id="appendix-C-1">Clients and servers may choose to support composite certificate schemes, such as those defined in <span>[<a href="#TLS-COMPOSITE-MLDSA" class="cite xref">TLS-COMPOSITE-MLDSA</a>]</span>. In these schemes, a single certificate contains a composite public key, and the associated signature proves knowledge of private keys of all components. However, from the perspective of the TLS protocol, this is a single certificate producing a single signature and so use of <code>dual_signature_algorithms</code> is not required.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
-<p id="appendix-C-2">If a composite signature algorithm appears in the <code>signature_algorithms</code> extension, it can fulfill the client's requirements for both classical and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
-<p id="appendix-C-3">The advantages of dual certificates over composites is operational flexibility for both Certification Authority operators and TLS server and client operators because two CAs and end-entity certificates, one classical and one PQ, allows for backwards compatible and dynamic negotiation of pure classical, pure PQ, or dual.<a href="#appendix-C-3" class="pilcrow">¶</a></p>
-<p id="appendix-C-4">The advantages of composites over dual certificates is that the certificate chains themselves are protected by dual-algorithms, which can be of great importance in use cases where trust stores are not easily updatable.<a href="#appendix-C-4" class="pilcrow">¶</a></p>
-<p id="appendix-C-5">It is worth noting that composites present as simply another signature algorithm, and as such nothing prevents them from being used as a component within a <code>dual_signature_algorithm</code>.<a href="#appendix-C-5" class="pilcrow">¶</a></p>
+<p id="appendix-D-1">Clients and servers may choose to support composite certificate schemes, such as those defined in <span>[<a href="#TLS-COMPOSITE-MLDSA" class="cite xref">TLS-COMPOSITE-MLDSA</a>]</span>. In these schemes, a single certificate contains a composite public key, and the associated signature proves knowledge of private keys of all components. However, from the perspective of the TLS protocol, this is a single certificate producing a single signature and so use of <code>dual_signature_algorithms</code> is not required.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
+<p id="appendix-D-2">If a composite signature algorithm appears in the <code>signature_algorithms</code> extension, it can fulfill the client's requirements for both classical and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
+<p id="appendix-D-3">The advantages of dual certificates over composites is operational flexibility for both Certification Authority operators and TLS server and client operators because two CAs and end-entity certificates, one classical and one PQ, allows for backwards compatible and dynamic negotiation of pure classical, pure PQ, or dual.<a href="#appendix-D-3" class="pilcrow">¶</a></p>
+<p id="appendix-D-4">The advantages of composites over dual certificates is that the certificate chains themselves are protected by dual-algorithms, which can be of great importance in use cases where trust stores are not easily updatable.<a href="#appendix-D-4" class="pilcrow">¶</a></p>
+<p id="appendix-D-5">It is worth noting that composites present as simply another signature algorithm, and as such nothing prevents them from being used as a component within a <code>dual_signature_algorithm</code>.<a href="#appendix-D-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-policy-examples">
-<section id="appendix-D">
+<section id="appendix-E">
       <h2 id="name-policy-examples">
-<a href="#appendix-D" class="section-number selfRef">Appendix D. </a><a href="#name-policy-examples" class="section-name selfRef">Policy Examples</a>
+<a href="#appendix-E" class="section-number selfRef">Appendix E. </a><a href="#name-policy-examples" class="section-name selfRef">Policy Examples</a>
       </h2>
-<p id="appendix-D-1">This section provides examples of cryptographic policies and examples of how to set <code>signature_algorithms</code> and <code>dual_signature_algorithms</code> in order to implement that policy. This section is non-normative, and other ways of implementing the same policy are possible; in particular the first and second lists within a <code>dual_signature_algorithms</code> extension <span class="bcp14">MAY</span> be swapped in any of the examples below without changing the semantics.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
-<p id="appendix-D-2">The scenarios in this section describe server authentication behavior based on client policy. Each case reflects a different client capability and authentication policy, based on how the client populates the <code>signature_algorithms</code>, <code>signature_algorithms_cert</code>, and <code>dual_signature_algorithms</code> extensions.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
-<p id="appendix-D-3">For client authentication, the same principles apply with roles reversed: the server drives authentication requirements by sending a <code>CertificateRequest</code> message that includes appropriate extensions.<a href="#appendix-D-3" class="pilcrow">¶</a></p>
+<p id="appendix-E-1">This section provides examples of cryptographic policies and examples of how to set <code>signature_algorithms</code> and <code>dual_signature_algorithms</code> in order to implement that policy. This section is non-normative, and other ways of implementing the same policy are possible; in particular the first and second lists within a <code>dual_signature_algorithms</code> extension <span class="bcp14">MAY</span> be swapped in any of the examples below without changing the semantics.<a href="#appendix-E-1" class="pilcrow">¶</a></p>
+<p id="appendix-E-2">The scenarios in this section describe server authentication behavior based on client policy. Each case reflects a different client capability and authentication policy, based on how the client populates the <code>signature_algorithms</code>, <code>signature_algorithms_cert</code>, and <code>dual_signature_algorithms</code> extensions.<a href="#appendix-E-2" class="pilcrow">¶</a></p>
+<p id="appendix-E-3">For client authentication, the same principles apply with roles reversed: the server drives authentication requirements by sending a <code>CertificateRequest</code> message that includes appropriate extensions.<a href="#appendix-E-3" class="pilcrow">¶</a></p>
 <div id="example-1-single-certificate">
-<section id="appendix-D.1">
+<section id="appendix-E.1">
         <h3 id="name-example-1-single-certificat">
-<a href="#appendix-D.1" class="section-number selfRef">D.1. </a><a href="#name-example-1-single-certificat" class="section-name selfRef">Example 1: Single-certificate</a>
+<a href="#appendix-E.1" class="section-number selfRef">E.1. </a><a href="#name-example-1-single-certificat" class="section-name selfRef">Example 1: Single-certificate</a>
         </h3>
-<p id="appendix-D.1-1">Client requires only one classical, pq or a composite signature. Client either does not support or is not configured to accept dual certificates.<a href="#appendix-D.1-1" class="pilcrow">¶</a></p>
-<p id="appendix-D.1-2">Client behavior:<a href="#appendix-D.1-2" class="pilcrow">¶</a></p>
+<p id="appendix-E.1-1">Client requires only one classical, pq or a composite signature. Client either does not support or is not configured to accept dual certificates.<a href="#appendix-E.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-E.1-2">Client behavior:<a href="#appendix-E.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-D.1-3.1">
-            <p id="appendix-D.1-3.1.1">Includes supported algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#appendix-D.1-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-E.1-3.1">
+            <p id="appendix-E.1-3.1.1">Includes supported algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#appendix-E.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-D.1-3.2">
-            <p id="appendix-D.1-3.2.1">Does not include <code>dual_signature_algorithms</code>.<a href="#appendix-D.1-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-E.1-3.2">
+            <p id="appendix-E.1-3.2.1">Does not include <code>dual_signature_algorithms</code>.<a href="#appendix-E.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="appendix-D.1-4">To satisfy this client, the server <span class="bcp14">MUST</span> send a single certificate chain with compatible algorithms and include a single signature in <code>CertificateVerify</code>.<a href="#appendix-D.1-4" class="pilcrow">¶</a></p>
+<p id="appendix-E.1-4">To satisfy this client, the server <span class="bcp14">MUST</span> send a single certificate chain with compatible algorithms and include a single signature in <code>CertificateVerify</code>.<a href="#appendix-E.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-2-dual-compatible-classic-primary-pq-optional">
-<section id="appendix-D.2">
+<section id="appendix-E.2">
         <h3 id="name-example-2-dual-compatible-c">
-<a href="#appendix-D.2" class="section-number selfRef">D.2. </a><a href="#name-example-2-dual-compatible-c" class="section-name selfRef">Example 2: Dual-Compatible, Classic Primary, PQ Optional</a>
+<a href="#appendix-E.2" class="section-number selfRef">E.2. </a><a href="#name-example-2-dual-compatible-c" class="section-name selfRef">Example 2: Dual-Compatible, Classic Primary, PQ Optional</a>
         </h3>
-<p id="appendix-D.2-1">Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.<a href="#appendix-D.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-D.2-2">Client behavior:<a href="#appendix-D.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-E.2-1">Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.<a href="#appendix-E.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-E.2-2">Client behavior:<a href="#appendix-E.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-D.2-3.1">
-            <p id="appendix-D.2-3.1.1">Includes supported classical algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#appendix-D.2-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-E.2-3.1">
+            <p id="appendix-E.2-3.1.1">Includes supported classical algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#appendix-E.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-D.2-3.2">
-            <p id="appendix-D.2-3.2.1">Includes supported classical algorithms again in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#appendix-D.2-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-E.2-3.2">
+            <p id="appendix-E.2-3.2.1">Includes supported classical algorithms again in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#appendix-E.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="appendix-D.2-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#appendix-D.2-4" class="pilcrow">¶</a></p>
+<p id="appendix-E.2-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#appendix-E.2-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-D.2-5.1">
-            <p id="appendix-D.2-5.1.1">Provide a single certificate chain with compatible classical algorithms and include a single signature in <code>CertificateVerify</code>, or<a href="#appendix-D.2-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-E.2-5.1">
+            <p id="appendix-E.2-5.1.1">Provide a single certificate chain with compatible classical algorithms and include a single signature in <code>CertificateVerify</code>, or<a href="#appendix-E.2-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-D.2-5.2">
-            <p id="appendix-D.2-5.2.1">Provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>DualCertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#appendix-D.2-5.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-E.2-5.2">
+            <p id="appendix-E.2-5.2.1">Provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>DualCertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#appendix-E.2-5.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="example-3-strict-dual">
-<section id="appendix-D.3">
+<section id="appendix-E.3">
         <h3 id="name-example-3-strict-dual">
-<a href="#appendix-D.3" class="section-number selfRef">D.3. </a><a href="#name-example-3-strict-dual" class="section-name selfRef">Example 3: Strict Dual</a>
+<a href="#appendix-E.3" class="section-number selfRef">E.3. </a><a href="#name-example-3-strict-dual" class="section-name selfRef">Example 3: Strict Dual</a>
         </h3>
-<p id="appendix-D.3-1">Client requires both classical and PQ authentication to be performed simultaneously. It does not support composite certificates.<a href="#appendix-D.3-1" class="pilcrow">¶</a></p>
-<p id="appendix-D.3-2">Client behavior:<a href="#appendix-D.3-2" class="pilcrow">¶</a></p>
+<p id="appendix-E.3-1">Client requires both classical and PQ authentication to be performed simultaneously. It does not support composite certificates.<a href="#appendix-E.3-1" class="pilcrow">¶</a></p>
+<p id="appendix-E.3-2">Client behavior:<a href="#appendix-E.3-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-D.3-3.1">
-            <p id="appendix-D.3-3.1.1">Includes an empty list in <code>signature_algorithms</code> (since this extension is required by [RFC8446] whenever certificate authentication is desired).<a href="#appendix-D.3-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-E.3-3.1">
+            <p id="appendix-E.3-3.1.1">Includes an empty list in <code>signature_algorithms</code> (since this extension is required by [RFC8446] whenever certificate authentication is desired).<a href="#appendix-E.3-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-D.3-3.2">
-            <p id="appendix-D.3-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#appendix-D.3-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-E.3-3.2">
+            <p id="appendix-E.3-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#appendix-E.3-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="appendix-D.3-4">To satisfy this client, the server <span class="bcp14">MUST</span> provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#appendix-D.3-4" class="pilcrow">¶</a></p>
+<p id="appendix-E.3-4">To satisfy this client, the server <span class="bcp14">MUST</span> provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#appendix-E.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="example-4-dual-compatible-pq-primary-classic-optional">
-<section id="appendix-D.4">
+<section id="appendix-E.4">
         <h3 id="name-example-4-dual-compatible-p">
-<a href="#appendix-D.4" class="section-number selfRef">D.4. </a><a href="#name-example-4-dual-compatible-p" class="section-name selfRef">Example 4: Dual-Compatible, PQ Primary, Classic Optional</a>
+<a href="#appendix-E.4" class="section-number selfRef">E.4. </a><a href="#name-example-4-dual-compatible-p" class="section-name selfRef">Example 4: Dual-Compatible, PQ Primary, Classic Optional</a>
         </h3>
-<p id="appendix-D.4-1">Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.<a href="#appendix-D.4-1" class="pilcrow">¶</a></p>
-<p id="appendix-D.4-2">Client behavior:<a href="#appendix-D.4-2" class="pilcrow">¶</a></p>
+<p id="appendix-E.4-1">Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.<a href="#appendix-E.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-E.4-2">Client behavior:<a href="#appendix-E.4-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-D.4-3.1">
-            <p id="appendix-D.4-3.1.1">Includes supported PQ algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#appendix-D.4-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-E.4-3.1">
+            <p id="appendix-E.4-3.1.1">Includes supported PQ algorithms in <code>signature_algorithms</code> and optionally <code>signature_algorithms_cert</code>.<a href="#appendix-E.4-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-D.4-3.2">
-            <p id="appendix-D.4-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms again in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#appendix-D.4-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-E.4-3.2">
+            <p id="appendix-E.4-3.2.1">Includes supported classical algorithms in <code>first_signature_algorithms</code> list of <code>dual_signature_algorithms</code> and supported PQ algorithms again in <code>second_signature_algorithms</code> list of <code>dual_signature_algorithms</code>.<a href="#appendix-E.4-3.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="appendix-D.4-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#appendix-D.4-4" class="pilcrow">¶</a></p>
+<p id="appendix-E.4-4">To satisfy this client, the server <span class="bcp14">MUST</span> either:<a href="#appendix-E.4-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-D.4-5.1">
-            <p id="appendix-D.4-5.1.1">Provide a single certificate chain with compatible PQ algorithms and include a single signature in <code>CertificateVerify</code>, or<a href="#appendix-D.4-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-E.4-5.1">
+            <p id="appendix-E.4-5.1.1">Provide a single certificate chain with compatible PQ algorithms and include a single signature in <code>CertificateVerify</code>, or<a href="#appendix-E.4-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="appendix-D.4-5.2">
-            <p id="appendix-D.4-5.2.1">Provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#appendix-D.4-5.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="appendix-E.4-5.2">
+            <p id="appendix-E.4-5.2.1">Provide a classical certificate chain followed by a PQ certificate chain as described in <a href="#certificate" class="auto internal xref">Section 5.2</a> and two signatures in <code>CertificateVerify</code> as described in <a href="#certificate-verify" class="auto internal xref">Section 5.3</a><a href="#appendix-E.4-5.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -2160,7 +2179,7 @@ struct {
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-E">
+<section id="appendix-F">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
