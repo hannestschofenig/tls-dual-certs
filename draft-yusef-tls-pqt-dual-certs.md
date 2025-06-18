@@ -81,8 +81,6 @@ It also addresses the challenges of integrating hybrid authentication in TLS 1.3
 
 This document defines a new extension `dual_signature_algorithms` to negotiate support for two categories of signature algorithms, typically one set of classic schemes and one set of PQ schemes. It also makes changes to the `Certificate` and `CertificateVerify` messages to take advantage of both certificates when authenticating the end entity.
 
-
-
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
