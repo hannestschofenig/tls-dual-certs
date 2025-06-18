@@ -1404,7 +1404,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <p id="section-1-4">It also addresses the challenges of integrating hybrid authentication in TLS 1.3 while balancing backward compatibility, forward security, and deployment practicality.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">This document defines a new extension <code>dual_signature_algorithms</code> to negotiate support for two categories of signature algorithms, typically one set of classic schemes and one set of PQ schemes. It also makes changes to the <code>Certificate</code> and <code>CertificateVerify</code> messages to take advantage of both certificates when authenticating the end entity.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">This method exemplifies a PQ/T hybrid protocol with non-composite authentication as defined in
- <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-pquip-pqt-hybrid-terminology-06#section-4" class="relref">Section 4</a> of [<a href="#I-D.ietf-pquip-pqt-hybrid-terminology" class="cite xref">I-D.ietf-pquip-pqt-hybrid-terminology</a>]</span>, where two single-algorithm schemes are used in parallel: when the certificate type is X.509, each certificate chain uses the same format as in standard PKI, and both chains together provide hybrid assurance without modifying the X.509 certificate structure. While this approach does not produce a single cryptographic hybrid signature, it ensures that both certificates are presented, validated, and cryptographically bound to the TLS handshake transcript. This specification is also compatible with other certificate types defined in the TLS Certificate Types registry [?RFC8447] provided that both components of the dual are of the same type. This document assumes X.509 certificates for all explanatory text.<a href="#section-1-6" class="pilcrow">¶</a></p>
+ <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-pquip-pqt-hybrid-terminology-06#section-4" class="relref">Section 4</a> of [<a href="#PQT-TERMS" class="cite xref">PQT-TERMS</a>]</span>, where two single-algorithm schemes are used in parallel: when the certificate type is X.509, each certificate chain uses the same format as in standard PKI, and both chains together provide hybrid assurance without modifying the X.509 certificate structure. While this approach does not produce a single cryptographic hybrid signature, it ensures that both certificates are presented, validated, and cryptographically bound to the TLS handshake transcript. This specification is also compatible with other certificate types defined in the TLS Certificate Types registry defined in <span><a href="https://rfc-editor.org/rfc/rfc8447#section-14" class="relref">Section 14</a> of [<a href="#IANA-TLS" class="cite xref">IANA-TLS</a>]</span> provided that both components of the dual are of the same type. This document assumes X.509 certificates for all explanatory text.<a href="#section-1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1714,7 +1714,7 @@ struct {
         <h3 id="name-weak-non-separability">
 <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-weak-non-separability" class="section-name selfRef">Weak Non-Separability</a>
         </h3>
-<p id="section-7.1-1">This dual certificate scheme achieves Weak Non-Separability as defined in <span>[<a href="#I-D.ietf-pquip-hybrid-signature-spectrums" class="cite xref">I-D.ietf-pquip-hybrid-signature-spectrums</a>]</span>, which is defined as:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-1">This dual certificate scheme achieves Weak Non-Separability as defined in <span>[<a href="#HYBRID-SIGS" class="cite xref">HYBRID-SIGS</a>]</span>, which is defined as:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-7.1-2.1">
             <p id="section-7.1-2.1.1">the guarantee that an adversary cannot simply “remove” one of the component signatures without evidence left behind.<a href="#section-7.1-2.1.1" class="pilcrow">¶</a></p>
@@ -1877,13 +1877,13 @@ struct {
         <dd>
 <span class="refTitle">"Digital Signature Standard (DSS)"</span>, <span class="refContent">National Institute of Standards and Technology (U.S.)</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.186-5</span>, <time datetime="2023-02" class="refDate">February 2023</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.186-5">https://doi.org/10.6028/nist.fips.186-5</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="I-D.ietf-pquip-hybrid-signature-spectrums">[I-D.ietf-pquip-hybrid-signature-spectrums]</dt>
+<dt id="HYBRID-SIGS">[HYBRID-SIGS]</dt>
         <dd>
 <span class="refAuthor">Bindel, N.</span>, <span class="refAuthor">Hale, B.</span>, <span class="refAuthor">Connolly, D.</span>, and <span class="refAuthor">F. D</span>, <span class="refTitle">"Hybrid signature spectrums"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-pquip-hybrid-signature-spectrums-06</span>, <time datetime="2025-01-09" class="refDate">9 January 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-pquip-hybrid-signature-spectrums-06">https://datatracker.ietf.org/doc/html/draft-ietf-pquip-hybrid-signature-spectrums-06</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="I-D.ietf-pquip-pqt-hybrid-terminology">[I-D.ietf-pquip-pqt-hybrid-terminology]</dt>
+<dt id="IANA-TLS">[IANA-TLS]</dt>
         <dd>
-<span class="refAuthor">D, F.</span>, <span class="refAuthor">P, M.</span>, and <span class="refAuthor">B. Hale</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-pquip-pqt-hybrid-terminology-06</span>, <time datetime="2025-01-10" class="refDate">10 January 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-pquip-pqt-hybrid-terminology-06">https://datatracker.ietf.org/doc/html/draft-ietf-pquip-pqt-hybrid-terminology-06</a>&gt;</span>. </dd>
+<span class="refAuthor">Salowey, J.</span> and <span class="refAuthor">S. Turner</span>, <span class="refTitle">"IANA Registry Updates for TLS and DTLS"</span>, <span class="seriesInfo">RFC 8447</span>, <span class="seriesInfo">DOI 10.17487/RFC8447</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8447">https://www.rfc-editor.org/rfc/rfc8447</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="ML-DSA">[ML-DSA]</dt>
         <dd>
@@ -1892,6 +1892,10 @@ struct {
 <dt id="PQ-RECOMMEND">[PQ-RECOMMEND]</dt>
         <dd>
 <span class="refAuthor">Reddy.K, T.</span> and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"Post-Quantum Cryptography Recommendations for TLS-based Applications"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-reddy-uta-pqc-app-07</span>, <time datetime="2025-02-25" class="refDate">25 February 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-reddy-uta-pqc-app-07">https://datatracker.ietf.org/doc/html/draft-reddy-uta-pqc-app-07</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PQT-TERMS">[PQT-TERMS]</dt>
+        <dd>
+<span class="refAuthor">D, F.</span>, <span class="refAuthor">P, M.</span>, and <span class="refAuthor">B. Hale</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-pquip-pqt-hybrid-terminology-06</span>, <time datetime="2025-01-10" class="refDate">10 January 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-pquip-pqt-hybrid-terminology-06">https://datatracker.ietf.org/doc/html/draft-ietf-pquip-pqt-hybrid-terminology-06</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="Signature-Spectrums">[Signature-Spectrums]</dt>
         <dd>
