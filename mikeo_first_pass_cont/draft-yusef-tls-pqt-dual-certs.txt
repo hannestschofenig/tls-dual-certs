@@ -6,7 +6,7 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 19 December 2025                                   M. Ounsworth
+Expires: 20 December 2025                                   M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
@@ -14,7 +14,7 @@ Expires: 19 December 2025                                   M. Ounsworth
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                            17 June 2025
+                                                            18 June 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 December 2025.
+   This Internet-Draft will expire on 20 December 2025.
 
 Copyright Notice
 
@@ -414,10 +414,7 @@ Table of Contents
        select (is_delimiter) {
            case Delimiter: uint24 delimiter = 0;
            case Non_Delimiter:
-             select (certificate_type) {
-                 // handling of certificate types defined in
-                 // [RFC8447] as usual.
-             };
+             opaque cert_specific_data<1..2^24-1>;
              Extension extensions<0..2^16-1>;
        };
    } CertificateEntry;
@@ -519,10 +516,6 @@ Table of Contents
    messages carried in Exported Authenticators with second signature
    using "Secondary Exported Authenticator" as the context string.
 
-   _EDITORIAL NOTE: As this document progresses through WG review, it
-   would be good to analyze whether this is actually adding security
-   value, or if it can be removed._
-
 5.4.  Dual Certificate Policy Enforcement
 
    Policy enforcement regarding the use of dual certificates is
@@ -557,7 +550,7 @@ Table of Contents
    handshake robustness.
 
    One implication of the design of this dual-algorithm negotiation
-   mechanism is that the peer MUST honour any combination of algorithms
+   mechanism is that the peer MUST honor any combination of algorithms
    from the first_signature_algorithms and second_signature_algorithms
    lists that the other peer chooses, even if it chooses the two largest
    or the two slowest algorithms.  In constrained environments, it is
