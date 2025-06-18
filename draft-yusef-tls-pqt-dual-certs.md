@@ -81,8 +81,8 @@ It also addresses the challenges of integrating hybrid authentication in TLS 1.3
 
 This document defines a new extension `dual_signature_algorithms` to negotiate support for two categories of signature algorithms, typically one set of classic schemes and one set of PQ schemes. It also makes changes to the `Certificate` and `CertificateVerify` messages to take advantage of both certificates when authenticating the end entity.
 
-This method exemplifies a PQ/T hybrid protocol with non-composite authentication defined in
-Section 4 of {{{{?I-D.ietf-pquip-pqt-hybrid-terminology}}}}, where two single-algorithm schemes are used in parallel: each certificate chain uses the same format as in standard PKI, and both chains together provide hybrid assurance without modifying the X.509 certificate structure. While this approach does not produce a single cryptographic hybrid signature, it ensures that both certificates are presented, validated, and cryptographically bound to the TLS handshake transcript.
+This method exemplifies a PQ/T hybrid protocol with non-composite authentication as defined in
+Section 4 of {{{{?I-D.ietf-pquip-pqt-hybrid-terminology}}}}, where two single-algorithm schemes are used in parallel: when the certificate type is X.509, each certificate chain uses the same format as in standard PKI, and both chains together provide hybrid assurance without modifying the X.509 certificate structure. While this approach does not produce a single cryptographic hybrid signature, it ensures that both certificates are presented, validated, and cryptographically bound to the TLS handshake transcript. This specification is also compatible with other certificate types defined in the TLS Certificate Types registry [?RFC8447] provided that both components of the dual are of the same type. This document assumes X.509 certificates for all explanatory text.
 
 # Conventions and Definitions
 
