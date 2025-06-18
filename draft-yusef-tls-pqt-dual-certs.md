@@ -81,6 +81,9 @@ It also addresses the challenges of integrating hybrid authentication in TLS 1.3
 
 This document defines a new extension `dual_signature_algorithms` to negotiate support for two categories of signature algorithms, typically one set of classic schemes and one set of PQ schemes. It also makes changes to the `Certificate` and `CertificateVerify` messages to take advantage of both certificates when authenticating the end entity.
 
+This method exemplifies a PQ/T hybrid protocol with non-composite authentication as defined in
+Section 4 of {{{{?I-D.ietf-pquip-pqt-hybrid-terminology}}}}, where two single-algorithm schemes are used in parallel: when the certificate type is X.509, each certificate chain uses the same format as in standard PKI, and both chains together provide hybrid assurance without modifying the X.509 certificate structure. While this approach does not produce a single cryptographic hybrid signature, it ensures that both certificates are presented, validated, and cryptographically bound to the TLS handshake transcript. This specification is also compatible with other certificate types defined in the TLS Certificate Types registry [?RFC8447] provided that both components of the dual are of the same type. This document assumes X.509 certificates for all explanatory text.
+
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
@@ -97,6 +100,8 @@ The proposed mechanism is fully backward compatible: traditional certificates an
 This document introduces a mechanism to enable dual-certificate authentication in TLS 1.3. The primary objective is to allow each TLS peer to present two certificate chains requiring an attacker to break both authentication algorithms to impersonate a peer. Typically one of the certificate chains is using a traditional cryptographic algorithms while the second leverages post-quantum (PQ) cryptography.
 
 The design builds on existing TLS 1.3 structures and introduces minimal protocol changes. It is applicable to both client and server authentication and is compatible with the Exported Authenticators mechanism {{!EXPORTED-AUTH=RFC9261}}.
+
+A full set of informal design requirements for this specification can be found in {{sec-design-requirements}}.
 
 ## Signature Algorithms Negotiation
 
@@ -155,9 +160,9 @@ This section defines the normative changes to TLS 1.3 required to support dual-c
 
 ## `dual_signature_algorithms` Extension
 
-A new extension, `dual_signature_algorithms`, is defined to allow peers to advertise support for two distinct categories of signature algorithms that can be paired together by selecting one algorithm from each list, for example classical and post-quantum signature algorithms that are each not fully trusted on their own.
-
 ### Structure {#sec-structure}
+
+A new extension, `dual_signature_algorithms`, is defined to allow peers to advertise support for two distinct lists of signature algorithms, for example, classical and post-quantum.
 
 `SignatureSchemeList` is defined in {{Section 4.2.3 of TLS}}, which is reproduced here:
 
@@ -187,7 +192,7 @@ When parsing `DualSignatureSchemeList`, implementations MUST NOT make assumption
 
 ### Use in Handshake and Exported Authenticator Messages
 
-The client MAY include this extension in `ClientHello` message to indicate combinations of dual algorithms it supports for verifying the server's signature. The server MAY include this extension in `CertificateRequest` message indicate combinations of dual algorithms it supports for verifying the client's signature. This extension MAY be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.
+The client MAY include this extension in `ClientHello` message to indicate the different combinations of dual algorithms it supports for verifying the server's signature. The server MAY include this extension in `CertificateRequest` message to indicate the different categories of algorithms it supports for verifying the client's signature. This extension MAY be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.
 
 If the extension is present in `ClientHello`, `CertificateRequest` of {{TLS}} or Authenticator Request defined in {{Section 4 of EXPORTED-AUTH}}, the peer MAY respond with a dual-certificate authentication structure. If the extension is absent, the peer MUST NOT send a two certificate chains or two signatures.
 
@@ -332,6 +337,10 @@ However, in general to achieve the intended security guarantees of dual-algorith
 
 Certificate chains MUST be validated independently with the same logic as if they were each presented in isolation, including trust anchors, certificate usage constraints, expiration, and revocation status. Implementations MUST NOT apply different policies and validation logic based on whether a certificate appeared as the first or second. In other words, if a dual certificate TLS handshake succeeds, then the same handshake MUST be able to succeed with the same two certificates, but the order of the first and second swapped in `dual_certificate_algorithms`, `Certificates`, and `DualCertificateVerify`.
 
+## Preventing Downgrade Attacks
+
+TLS clients that are capable of accepting both traditional-only certificates and dual certificate configurations may remain vulnerable to downgrade attacks. In such a scenario, an attacker with access to a CRQC could forge a valid traditional certificate to impersonate the server and it does not indicate support for dual certificates. To mitigate this risk, clients should progressively phase out acceptance of traditional-only certificate chains once dual certificate deployment is widespread and interoperability with legacy servers is no longer necessary. During the transition period, accepting traditional-only certificate chains may remain necessary to maintain backward compatibility with servers that have not yet deployed dual certificates.
+
 #  IANA Considerations
 
 This specification registers the `dual_signature_algorithms` TLS extension and `dual_certificate_required` TLS alert.
@@ -358,7 +367,7 @@ IANA is requested to add the following entry to the "TLS Alerts" registry:
 
 # Acknowledgments
 
-We would like to thank ... for their comments.
+We would like to thank Suzanne Wibada (Université de Sherbrooke) for her reviews and comments during the work on the initial version of this document, and her willingness to implement the recommendation of this document.
 
 --- back
 
@@ -397,27 +406,21 @@ Design options:
 2. The client MUST honor any choice of pair from \[DualFirst\], \[DualSecond\]; ie if it supports the algorithms, then it supports them; it is not allowed to reject specific combinations. This option is presented in this version.
 3. The client MAY abort the connection if it does not accept the server's choice of combination.
 
-# Informal Requirements for Dual TLS Certificate Support
 
-## General TLS Semantics
+# Informal Requirements for Dual TLS Certificate Support {#sec-design-requirements}
 
-### Protocol Flow Consistency
+This section documents the design requirements that drove the development of this specification.
 
-Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with `Certificate`, `CertificateVerify`, and `Finished` messages.
+This section is primarily intended to easy WG review and could be removed or simplified prior to RFC publication.
 
-### Minimal Protocol Changes
+## Dual-Algorithm Security
 
-Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.
+### Weak Non-Separability
 
-### mTLS support
+The dual certificate authentication achieves, at least, Weak Non-Separability {{?Signature-Spectrums=I-D.ietf-pquip-hybrid-signature-spectrums-06}} at the time of verification of the `CertificateVerify` message.
 
-The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.
 
-### Exported Authenticators Compatibility
-
-The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.
-
-## Certificate Handling Semantics
+## Dual Certificate Semantics
 
 ### Independent Chain Usability
 
@@ -427,35 +430,64 @@ Each certificate chain (e.g., classic and PQ) must be independently usable for a
 
 The mechanism must clearly distinguish and delimit multiple certificate chains to prevent ambiguity or misinterpretation.
 
-### Chain-Specific Signature Algorithms
-
-Each certificate chain must be associated with its own set of supported signature algorithms, allowing negotiation of appropriate algorithms for classic and PQ use cases.
-
-### Multiple Chains Support (Generalisation)
-
-The mechanism must be designed in a way that could support more than two certificate chains in the future, not just hardcoded to classic + PQ.
-
 ## Use Case and Deployment Flexibility
 
 ### Backward Compatibility
 
 When only one certificate chain is used, the mechanism must remain compatible with existing TLS 1.3 endpoints unaware of dual-certificate support or willing to use only a single certificate.
 
-### Policy Signalling
+### Forward Compatibility
 
-A mechanism must exist for one party (client or server) to signal whether dual certificate presentation is required, optional, or not supported, to coordinate authentication expectations.
+The mechanism must be capable of negotiating algorithms requiring dual certificates as well as algorithms that are acceptable standalone.
 
-### Future extendability to Non-PQC Multi-Cert Use cases
+As an example, the mechanism must be capable of expressing the following algorithm preference:
 
-The mechanism must be extendable to other multi-certificate use cases
+> I would accept SLH-DSA-128s, Composite_MLDSA65_RSA2048 Composite_MLDSA65_ECDSA-P256, or ML-DSA-87 by themselves, or a dual-cert hybrid with one of \[ML-DSA-44, ML-DSA-65\] with one of \[RSA, ECDSA-P256, ECDSA-P384\].
+
+### Negotiation Expressiveness
+
+Signature algorithm negotiation, whether single or dual, must arrive at a unique selection of algorithms if and only if there is at least one configuration that is mutually-acceptable to client and server. Specifically, the negotiation mechanism must be expressive enough that clients can list all valid configurations that they would accept. Conversely, the negotiation mechanism must be specific enough that the client is not forced, through clumsiness of the negotiation mechanism to list configurations that in fact it does not support and thus rely on failures and retries to arrive at an acceptable algorithm selection.
 
 ### Mitigation of Side Channels
 
 The mechanism should avoid constructions that enable side-channel attacks by observing how distinct algorithms are applied to the same message.
 
-### Transparency in Signature Validation
+_MikeO: I have never seen this particular side-channel attack described in the literature, so I think a reference is needed. Also, side-channels is a very wide field, so it seems odd to pick out only a very specific type of side-channels to mention. I suggest removing this section._
+
+### Non-ambiguity of Message Formats
 
 The order and pairing between certificates and their corresponding signatures must be explicit, so verifiers can unambiguously match them.
+
+## Interaction With Existing TLS Semantics
+
+### Protocol Flow Consistency
+
+Dual certificate authentication must follow the same logical flow as standard TLS certificate authentication, including integration with `Certificate`, `CertificateVerify`, and `Finished` messages.
+
+### mTLS support
+
+The mechanism must support both server and client authentication scenarios. In case of mutual authentication dual certificates may be used unidirectionally as well as bidirectionally.
+
+### Exported Authenticators Compatibility
+
+The mechanism must be usable with Exported Authenticators (RFC 9261) for mutual authentication in post-handshake settings.
+
+
+### Minimal Protocol Changes
+
+Any additions or modifications to the TLS protocol must be minimal to ease deployment, reduce implementation complexity and minimize new security risks.
+
+This requirement favours a design which minimizes interaction with other TLS extensions -- ie where all other extensions related to certificates will transfer their semantics from a single-certificate to a dual-certificate setting in a trivial and obvious way and no special processing rules need to be described. Ditto for existing IANA registries relating to the TLS protocol.
+
+
+## Non-Goals
+
+The following are listed as non-goals; i.e. they are out-of-scope and will not be considered in the design of dual certificate authentication.
+
+### Multiple Identities
+
+This mechanism is specific to cryptographic algorithm migration. It is not a generic mechanism for using multiple identities in a single TLS handshake. In particular, this mechanism does not allow for negotiating two certificates with the same algorithm but containing different identifiers, or for negotiating two independent sets of `certificate_authorities`.
+
 
 
 # Suggested Configuration Mechanism {#appdx-config}
@@ -537,4 +569,3 @@ To satisfy this client, the server MUST either:
 
 - Provide a single certificate chain with compatible PQ algorithms and include a single signature in `CertificateVerify`, or
 - Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
-
