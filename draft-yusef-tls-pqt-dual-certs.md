@@ -210,10 +210,7 @@ struct {
     select (is_delimiter) {
         case Delimiter: uint24 delimiter = 0;
         case Non_Delimiter:
-          select (certificate_type) {
-              // handling of certificate types defined in
-              // [RFC8447] as usual.
-          };
+          opaque cert_specific_data<1..2^24-1>;
           Extension extensions<0..2^16-1>;
     };
 } CertificateEntry;
@@ -272,8 +269,6 @@ Implementations MUST verify both signatures and MUST associate each with its cor
 
 This dual-signature structure applies equally to `CertificateVerify` messages carried in Exported Authenticators with second signature using "Secondary Exported Authenticator" as the context string.
 
-_EDITORIAL NOTE: As this document progresses through WG review, it would be good to analyze whether this is actually adding security value, or if it can be removed._
-
 ## Dual Certificate Policy Enforcement
 
 Policy enforcement regarding the use of dual certificates is implementation-defined and driven by the authenticating peer. When dual certificate authentication is required by local policy, such as during high-assurance sessions or post-quantum transition periods, the authenticating endpoint MUST abort a handshake where only one signature or one certificate chain is present with an `dual_certificate_required` alert. Implementations MUST ensure that both certificates and both signatures are processed together and MUST NOT accept fallback to single-certificate authentication when dual-authentication is expected.
@@ -288,7 +283,7 @@ The use of dual certificates increases the size of the certificate and certifica
 
 To mitigate these impacts, deployments can apply certificate chain optimization techniques, such as those described in {{Section 6.1 of ?PQ-RECOMMEND=I-D.reddy-uta-pqc-app}}, to minimize transmission overhead and improve handshake robustness.
 
-One implication of the design of this dual-algorithm negotiation mechanism is that the peer MUST honour any combination of algorithms from the `first_signature_algorithms` and `second_signature_algorithms` lists that the other peer chooses, even if it chooses the two largest or the two slowest algorithms. In constrained environments, it is important for TLS implementations to be configured with this in mind.
+One implication of the design of this dual-algorithm negotiation mechanism is that the peer MUST honor any combination of algorithms from the `first_signature_algorithms` and `second_signature_algorithms` lists that the other peer chooses, even if it chooses the two largest or the two slowest algorithms. In constrained environments, it is important for TLS implementations to be configured with this in mind.
 
 
 #  Security Considerations
