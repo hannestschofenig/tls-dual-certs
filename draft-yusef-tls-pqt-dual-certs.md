@@ -144,15 +144,13 @@ This encoding applies equally to the `CertificateVerify` message of Exported Aut
 
 The order of the signatures in the message MUST correspond to the order of the certificate chains in the Certificate message: the first signature MUST correspond to a classical algorithm from `first_signature_algorithms` list of `dual_signature_algorithms` extension, while the second signature MUST correspond to a PQ algorithm from `second_signature_algorithms` list of `dual_signature_algorithms` extension.
 
-
 ## Common Chains
 
 In order to lessen operational burden on Certification Authority (CA) operators, the two certificates of the dual MAY be issued from the same CA. For example, during the PQC migration, a CA operator might wish to stand up a root CA using a Level 5 PQC algorithm or a hash-based signature, and then continue to issue RSA and ECDSA certificates off that root.
 
-Negotiation of such a setup requires use of the `signature_algorithms_cert` TLS 1.3 extension, which is unmodified from [TLS] and when present it applies equally to both chains of the dual.
+Negotiation of such a setup requires use of the `signature_algorithms_cert` TLS 1.3 extension, which is unmodified from its definition in {{Section 4.2.3 of TLS}} and when present it applies equally to both chains of the dual.
 
 In order to optimize bandwidth and avoid sending duplicate copies of the same chain, when constructing a `Certificate` message as described in {{certificate}}, the second certificate chain MAY consist of only an end-entity certificate.
-
 
 # Protocol Changes
 
@@ -183,12 +181,11 @@ struct {
 ~~~~~~~~~~
 {: title="Contents of dual_signature_algorithms extension"}
 
-SignatureScheme is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry. `first_signature_algorithms` and `second_signature_algorithms` list MUST NOT contain common elements. TLS endpoint observing such overlap between primary and secondary supported signature lists MUST terminate the connection with `illegal_parameter` alert.
+SignatureScheme is a 2-octet value identifying a supported signature algorithm as defined in TLS SignatureScheme IANA registry.
 
 The `dual_signature_algorithms` extension MAY contain common elements with `signature_algorithms` if the peer wishes to advertize that it will accept a certain algorithm either standalone or as part of a dual signature. Listing an algorithm in `signature_algorithms` does not imply that it would be acceptable as part of a dual signature unless that algorithm also appears in one of the lists in `dual_signature_algorithms`. See {{sec-policy-examples}} for examples of cryptographic policies, and how to set `signature_algorithms` and `dual_signature_algorithms` to implement those policies.
 
 When parsing `DualSignatureSchemeList`, implementations MUST NOT make assumptions about which sub-list a given algorithm will appear in. For example, an implementation MUST NOT assume that PQ algorithms will appear in the first list and PQ in the second. As a test, if a TLS handshake containing a `DualSignatureSchemeList` succeeds, then an equivalent TLS handshake containing an equivalent `DualSignatureSchemeList` but with the first and second lists swapped MUST also succeed. However, it is not required that these two test cases result in the same selected signature algorithm and certificate. See {{appdx-config}} for a suggested configuration mechanism for selecting a preferred pair of algorithms.
-
 
 ### Use in Handshake and Exported Authenticator Messages
 
@@ -236,11 +233,11 @@ struct {
 
 All entries before the delimiter are treated as the first certificate chain and MUST use algorithms from `first_signature_algorithms` list of `dual_signature_algorithms` extension, all entries after the delimiter are treated as the second certificate chain and MUST use algorithms from `second_signature_algorithms` list of `dual_signature_algorithms` extension. As specified in {{Section 4.4.2 of TLS}}, end-entity certificate MUST be the first in both chains.
 
-A peer receiving this structure MUST validate each chain independently according to its corresponding signature algorithm. The first certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `first_signature_algorithms` section of `dual_signature_algorithms` extension. The second certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `second_signature_algorithms` section of `dual_signature_algorithms` extension. If a `signature_algorithms_cert` extension is absent, then the each certificate chain of the dual MUST also use an algorithm from the same list, but not necessarily the same one as the EE certificate. I.E. it is always allowed to do mixed-algorithm chains within the same list.
+A peer receiving this structure MUST validate each chain independently according to its corresponding signature algorithm. Implementers MAY wish to consider performing this verification in a timing-invariant way so as not to leak which certificate failed, for example if it failed for policy reasons rather than cryptographic reasons, however since this information is not hidden in a single-certificate TLS handshake, implementers MAY decide that this is not important.
 
-More advances configurations of mixed-algorithm certificate chains will require negotiation of chain algorithms outside of the respective dual list. For example, consider that a client wants to allow SLH-DSA roots to issue ML-DSA end entities but does not want to support SLH-DSA end entities as a dual (or does not want to support SLH-DSA end entities at all). Or consider that a ML-DSA-87 CA will issue both the ML-DSA-44 and RSA end entities that are used in the dual. Support for such use cases is accomplished via the `signature_algorithms_cert` extension which is used un-modified from [TLS] and when present it applies equally to both chains of the dual. Note that there is only one `signature_algorithms_cert` extension, so algorithms for the two chains cannot be negotiated separately.
+The first certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `first_signature_algorithms` section of `dual_signature_algorithms` extension. The second certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `second_signature_algorithms` section of `dual_signature_algorithms` extension. End-entity certificates of both chains MUST use different public keys.
 
-Implementers MAY wish to consider performing this verification in a timing-invariant way so as not to leak which certificate failed, for example if it failed for policy reasons rather than cryptographic reasons, however since this information is not hidden in a single-certificate TLS handshake, implementers MAY decide that this is not important.
+If a `signature_algorithms_cert` extension is absent, then all certificates of given chain MUST also use an algorithm from the corresponding list, but not necessarily the same one as the end-entity certificate. It is always allowed to provide mixed-algorithm certificate chains within the same list as long as relevant list contains more than one entry.
 
 This encoding applies equally to the `CompressedCertificate` message and to `Certificate` message of Exported Authenticators.
 
@@ -256,7 +253,7 @@ struct {
 ~~~
 {: title="TLS 1.3 CertificateVerify message"}
 
-This document defines `DualCertificateVerify` which extends `CertificateVerify` in the obvious way to carry two independent signatures.
+This document defines `DualCertificateVerify` which extends `CertificateVerify` to carry two independent signatures.
 
 ~~~~~~~~~~ ascii-art
 struct {
@@ -268,11 +265,11 @@ struct {
 ~~~~~~~~~~
 {: title="DualCertificateVerify message"}
 
-It is an error for any fields to be empty. In particular, the `DualCertificateVerify` structure MUST NOT be used to carry only a single signature. Such cases MUST abort with an `illegal_parameter` alert.
+It is an error for any fields to be empty. In particular, the `DualCertificateVerify` structure MUST NOT be used to carry only a single signature. Both signatures included in a single `DualCertificateVerify` structure MUST use different signature algorithms. Violation of this rules MUST result in session termination with an `illegal_parameter` alert.
 
 The `DualCertificateVerify` message MAY be used in place of `CertificateVerify` anywhere that it is allowed.
 
-Each signature covers the transcript hash as in TLS 1.3, but with a distinct context string for domain separation, which are defined in {sec-context-strings}.
+Each signature covers the transcript hash as in TLS 1.3, but with a distinct context string for domain separation, which are defined in {{sec-context-strings}}.
 
 ### Context Strings {#sec-context-strings}
 
@@ -488,8 +485,6 @@ The following are listed as non-goals; i.e. they are out-of-scope and will not b
 
 This mechanism is specific to cryptographic algorithm migration. It is not a generic mechanism for using multiple identities in a single TLS handshake. In particular, this mechanism does not allow for negotiating two certificates with the same algorithm but containing different identifiers, or for negotiating two independent sets of `certificate_authorities`.
 
-
-
 # Suggested Configuration Mechanism {#appdx-config}
 
 This section gives a non-normative suggestion for a mechanism for configuration of algorithm selection preference in a dual-algorithm setting.
@@ -509,8 +504,6 @@ The advantages of dual certificates over composites is operational flexibility f
 The advantages of composites over dual certificates is that the certificate chains themselves are protected by dual-algorithms, which can be of great importance in use cases where trust stores are not easily updatable.
 
 It is worth noting that composites present as simply another signature algorithm, and as such nothing prevents them from being used as a component within a `dual_signature_algorithm`.
-
-
 
 # Policy Examples {#sec-policy-examples}
 
