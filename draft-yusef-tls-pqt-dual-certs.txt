@@ -327,7 +327,8 @@ Table of Contents
 
    Negotiation of such a setup requires use of the
    signature_algorithms_cert TLS 1.3 extension, which is unmodified from
-   [TLS] and when present it applies equally to both chains of the dual.
+   its definition in Section 4.2.3 of [TLS] and when present it applies
+   equally to both chains of the dual.
 
    In order to optimize bandwidth and avoid sending duplicate copies of
    the same chain, when constructing a Certificate message as described
@@ -370,10 +371,6 @@ Table of Contents
 
    SignatureScheme is a 2-octet value identifying a supported signature
    algorithm as defined in TLS SignatureScheme IANA registry.
-   first_signature_algorithms and second_signature_algorithms list MUST
-   NOT contain common elements.  TLS endpoint observing such overlap
-   between primary and secondary supported signature lists MUST
-   terminate the connection with illegal_parameter alert.
 
    The dual_signature_algorithms extension MAY contain common elements
    with signature_algorithms if the peer wishes to advertize that it
@@ -479,37 +476,28 @@ Table of Contents
 
    A peer receiving this structure MUST validate each chain
    independently according to its corresponding signature algorithm.
-   The first certificate chain MUST contain an end-entity certificate
-   whose public key is compatible with one of the algorithms listed in
-   the first_signature_algorithms section of dual_signature_algorithms
-   extension.  The second certificate chain MUST contain an end-entity
-   certificate whose public key is compatible with one of the algorithms
-   listed in the second_signature_algorithms section of
-   dual_signature_algorithms extension.  If a signature_algorithms_cert
-   extension is absent, then the each certificate chain of the dual MUST
-   also use an algorithm from the same list, but not necessarily the
-   same one as the EE certificate.  I.E. it is always allowed to do
-   mixed-algorithm chains within the same list.
-
-   More advances configurations of mixed-algorithm certificate chains
-   will require negotiation of chain algorithms outside of the
-   respective dual list.  For example, consider that a client wants to
-   allow SLH-DSA roots to issue ML-DSA end entities but does not want to
-   support SLH-DSA end entities as a dual (or does not want to support
-   SLH-DSA end entities at all).  Or consider that a ML-DSA-87 CA will
-   issue both the ML-DSA-44 and RSA end entities that are used in the
-   dual.  Support for such use cases is accomplished via the
-   signature_algorithms_cert extension which is used un-modified from
-   [TLS] and when present it applies equally to both chains of the dual.
-   Note that there is only one signature_algorithms_cert extension, so
-   algorithms for the two chains cannot be negotiated separately.
-
    Implementers MAY wish to consider performing this verification in a
    timing-invariant way so as not to leak which certificate failed, for
    example if it failed for policy reasons rather than cryptographic
    reasons, however since this information is not hidden in a single-
    certificate TLS handshake, implementers MAY decide that this is not
    important.
+
+   The first certificate chain MUST contain an end-entity certificate
+   whose public key is compatible with one of the algorithms listed in
+   the first_signature_algorithms section of dual_signature_algorithms
+   extension.  The second certificate chain MUST contain an end-entity
+   certificate whose public key is compatible with one of the algorithms
+   listed in the second_signature_algorithms section of
+   dual_signature_algorithms extension.  End-entity certificates of both
+   chains MUST use different public keys.
+
+   If a signature_algorithms_cert extension is absent, then all
+   certificates of given chain MUST also use an algorithm from the
+   corresponding list, but not necessarily the same one as the end-
+   entity certificate.  It is always allowed to provide mixed-algorithm
+   certificate chains within the same list as long as relevant list
+   contains more than one entry.
 
    This encoding applies equally to the CompressedCertificate message
    and to Certificate message of Exported Authenticators.
@@ -526,8 +514,7 @@ Table of Contents
                 Figure 5: TLS 1.3 CertificateVerify message
 
    This document defines DualCertificateVerify which extends
-   CertificateVerify in the obvious way to carry two independent
-   signatures.
+   CertificateVerify to carry two independent signatures.
 
    struct {
        SignatureScheme first_algorithm;
@@ -540,15 +527,17 @@ Table of Contents
 
    It is an error for any fields to be empty.  In particular, the
    DualCertificateVerify structure MUST NOT be used to carry only a
-   single signature.  Such cases MUST abort with an illegal_parameter
-   alert.
+   single signature.  Both signatures included in a single
+   DualCertificateVerify structure MUST use different signature
+   algorithms.  Violation of this rules MUST result in session
+   termination with an illegal_parameter alert.
 
    The DualCertificateVerify message MAY be used in place of
    CertificateVerify anywhere that it is allowed.
 
    Each signature covers the transcript hash as in TLS 1.3, but with a
    distinct context string for domain separation, which are defined in
-   {sec-context-strings}.
+   Section 5.3.1.
 
 5.3.1.  Context Strings
 
