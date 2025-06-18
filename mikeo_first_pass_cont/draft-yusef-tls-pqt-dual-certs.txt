@@ -75,6 +75,9 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
+     1.1.  Open Design Issues
+     1.2.  Allow mixed certificate chains?
+     1.3.  Can the client fail if it doesn't like the server's choice?
    2.  Conventions and Definitions
    3.  Scope
    4.  Design Overview
@@ -157,6 +160,66 @@ Table of Contents
    also makes changes to the Certificate and CertificateVerify messages
    to take advantage of both certificates when authenticating the end
    entity.
+
+1.1.  Open Design Issues
+
+   This section documents open design questions that are not resolved in
+   this version, and for which the authors wish Working Group input.
+
+   This section is for Working Group review, and to be removed before
+   publication.
+
+1.2.  Allow mixed certificate chains?
+
+   Issue: TLS 1.3 has signature_algorithms to negotiate the signature
+   used in the TLS handshake (which is the public key of the EE cert),
+   and optionally signature_algorithms_cert if the peer wishes to
+   negotiate the CA's algorithms separately.  Historically, cert chains
+   are either exclusively RSA or exclusively ECDSA and
+   signature_algorithms_certs is badly supported in the wild.
+
+   The question is whether to continue to support negotiation of CA algs
+   separately from EE algs in a dual context.
+
+   Design options:
+
+   1.  When a signature_algorithms_certs extension is present, then it
+       applies to both chains of the dual, and dual_signature_algorithms
+       only applies to EE certs.  If not present, then
+       dual_signature_algorithms applies to both EE and chain.  This is
+       the option chosen for presentation in this version of the draft,
+       and is believed to be most consistent with the intent of 8446,
+       though it is has bad alignment with TLS implementations in the
+       wild and increases implementation complexity.
+
+   2.  Mandate that dual_signature_algorithms always applies to both EE
+       and chain, and take the position that signature_algorithms_cert
+       only applies to the single-certificate case.  This makes it
+       impossible to have dual certs with mixed-algorithm chains.
+
+1.3.  Can the client fail if it doesn't like the server's choice?
+
+   This design choice is about how expressive the negotiation mechanism
+   is.
+
+   This version presents a scheme which presents three lists: [Single],
+   [DualFirst], [DualSecond].  It is implicit that the full set of
+   combinations of [DualFirst] X [DualSecond] is supported.  This design
+   does not allow for the omission of combinations that make little
+   sense, such as RSA-2048 with a PQC Level 5 scheme.
+
+   Design options:
+
+   1.  Make the negotiation mechanism more expressive (ie more complex)
+       to cover this case.
+
+   2.  The client MUST honor any choice of pair from [DualFirst],
+       [DualSecond]; ie if it supports the algorithms, then it supports
+       them; it is not allowed to reject specific combinations.  This
+       option is presented in this version.
+
+   3.  The client MAY abort the connection if it does not accept the
+       server's choice of combination.
 
 2.  Conventions and Definitions
 
@@ -437,18 +500,22 @@ Table of Contents
    extension.  The second certificate chain MUST contain an end-entity
    certificate whose public key is compatible with one of the algorithms
    listed in the second_signature_algorithms section of
-   dual_signature_algorithms extension.  Both certificate chains MUST
-   contain non-end-entity certificates whose public keys are compatible
-   with algorithms listed in the signature_algorithm_cert extension if
-   present; this behaviour is unmodified from [RFC8446].  Any errors
-   encountered during certificate or certificate chain validation MUST
-   be treated with the same bahaviour as if that error had occurred in a
-   single-algorithm context as specified in [RFC8446].  Implementers MAY
-   wish to consider performing this verification in a timing-invariant
-   way so as not to leak which certificate failed, for example if it
-   failed for policy reasons rather than cryptographic reasons, however
-   since this information is not hidden in a single-certificate TLS
-   handshake, implementers MAY decide that this is not important.
+   dual_signature_algorithms extension.  If a signature_algorithms_cert
+   extension is absent, then the each certificate chain of the dual MUST
+   use the same algorithm in the end-entity and chain certificates.
+   Presence of the signature_algorithms_cert extension indicates support
+   for mixed-algorithm chains, and it applies to both certificates.
+   Note that there is only one signature_algorithms_cert extension, so
+   algorithms for the two chains cannot be negotiated separately and
+   both chains MAY use the same algorithm and in fact both end-entities
+   MAY be issued by the same CA.
+
+   Implementers MAY wish to consider performing this verification in a
+   timing-invariant way so as not to leak which certificate failed, for
+   example if it failed for policy reasons rather than cryptographic
+   reasons, however since this information is not hidden in a single-
+   certificate TLS handshake, implementers MAY decide that this is not
+   important.
 
    This encoding applies equally to the CompressedCertificate message
    and to Certificate message of Exported Authenticators.
@@ -690,10 +757,6 @@ Table of Contents
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
-
-   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
-              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
-              <https://www.rfc-editor.org/rfc/rfc8446>.
 
    [TLS]      Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", Work in Progress, Internet-Draft, draft-
