@@ -81,36 +81,7 @@ It also addresses the challenges of integrating hybrid authentication in TLS 1.3
 
 This document defines a new extension `dual_signature_algorithms` to negotiate support for two categories of signature algorithms, typically one set of classic schemes and one set of PQ schemes. It also makes changes to the `Certificate` and `CertificateVerify` messages to take advantage of both certificates when authenticating the end entity.
 
-## Open Design Issues
 
-This section documents open design questions that are not resolved in this version, and for which the authors wish Working Group input.
-
-This section is for Working Group review, and to be removed before publication.
-
-## Allow mixed certificate chains?
-
-Issue: TLS 1.3 has `signature_algorithms` to negotiate the signature used in the TLS handshake (which is the public key of the EE cert), and optionally `signature_algorithms_cert` if the peer wishes to negotiate the CA's algorithms separately. Historically, cert chains are either exclusively RSA or exclusively ECDSA and `signature_algorithms_certs` is badly supported in the wild.
-
-The question is whether to continue to support negotiation of CA algs separately from EE algs in a dual context.
-
-Design options:
-
-1. When a `signature_algorithms_certs` extension is present, then it applies to both chains of the dual, and `dual_signature_algorithms` only applies to EE certs. If not present, then `dual_signature_algorithms` applies to both EE and chain. This is the option chosen for presentation in this version of the draft, and is believed to be most consistent with the intent of 8446, though it is has bad alignment with TLS implementations in the wild and increases implementation complexity.
-
-2. Mandate that `dual_signature_algorithms` always applies to both EE and chain, and take the position that `signature_algorithms_cert` only applies to the single-certificate case. This makes it impossible to have dual certs with mixed-algorithm chains.
-
-
-## Can the client fail if it doesn't like the server's choice?
-
-This design choice is about how expressive the negotiation mechanism is.
-
-This version presents a scheme which presents three lists: \[Single\], \[DualFirst\], \[DualSecond\]. It is implicit that the full set of combinations of \[DualFirst\] X \[DualSecond\] is supported. This design does not allow for the omission of combinations that make little sense, such as RSA-2048 with a PQC Level 5 scheme.
-
-Design options:
-
-1. Make the negotiation mechanism more expressive (ie more complex) to cover this case.
-2. The client MUST honor any choice of pair from \[DualFirst\], \[DualSecond\]; ie if it supports the algorithms, then it supports them; it is not allowed to reject specific combinations. This option is presented in this version.
-3. The client MAY abort the connection if it does not accept the server's choice of combination.
 
 # Conventions and Definitions
 
@@ -170,6 +141,16 @@ This encoding applies equally to the `CertificateVerify` message of Exported Aut
 
 The order of the signatures in the message MUST correspond to the order of the certificate chains in the Certificate message: the first signature MUST correspond to a classical algorithm from `first_signature_algorithms` list of `dual_signature_algorithms` extension, while the second signature MUST correspond to a PQ algorithm from `second_signature_algorithms` list of `dual_signature_algorithms` extension.
 
+
+## Common Chains
+
+In order to lessen operational burden on Certification Authority (CA) operators, the two certificates of the dual MAY be issued from the same CA. For example, during the PQC migration, a CA operator might wish to stand up a root CA using a Level 5 PQC algorithm or a hash-based signature, and then continue to issue RSA and ECDSA certificates off that root.
+
+Negotiation of such a setup requires use of the `signature_algorithms_cert` TLS 1.3 extension, which is unmodified from [TLS] and when present it applies equally to both chains of the dual.
+
+In order to optimize bandwidth and avoid sending duplicate copies of the same chain, when constructing a `Certificate` message as described in {{certificate}}, the second certificate chain MAY consist of only an end-entity certificate.
+
+
 # Protocol Changes
 
 This section defines the normative changes to TLS 1.3 required to support dual-certificate authentication. These changes extend existing handshake messages and introduce the new extension.
@@ -228,6 +209,8 @@ struct {
 
 This document re-uses the `Certificate` structure as-is and extends the semantics of `certificate_list` to support two logically distinct certificate chains, encoded sequentially and separated by a delimiter.
 
+In order to support bandwidth optimization in the case that the two certificates are issued by the same CA, the second certificate chain MAY consist of only an end-entity certificate. In this case, validators SHOULD attempt to validate the second certificate using the chain provided with the first certificate.
+
 ### Delimiter
 
 The delimiter is a zero-length certificate entry encoded as 3 bytes of 0x00. TLS 1.3 prohibits empty certificate entries, so this delimiter is unambiguous. The delimiter MUST NOT be sent to peers that did not indicate support for dual certificates by including the `dual_signature_algorithms` extension.
@@ -250,7 +233,9 @@ struct {
 
 All entries before the delimiter are treated as the first certificate chain and MUST use algorithms from `first_signature_algorithms` list of `dual_signature_algorithms` extension, all entries after the delimiter are treated as the second certificate chain and MUST use algorithms from `second_signature_algorithms` list of `dual_signature_algorithms` extension. As specified in {{Section 4.4.2 of TLS}}, end-entity certificate MUST be the first in both chains.
 
-A peer receiving this structure MUST validate each chain independently according to its corresponding signature algorithm. The first certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `first_signature_algorithms` section of `dual_signature_algorithms` extension. The second certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `second_signature_algorithms` section of `dual_signature_algorithms` extension. If a `signature_algorithms_cert` extension is absent, then the each certificate chain of the dual MUST use the same algorithm in the end-entity and chain certificates. Presence of the `signature_algorithms_cert` extension indicates support for mixed-algorithm chains, and it applies to both certificates. Note that there is only one `signature_algorithms_cert` extension, so algorithms for the two chains cannot be negotiated separately and both chains MAY use the same algorithm and in fact both end-entities MAY be issued by the same CA.
+A peer receiving this structure MUST validate each chain independently according to its corresponding signature algorithm. The first certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `first_signature_algorithms` section of `dual_signature_algorithms` extension. The second certificate chain MUST contain an end-entity certificate whose public key is compatible with one of the algorithms listed in the `second_signature_algorithms` section of `dual_signature_algorithms` extension. If a `signature_algorithms_cert` extension is absent, then the each certificate chain of the dual MUST also use an algorithm from the same list, but not necessarily the same one as the EE certificate. I.E. it is always allowed to do mixed-algorithm chains within the same list.
+
+More advances configurations of mixed-algorithm certificate chains will require negotiation of chain algorithms outside of the respective dual list. For example, consider that a client wants to allow SLH-DSA roots to issue ML-DSA end entities but does not want to support SLH-DSA end entities as a dual (or does not want to support SLH-DSA end entities at all). Or consider that a ML-DSA-87 CA will issue both the ML-DSA-44 and RSA end entities that are used in the dual. Support for such use cases is accomplished via the `signature_algorithms_cert` extension which is used un-modified from [TLS] and when present it applies equally to both chains of the dual. Note that there is only one `signature_algorithms_cert` extension, so algorithms for the two chains cannot be negotiated separately.
 
 Implementers MAY wish to consider performing this verification in a timing-invariant way so as not to leak which certificate failed, for example if it failed for policy reasons rather than cryptographic reasons, however since this information is not hidden in a single-certificate TLS handshake, implementers MAY decide that this is not important.
 
@@ -378,6 +363,41 @@ IANA is requested to add the following entry to the "TLS Alerts" registry:
 We would like to thank ... for their comments.
 
 --- back
+
+# Open Design Issues
+
+This section documents open design questions that are not resolved in this version, and for which the authors wish Working Group input.
+
+This section is for Working Group review, and to be removed before publication.
+
+## Allow mixed certificate chains?
+
+Issue: TLS 1.3 has `signature_algorithms` to negotiate the signature used in the TLS handshake (which is also the public key of the EE cert), and optionally `signature_algorithms_cert` if the peer wishes to negotiate the CA's algorithms separately. Historically, cert chains are either exclusively RSA or exclusively ECDSA with mixed RSA-ECDSA chains being extremely rale and therefore `signature_algorithms_certs` is extremely rarely used in the wild.
+
+One design consideration here is whether we want to allow both the PQ and traditional chains to come off the same CA in order to lower operational burden for CAs needing to maintain separate PQ and Traditional PKIs. Consider for example an ML-DSA-87 CA that issues both ML-DSA-44 and RSA EEs. Or consider an SLH-DSA CA that issus ML-DSA-44 and RSA EEs.
+
+The question is whether to continue to support negotiation of CA algs separately from EE algs in a dual context.
+
+Design options:
+
+1. When a `signature_algorithms_certs` extension is present, then it applies to both chains of the dual, and `dual_signature_algorithms` only applies to EE certs. If not present, then `dual_signature_algorithms` applies to both EE and chain. This is the option chosen for presentation in this version of the draft, and is believed to be most consistent with the intent of 8446, though it is has bad alignment with TLS implementations in the wild and increases implementation complexity.
+
+2. Mandate that `dual_signature_algorithms` always applies to both EE and chain, and take the position that `signature_algorithms_cert` only applies to the single-certificate case. This makes it impossible to have dual certs with mixed-algorithm chains.
+
+3. Add a `dual_signature_algorithms_certs` so that the algs of the two chains can be negotioted separately.
+
+
+## Can the client fail if it doesn't like the server's choice?
+
+This design choice is about how expressive the negotiation mechanism is.
+
+This version presents a scheme which presents three lists: \[Single\], \[DualFirst\], \[DualSecond\]. It is implicit that the full set of combinations of \[DualFirst\] X \[DualSecond\] is supported. This design does not allow for the omission of combinations that make little sense, such as RSA-2048 with a PQC Level 5 scheme.
+
+Design options:
+
+1. Make the negotiation mechanism more expressive (ie more complex) to cover this case.
+2. The client MUST honor any choice of pair from \[DualFirst\], \[DualSecond\]; ie if it supports the algorithms, then it supports them; it is not allowed to reject specific combinations. This option is presented in this version.
+3. The client MAY abort the connection if it does not accept the server's choice of combination.
 
 # Informal Requirements for Dual TLS Certificate Support
 
