@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-17T01:03:31.096733+00:00",
+  "timestamp": "2025-06-19T01:03:39.217503+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -245,7 +245,7 @@
       "id": "I_kwDOOsIF4s67Y5NO",
       "title": "Security Considerations needs some analysis of Hybrid Non-Separability properties",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/22",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ounsworth",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -254,9 +254,112 @@
       "labels": [],
       "body": "Write some text that classifies this scheme according to the various hybrid taxonomies; for example [draft-ietf-pquip-pqt-hybrid-terminology] and [ietf-pquip-hybrid-signature-spectrums]\n\nI volunteer to write this.",
       "createdAt": "2025-06-13T15:01:16Z",
-      "updatedAt": "2025-06-13T15:01:16Z",
+      "updatedAt": "2025-06-18T21:42:58Z",
+      "closedAt": "2025-06-18T21:42:58Z",
+      "comments": []
+    },
+    {
+      "number": 31,
+      "id": "I_kwDOOsIF4s67-2MG",
+      "title": "Additional Side-Channel text",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/31",
+      "state": "OPEN",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "For the time-being, I have removed this text (4bf7173) because I don't know what it means. If we think it is important, then we should expand it and put literature references.\n\n> Distinct context strings are REQUIRED for the two signatures to prevent cross-protocol misuse or collision attacks.\n\nMy comment was:\n\n> I think this section needs to be expanded and beefed up with literature references, because I'm not convinced that these are real and justified attacks. If you can get a cross-protocol or collision attack between ML-DSA and ECDSA, I'll be impressed. What does that even mean?\n> Also, side-channels is a very wide field, so it seems odd to pick out only a very specific type of side-channels to mention. I suggest removing this section.",
+      "createdAt": "2025-06-17T14:56:05Z",
+      "updatedAt": "2025-06-17T15:07:15Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 32,
+      "id": "I_kwDOOsIF4s68AsHh",
+      "title": "Make sure that Protocol Changes (section 5) are generic",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/32",
+      "state": "CLOSED",
+      "author": "rifaat-ietf",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The following are some suggestion to make sure that the text in the Protocol section is generic and not specific to the PQC transition.\n\n\nOLD\n===\n5.1. dual_signature_algorithms Extension\nA new extension, dual_signature_algorithms, is defined to allow peers to \nadvertise support for two distinct categories of signature algorithms: classical and post-quantum.\n\nNEW\n===\n5.1. dual_signature_algorithms Extension\nA new extension, dual_signature_algorithms, is defined to allow peers to \nadvertise support for two distinct categories of signature algorithms, for example, classical and post-quantum.\n\n\nOLD\n===\n5.1.2. Use in Handshake and Exported Authenticator Messages\nThe client MAY include this extension in ClientHello message to indicate classical and PQ algorithms it supports for verifying the server's signature. The server MAY include this extension in CertificateRequest message to classical and PQ algorithms it supports for verifying the client's signature. This extension MAY be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.\n\nNEW\n===\n5.1.2. Use in Handshake and Exported Authenticator Messages\nThe client MAY include this extension in ClientHello message to indicate the different categories of algorithms it supports for verifying the server's signature. The server MAY include this extension in CertificateRequest message to indicate the different categories of algorithms it supports for verifying the client's signature. This extension MAY be included in an Authenticator Request by the requestor to signal support for dual certificates in the response.\n\n\nOLD\n===\n\n5.2.1. Delimiter\n:\n:\nAll entries before the delimiter are treated as the first certificate chain and MUST use classical algorithms from first_signature_algorithms list of dual_signature_algorithms extension, all entries after the delimiter are treated as the second certificate chain and MUST use PQ algorithms from second_signature_algorithms list of dual_signature_algorithms extension. As specified in Section 4.4.2 of [TLS], end-entity certificate MUST be the first in both chains.\n\n\nNEW\n===\n:\n:\nAll entries before the delimiter are treated as the first certificate chain and MUST use algorithms from first_signature_algorithms list of dual_signature_algorithms extension (for example classical algorithms), all entries after the delimiter are treated as the second certificate chain and MUST use algorithms from second_signature_algorithms list of dual_signature_algorithms extension (for example PQC algorithms). As specified in Section 4.4.2 of [TLS], end-entity certificate MUST be the first in both chains.\n",
+      "createdAt": "2025-06-17T17:51:00Z",
+      "updatedAt": "2025-06-17T18:09:31Z",
+      "closedAt": "2025-06-17T18:09:31Z",
+      "comments": [
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I like it. Do it!",
+          "createdAt": "2025-06-17T17:54:34Z",
+          "updatedAt": "2025-06-17T17:54:34Z"
+        },
+        {
+          "author": "rifaat-ietf",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Done",
+          "createdAt": "2025-06-17T18:09:31Z",
+          "updatedAt": "2025-06-17T18:09:31Z"
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "id": "I_kwDOOsIF4s68CT-Y",
+      "title": "Add Appendix B with encoding examples for Certificate and CertificateVerify",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/33",
+      "state": "OPEN",
+      "author": "wibs2401",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "I would like to suggest the addition of an Appendix B \u2013 Encoded Examples that provides concrete examples for the dual-certificate mechanism defined in Sections 5.2 and 5.3.\n\nThese examples help illustrate the encoding of:\n\n    - Certificate messages containing two certificate chains separated by a zero-length CertificateEntry,\n\n    - CertificateVerify messages contain two digital signatures, each with a distinct algorithm and context string.",
+      "createdAt": "2025-06-17T20:43:45Z",
+      "updatedAt": "2025-06-17T20:43:45Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 34,
+      "id": "I_kwDOOsIF4s68EGWA",
+      "title": "Analysis needed: do we need separate context strings?",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/34",
+      "state": "OPEN",
+      "author": "ounsworth",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As this document progresses through WG review, it would be good to analyze whether the separate context strings described in {{sec-context-strings}} are actually adding security value, or if they can be removed / simplified.\n\nCurrently (-00), I think the security consideration section about them do not fully justify them.",
+      "createdAt": "2025-06-18T01:50:24Z",
+      "updatedAt": "2025-06-18T01:50:24Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 35,
+      "id": "I_kwDOOsIF4s68FoGv",
+      "title": "Restrict dual_signature_algorithms extension to use explicit pairings",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/35",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently, the dual_signature_algorithms extension allows the client and server to indicate lists of supported traditional and post-quantum signature algorithms separately. This can lead to incompatible security-level pairings \u2014 for example, combining a low-level traditional algorithm with a high-level post-quantum algorithm, or vice versa, which will not align with security goals.\n\nProposed modification:\n\nDefine the extension to use explicit pairs, ensuring that each classical and post-quantum algorithm are paired intentionally and only valid combinations are advertised:\n\nstruct {\n    SignatureScheme traditional;\n    SignatureScheme pq;\n} DualSignaturePair;\n\nDualSignatureSchemeList DualSignaturePair<2..2^16-2>;\nRationale:\n\nPros:\n\n1. Explicit pairs prevent accidental mismatches and remove ambiguity about which traditional and post-quantum schemes should be used together.\n\n2. This enforces that only compatible pairs with matching security levels are used, reducing the risk of weak configurations. For example, valid pairs would be:\n\nP-256 + ML-DSA-44 (Level 1)\n\nP-384 + ML-DSA-65 (Level 3)\n\nEd448 + ML-DSA-87 (Level 5)\n\nMismatched pairs, such as P-256 (Level 1) with ML-DSA-87 (Level 5), would be excluded.\n\n3. Restricting to a small, curated set of well-vetted pairs simplifies testing and interoperability, since each pair can be explicitly tested rather than validating an exponential number of possible combinations. when some pairs make little sense from a security perspective.",
+      "createdAt": "2025-06-18T06:08:40Z",
+      "updatedAt": "2025-06-18T16:13:00Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think this is a good thing to discuss in a public working group forum, but I disagree with it.\n\nReasons:\n\n1. Academically, there is no consensus on how to compare the \"bits of security\" against a classical and quantum attacker, so an academic grounds, I think you will have a hard time arguing that P-256 is \"PQC Level 1\".\n2. Someone may be trying to achieve different security properties from the two components; for example ML-DSA-87 to achieve long-term security (of the CAs), and traditional only to hedge against short-term zero-days in ML-DSA, in which case P256 is a totally reasonable choice.\n3. Achieving this will make the negotiation mechanism significantly more complex to implement.",
+          "createdAt": "2025-06-18T16:12:35Z",
+          "updatedAt": "2025-06-18T16:13:00Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -1255,52 +1358,1129 @@
       "id": "PR_kwDOOsIF4s6ay3H4",
       "title": "MikeO re-working of Design Goals",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/28",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ounsworth",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-06-16T22:01:51Z",
-      "updatedAt": "2025-06-16T22:01:51Z",
+      "updatedAt": "2025-06-18T00:28:19Z",
       "baseRepository": "hannestschofenig/tls-dual-certs",
       "baseRefName": "main",
       "baseRefOid": "29b6392a39ae0d13d73ad1d2ac975ed223f6d910",
       "headRepository": "hannestschofenig/tls-dual-certs",
       "headRefName": "mikeo_edits",
-      "headRefOid": "9fa3f7fded9c526486e02662497d647b72e81b53",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "416c641f92f9d56fc833f18b64f61621ae4c93ce",
+      "closedAt": "2025-06-18T00:28:16Z",
+      "mergedAt": "2025-06-18T00:28:16Z",
+      "mergedBy": "ounsworth",
+      "mergeCommit": {
+        "oid": "b3e55b100930491e895a1c7bc245656662c8c6d0"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6u7urm",
+          "commit": {
+            "abbreviatedOid": "9fa3f7f"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2025-06-17T09:29:50Z",
+          "updatedAt": "2025-06-17T09:31:24Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "I was under the impression that if dual certificate chains are used, signature_algorithms_cert is not relevant. All certificates in the first chain must match algorithms from the first list of dual_signature_algorithms and second chain must match algorithms from the second list of dual_signature_algorithms.\r\n\r\nIn my experience \"_cert\" extension causes nothing but trouble. I don't think we need to take care of it in practical cases of dual certs",
+              "createdAt": "2025-06-17T09:29:50Z",
+              "updatedAt": "2025-06-17T09:31:24Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "Fine with me. Please adjust the PR.",
+              "createdAt": "2025-06-17T09:30:14Z",
+              "updatedAt": "2025-06-17T09:31:24Z"
+            },
+            {
+              "originalPosition": 83,
+              "body": "Please file an issue",
+              "createdAt": "2025-06-17T09:31:05Z",
+              "updatedAt": "2025-06-17T09:31:24Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vANJc",
+          "commit": {
+            "abbreviatedOid": "9fa3f7f"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:06:39Z",
+          "updatedAt": "2025-06-17T15:06:39Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "I see your point about \"_cert\" not being useful in the wild, but I think mixed-algorithm chains are going to be more common in a post-quantum world, for example an SLH-DSA root that issues ML-DSA certs. Or an ML-DSA root that issues both ML-DSA and ECDSA certs. We cannot forbid mixed-algorithm chains.",
+              "createdAt": "2025-06-17T15:06:39Z",
+              "updatedAt": "2025-06-17T15:06:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAOPv",
+          "commit": {
+            "abbreviatedOid": "9fa3f7f"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:07:57Z",
+          "updatedAt": "2025-06-17T15:07:58Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "Also, this is good!\r\nWe write down design goals, and we uncover differences in our understanding. The design goals are doing their job! :smile: ",
+              "createdAt": "2025-06-17T15:07:58Z",
+              "updatedAt": "2025-06-17T15:07:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAPT8",
+          "commit": {
+            "abbreviatedOid": "9fa3f7f"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:09:15Z",
+          "updatedAt": "2025-06-17T15:09:15Z",
+          "comments": [
+            {
+              "originalPosition": 83,
+              "body": "Done: #31 ",
+              "createdAt": "2025-06-17T15:09:15Z",
+              "updatedAt": "2025-06-17T15:09:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAQNy",
+          "commit": {
+            "abbreviatedOid": "9fa3f7f"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:10:00Z",
+          "updatedAt": "2025-06-17T15:10:00Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Done: 416c641",
+              "createdAt": "2025-06-17T15:10:00Z",
+              "updatedAt": "2025-06-17T15:10:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAnQs",
+          "commit": {
+            "abbreviatedOid": "9fa3f7f"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:35:06Z",
+          "updatedAt": "2025-06-17T15:35:06Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "Absolutely! This is a complex proposal that requires collaboration from folks with diverse backgrounds.\r\n\r\n`signature_algorithms_cert` is troublesome in many ways. I don't think we can make it universal for single and dual certificates. For example, one may want to allow SLH-DSA root/intermediate in both single and dual chains, but ECDSA only in the dual intermediate. Or some may want to allow ECDSA for both single and dual during transition period and allow ML-DSA only in the dual.\r\n\r\nI think leaving `signature_algorithms`/`signature_algorithms_cert` alone for single certificate chains and using entries in `dual_signature_algorithms` for both end-entity and intermediate certificates solves all practical use cases. Again, if one wants to trust SLH-DSA in both cases it can be included it everywhere.",
+              "createdAt": "2025-06-17T15:35:06Z",
+              "updatedAt": "2025-06-17T15:35:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vFQQw",
+          "commit": {
+            "abbreviatedOid": "9fa3f7f"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T00:28:11Z",
+          "updatedAt": "2025-06-18T00:28:11Z",
+          "comments": [
+            {
+              "originalPosition": 48,
+              "body": "I understand your concerns. I am going to merge this PR, and then do a pass on main that adds an Open Design Questions section.",
+              "createdAt": "2025-06-18T00:28:11Z",
+              "updatedAt": "2025-06-18T00:28:12Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 29,
       "id": "PR_kwDOOsIF4s6azqFd",
       "title": "MikeO first pass continued",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/29",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ounsworth",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "up to the end of section 7\r\n\r\n... taking a break, I'll continue later.",
+      "body": "I finished my initial pass.\r\n\r\nI did not find any show-stoppers or major design issues.\r\n\r\nI tightened up many things to be more precise.\r\n\r\nI left a few inline comments. I think I have made improvements, but feel free to re-edit anything.\r\n\r\nCloses #22",
       "createdAt": "2025-06-17T00:39:58Z",
-      "updatedAt": "2025-06-17T00:40:02Z",
+      "updatedAt": "2025-06-18T21:42:58Z",
+      "baseRepository": "hannestschofenig/tls-dual-certs",
+      "baseRefName": "main",
+      "baseRefOid": "9eee96880484dbe6305e193a9133c323fd844b26",
+      "headRepository": "hannestschofenig/tls-dual-certs",
+      "headRefName": "mikeo_first_pass_cont",
+      "headRefOid": "90f90720a1dc92d3269ff3656358245c6551a160",
+      "closedAt": "2025-06-18T21:42:57Z",
+      "mergedAt": "2025-06-18T21:42:57Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "5604dd7e1b1970d1fc15cbf0d2772589fe7f2e4e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6u7LyH",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2025-06-17T08:51:14Z",
+          "updatedAt": "2025-06-17T09:25:08Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\r\nThe `dual_signature_algorithms` extension does not replace `signature_algorithms`. Since `signature_algorithms` is required any time that certificate-based authentication is requested according to {{Section 4.2.3 of TLS}}, TLS peers MUST include the `signature_algorithms` extension regardless of whether `dual_signature_algorithms` is used. The `signature_algorithms` extension indicates algorithms acceptable for single-certificate authentication and MUST contain either a non-empty list of such algorithms or be empty if only dual-certificate authentication is acceptable.\r\n```",
+              "createdAt": "2025-06-17T08:51:14Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "```suggestion\r\n`SignatureSchemeList` is defined in {{Section 4.2.3 of TLS}}, which is reproduced here:\r\n```",
+              "createdAt": "2025-06-17T08:57:11Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 48,
+              "body": "```suggestion\r\nIf the extension is present in `ClientHello`, `CertificateRequest` of {{TLS}} or Authenticator Request defined in {{Section 4 of EXPORTED-AUTH}}, the peer MAY respond with a dual-certificate authentication structure. If the extension is absent, the peer MUST NOT send a two certificate chains or two signatures.\r\n```",
+              "createdAt": "2025-06-17T08:59:38Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 84,
+              "body": "Any particular reason you want to remove it? I think complete structure makes it easier for implementers.",
+              "createdAt": "2025-06-17T09:02:11Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 96,
+              "body": "```suggestion\r\nA peer receiving this structure MUST validate each chain independently according to its corresponding signature algorithm. Any errors encountered during certificate or certificate chain validation MUST be treated with the same bahavior as if that error had occurred in a single-algorithm context as specified in {{Section 4.4.2.4 of TLS}}. Implementers MAY wish to consider performing this verification in a timing-invariant way so as not to leak which certificate failed, for example if it failed for policy reasons rather than cryptographic reasons, however since this information is not hidden in a single-certificate TLS handshake, implementers MAY decide that this is not important.\r\n```\r\n\r\nI removed sentences that seem to contradict previous paragraph. I believe we want first chain to contain only certificates using algorithms from the first list and the second chain to contain only certificates using algorithms from the second list - regardless if they are end-entity certificate or not. Don't you agree?",
+              "createdAt": "2025-06-17T09:12:06Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 103,
+              "body": "```suggestion\r\n`CertificateVerify` message is defined in {{Section 4.4.3 of TLS}} as follows:\r\n```",
+              "createdAt": "2025-06-17T09:13:14Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 113,
+              "body": "I'm not sure about renaming the structure. Some may assume that we are introducing a new message type.\r\n\r\nI think we need to have a single struct with select along the following lines:\r\n~~~\r\nstruct {\r\n    select (Certificate.contains_delimiter):\r\n        true:\r\n             SignatureScheme algorithm;\r\n             opaque signature<0..2^16-1>;\r\n        false:\r\n             SignatureScheme first_algorithm;\r\n             opaque first_signature<0..2^16-1>;\r\n             SignatureScheme second_algorithm;\r\n             opaque second_signature<0..2^16-1>;\r\n} CertificateVerify;\r\n~~~\r\n\r\nOr we need to be very explicit that this is the replacement contents of CertificateVerify when Delimiter is present in the `Certificate` message.",
+              "createdAt": "2025-06-17T09:17:54Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 130,
+              "body": "```suggestion\r\nThe `DualCertificateVerify` message MAY be used in place of `CertificateVerify` anywhere that it is allowed.\r\n```\r\nAgain, this implies that we are introducing a new message type into TLS... which is not the case.",
+              "createdAt": "2025-06-17T09:18:58Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 144,
+              "body": "Please remove this and file an issue to track this.",
+              "createdAt": "2025-06-17T09:19:39Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 161,
+              "body": "```suggestion\r\nOne implication of the design of this dual-algorithm negotiation mechanism is that the peer is expected to honor any combination of algorithms from the `first_signature_algorithms` and `second_signature_algorithms` lists that the other peer chooses, even if it chooses the two largest or the two slowest algorithms. In constrained environments, it is important for TLS implementations to be configured with this in mind.\r\n```\r\n\r\nI don't think MUST is appropriate here. Local policy may still decline a combination it does not like.",
+              "createdAt": "2025-06-17T09:20:56Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 166,
+              "body": "Sounds good. Please open an issue.",
+              "createdAt": "2025-06-17T09:21:32Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 256,
+              "body": "```suggestion\r\nAs defined in {{Section 4.4 of TLS}}, `CertificateVerify` (and therefore by extension `DualCertificateVerify`) contains signatures over the value `Transcript-Hash(Handshake Context, Certificate)`. In the dual certificate context, `Certificate` will contain both certificate chains, which is sufficient to cause the client to abort and therefore achieves Weak Non-Separability.\r\n```",
+              "createdAt": "2025-06-17T09:23:24Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            },
+            {
+              "originalPosition": 273,
+              "body": "Please file an issue",
+              "createdAt": "2025-06-17T09:24:21Z",
+              "updatedAt": "2025-06-17T09:25:08Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6u_tYx",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:33:48Z",
+          "updatedAt": "2025-06-17T14:33:48Z",
+          "comments": [
+            {
+              "originalPosition": 84,
+              "body": "One of the design goals is to de-couple this from  other TLS extensions and IANA registries. Therefore I think it's weird for this document to give an implementation of [RFC8447]'s  TLS Certificate Types registry. What happens if this registry adds more things? Then suddenly our case block is out of date.\r\n\r\n",
+              "createdAt": "2025-06-17T14:33:48Z",
+              "updatedAt": "2025-06-17T14:34:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6u_xCy",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:37:48Z",
+          "updatedAt": "2025-06-17T14:37:48Z",
+          "comments": [
+            {
+              "originalPosition": 144,
+              "body": "I think it's worth leaving in because I would like the opinion of the wider community, not just the authors who are looking at github issues. But if you feel strongly, then go ahead and remove either the note.",
+              "createdAt": "2025-06-17T14:37:48Z",
+              "updatedAt": "2025-06-17T14:37:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6u_yRa",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:39:14Z",
+          "updatedAt": "2025-06-17T14:39:15Z",
+          "comments": [
+            {
+              "originalPosition": 84,
+              "body": "Ok, how about:\r\n\r\n~~~~~~~~~~ ascii-art\r\nstruct {\r\n    select (is_delimiter) {\r\n        case Delimiter: uint24 delimiter = 0;\r\n        case Non_Delimiter:\r\n          opaque cert_specific_data<1..2^24-1>;\r\n          Extension extensions<0..2^16-1>;\r\n    };\r\n} CertificateEntry;\r\n~~~~~~~~~~\r\n{: title=\"Updated CertificateEntry structure definition\"}\r\n",
+              "createdAt": "2025-06-17T14:39:15Z",
+              "updatedAt": "2025-06-17T14:39:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6u_zOy",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:40:18Z",
+          "updatedAt": "2025-06-17T14:40:18Z",
+          "comments": [
+            {
+              "originalPosition": 96,
+              "body": "I fully disagree.\r\n\r\n`signature_algorithms` is about negotiating the public key of the end-entity cert. `signature_algorithms_cert` is about negotiating the algorithm of the intermediate and root CA. Mixed-algorithm chains are perfectly fine in TLS, and I expect that they will become more common in a PQ world (ex.: SLH-DSA roots with ML-DSA EEs).\r\n\r\nIn fact, I think it's totally reasonable for the two certs of a dual-cert to be issued by the same SLH-DSA CA.",
+              "createdAt": "2025-06-17T14:40:18Z",
+              "updatedAt": "2025-06-17T14:40:18Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6u_2HS",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:43:25Z",
+          "updatedAt": "2025-06-17T14:43:25Z",
+          "comments": [
+            {
+              "originalPosition": 161,
+              "body": "I disagree.\r\n\r\nI think it would be bad design for a client to advertise certain algorithms, the server picks from that list, and then the client kills the connection because it doesn't like what the server picked. I think that should not be possible. The easiest way to make that not possible is to say that if you advertised support for it, then you MUST support it. Otherwise you've advertised falsly.\r\n\r\nThere's a property \"Negotiation Correctness\" or something that if there is at least one mutually-acceptable configuration, then the negotiation mechanism must be able to find it and have the connection suceed. What you're describing, it's possible that the connection fails, even though it could have succeeded. I think this mechanism should be designed so that this is not possible.",
+              "createdAt": "2025-06-17T14:43:25Z",
+              "updatedAt": "2025-06-17T14:49:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vABMB",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:53:36Z",
+          "updatedAt": "2025-06-17T14:53:37Z",
+          "comments": [
+            {
+              "originalPosition": 166,
+              "body": "Done in e1b828e",
+              "createdAt": "2025-06-17T14:53:36Z",
+              "updatedAt": "2025-06-17T14:53:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAEWx",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:56:59Z",
+          "updatedAt": "2025-06-17T14:56:59Z",
+          "comments": [
+            {
+              "originalPosition": 96,
+              "body": "In practice, `signature_algorithms` is used for both intermediate and end-entity certificates. I have not seen in _certs being used for anything meaningful in the wild - but plenty of bugs and weird behaviour caused by misuse of `signature_algorithms_cert` extensions.\r\n\r\nIs there a downside to include both SLH-DSA and ML-DSA in a list of `dual_signature_algorithms` to cover your use case? That is, do you want to restrict SLH-DSA from being used in end-entity certificate or ML-DSA used in root certificate?\r\n\r\nIn that case, we need to introduce additional `dual_signature_algorthms_cert` extension.",
+              "createdAt": "2025-06-17T14:56:59Z",
+              "updatedAt": "2025-06-17T14:57:00Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAFgS",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:58:17Z",
+          "updatedAt": "2025-06-17T14:58:17Z",
+          "comments": [
+            {
+              "originalPosition": 273,
+              "body": "Done #31 ",
+              "createdAt": "2025-06-17T14:58:17Z",
+              "updatedAt": "2025-06-17T14:58:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAGxL",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T14:59:42Z",
+          "updatedAt": "2025-06-17T14:59:43Z",
+          "comments": [
+            {
+              "originalPosition": 96,
+              "body": "Wait, so you're trying to use this draft to on-purpose contradict 8446 to make it match what's in the wild? That seems extremely bad.\r\n\r\nIf you think that 8446 does not match what's in the wild, then you should file an errata against 8446. I think our document needs to match the text of 8446.",
+              "createdAt": "2025-06-17T14:59:43Z",
+              "updatedAt": "2025-06-17T15:01:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAHyi",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:00:49Z",
+          "updatedAt": "2025-06-17T15:00:49Z",
+          "comments": [
+            {
+              "originalPosition": 96,
+              "body": "> Is there a downside to include both SLH-DSA and ML-DSA in a list of dual_signature_algorithms to cover your use case?\r\n\r\nBut that doesn't cover the case I described. That would allow SLH-DSA to be used in a dual, that does not allow it to be used as a single in the cert chain.",
+              "createdAt": "2025-06-17T15:00:49Z",
+              "updatedAt": "2025-06-17T15:00:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAKVc",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:03:38Z",
+          "updatedAt": "2025-06-17T15:03:38Z",
+          "comments": [
+            {
+              "originalPosition": 84,
+              "body": "That looks better.",
+              "createdAt": "2025-06-17T15:03:38Z",
+              "updatedAt": "2025-06-17T15:03:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAetF",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:24:22Z",
+          "updatedAt": "2025-06-17T15:24:23Z",
+          "comments": [
+            {
+              "originalPosition": 96,
+              "body": "This does not contradict 8446.\r\n\r\nIn 8446 `signature_algorithms_cert` is an optional extension. In absence of it, `signature_algorithms` is used for both intermediate certificates and end-entity certificate. Vast majority of implementations set only `signature_algorithms`. Some implementations do use both, but provide identical lists. I have yet to see an implementation that would set different lists for a good reason. I do not see grounds for errata - but perhaps `signature_algorithms_cert` could be deprecated or removed in future version of TLS.\r\n\r\nYou could include SLH-DSA in both `signature_algorithms` and one of the lists of `dual_signature_algorithms` to allow it in both single and dual certificates.",
+              "createdAt": "2025-06-17T15:24:22Z",
+              "updatedAt": "2025-06-17T15:24:23Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAgAM",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:25:59Z",
+          "updatedAt": "2025-06-17T15:25:59Z",
+          "comments": [
+            {
+              "originalPosition": 144,
+              "body": "I would stay consistent with how we track the issues we want WG to review. Please remove this text and file an issue. We will make sure to mention this along side others during the presentation to the WG.",
+              "createdAt": "2025-06-17T15:25:59Z",
+              "updatedAt": "2025-06-17T15:25:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAgVD",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:26:23Z",
+          "updatedAt": "2025-06-17T15:26:24Z",
+          "comments": [
+            {
+              "originalPosition": 161,
+              "body": "Okay. Let's keep MUST for the time being.",
+              "createdAt": "2025-06-17T15:26:23Z",
+              "updatedAt": "2025-06-17T15:26:24Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAhLJ",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:27:25Z",
+          "updatedAt": "2025-06-17T15:27:25Z",
+          "comments": [
+            {
+              "originalPosition": 161,
+              "body": "But please translate honour to US English as common in IETF drafts :)",
+              "createdAt": "2025-06-17T15:27:25Z",
+              "updatedAt": "2025-06-17T15:27:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAhps",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:28:02Z",
+          "updatedAt": "2025-06-17T15:28:02Z",
+          "comments": [
+            {
+              "originalPosition": 84,
+              "body": "Great! Would you mind adjusting PR accordingly?",
+              "createdAt": "2025-06-17T15:28:02Z",
+              "updatedAt": "2025-06-17T15:28:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vFoGq",
+          "commit": {
+            "abbreviatedOid": "f26c2ff"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T01:47:45Z",
+          "updatedAt": "2025-06-18T01:47:45Z",
+          "comments": [
+            {
+              "originalPosition": 144,
+              "body": "ACK",
+              "createdAt": "2025-06-18T01:47:45Z",
+              "updatedAt": "2025-06-18T01:47:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vKQWB",
+          "commit": {
+            "abbreviatedOid": "78e631d"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2025-06-18T10:40:42Z",
+          "updatedAt": "2025-06-18T10:46:20Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "```suggestion\r\nIssue: TLS 1.3 has `signature_algorithms` to negotiate the signature used in the TLS handshake (which is the public key of the EE cert), and optionally `signature_algorithms_cert` if the peer wishes to negotiate the CA's algorithms separately.\r\n```\r\nI still think this is missing the point. Mixed certificate chains are getting quite common and do not require `signature_algorithms_certs`. As long as `signature_algorithms` include both RSA and ECDSA chain can have a mix of RSA and ECDSA. Let's remove the last sentence.",
+              "createdAt": "2025-06-18T10:40:42Z",
+              "updatedAt": "2025-06-18T10:46:21Z"
+            },
+            {
+              "originalPosition": 4,
+              "body": "Can we please move this section to appendix?",
+              "createdAt": "2025-06-18T10:41:45Z",
+              "updatedAt": "2025-06-18T10:46:21Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "```suggestion\r\n2. Mandate that `dual_signature_algorithms` always applies to both EE and chain, and take the position that `signature_algorithms_cert` only applies to the single-certificate case.\r\n```\r\nNo it does not. You can have a mix of certificate algorithms in the chain as long as all of them match _some_ entry from the relevant list. For instance if the list contains SLH-DSA and ML-DSA you can have SLH-DSA root and ML-DSA end-entity in the corresponding chain.",
+              "createdAt": "2025-06-18T10:43:25Z",
+              "updatedAt": "2025-06-18T10:47:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vKVqJ",
+          "commit": {
+            "abbreviatedOid": "78e631d"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T10:48:51Z",
+          "updatedAt": "2025-06-18T10:48:51Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "Also it's not correct that \"`signature_algorithms_certs` is badly supported in the wild\". It is very rarely used, but must be supported by all TLS 1.3 compliant stacks.",
+              "createdAt": "2025-06-18T10:48:51Z",
+              "updatedAt": "2025-06-18T10:48:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vKWTS",
+          "commit": {
+            "abbreviatedOid": "78e631d"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T10:49:48Z",
+          "updatedAt": "2025-06-18T10:49:49Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "Another option is to introduce `dual_signature_algorithms_certs`",
+              "createdAt": "2025-06-18T10:49:49Z",
+              "updatedAt": "2025-06-18T10:49:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vPgUV",
+          "commit": {
+            "abbreviatedOid": "78e631d"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T17:12:04Z",
+          "updatedAt": "2025-06-18T17:12:04Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Done.",
+              "createdAt": "2025-06-18T17:12:04Z",
+              "updatedAt": "2025-06-18T17:12:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vPgrm",
+          "commit": {
+            "abbreviatedOid": "78e631d"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T17:12:42Z",
+          "updatedAt": "2025-06-18T17:12:42Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "I adjusted this wording. That is a much better proposal anyway :smile: ",
+              "createdAt": "2025-06-18T17:12:42Z",
+              "updatedAt": "2025-06-18T17:12:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vPg3Y",
+          "commit": {
+            "abbreviatedOid": "78e631d"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T17:13:00Z",
+          "updatedAt": "2025-06-18T17:13:01Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "Added.",
+              "createdAt": "2025-06-18T17:13:01Z",
+              "updatedAt": "2025-06-18T17:13:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vP0RF",
+          "commit": {
+            "abbreviatedOid": "eef125d"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T17:44:35Z",
+          "updatedAt": "2025-06-18T17:44:35Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "Unfortunately I still strongly disagree with this :-(\r\n\r\nA single `signature_algorithms_cert` will provide a single list of root and intermediate algorithms for single, and both parts of dual chain. That is, if you include only SLH-DSA in it, it would MANDATE SLH-DSA and SLH-DSA only for all roots and intermediates of all chains. I don't think this is practical.",
+              "createdAt": "2025-06-18T17:44:35Z",
+              "updatedAt": "2025-06-18T17:44:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vQ_V-",
+          "commit": {
+            "abbreviatedOid": "eef125d"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T19:42:45Z",
+          "updatedAt": "2025-06-18T19:42:45Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "Ok, fine, then change the text to whatever you think it should be, and let's publish this.",
+              "createdAt": "2025-06-18T19:42:45Z",
+              "updatedAt": "2025-06-18T19:42:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vQ_sS",
+          "commit": {
+            "abbreviatedOid": "90f9072"
+          },
+          "author": "hannestschofenig",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T19:43:25Z",
+          "updatedAt": "2025-06-18T19:43:25Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "What information would be carried in a signature_algorithms_cert when the CA issues a PQ cert and a ECC cert?\r\n\r\nWhat is meant with the last sentence about \"optimize bandwidth\" in such a case? The two chains would be different and the case where the second chain only contains the end entity cert is when there is no subordinate CA certificate and the trust anchor (root CA cert) is not transmitted in the TLS Certificate message (which should not be done anyway).",
+              "createdAt": "2025-06-18T19:43:25Z",
+              "updatedAt": "2025-06-18T19:43:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRA2g",
+          "commit": {
+            "abbreviatedOid": "eef125d"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T19:45:22Z",
+          "updatedAt": "2025-06-18T19:45:22Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "But yes, if you have `signature_algorithms_cert = {slhdsa}`, then you are saying that only SLH-DSA CAs are allowed. Which is a policy that I could see someone wanting to communicate in a ClientHello.\r\n\r\nIf you want to allow all algs as CAs, then you would need to list them all in signature_algorithms_cert. That is how I would expect that to work. Is that not how it works today?",
+              "createdAt": "2025-06-18T19:45:22Z",
+              "updatedAt": "2025-06-18T19:46:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRBm_",
+          "commit": {
+            "abbreviatedOid": "90f9072"
+          },
+          "author": "hannestschofenig",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T19:46:50Z",
+          "updatedAt": "2025-06-18T19:46:50Z",
+          "comments": [
+            {
+              "originalPosition": 130,
+              "body": "This is a difficult case and will require feedback from the TLS group. Both, changing the structure of the CertificateVerify as well as renaming it, is quite a change. Implementation-wise is not a big deal but conceptually I think it is.",
+              "createdAt": "2025-06-18T19:46:50Z",
+              "updatedAt": "2025-06-18T19:46:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRB1C",
+          "commit": {
+            "abbreviatedOid": "90f9072"
+          },
+          "author": "hannestschofenig",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T19:47:15Z",
+          "updatedAt": "2025-06-18T19:47:15Z",
+          "comments": [
+            {
+              "originalPosition": 178,
+              "body": "```suggestion\r\nThe use of dual certificates increases the size of the Certificate and CertificateVerify messages, which can result in larger TLS handshake messages. These larger payloads may cause packet fragmentation, retransmissions, and handshake delays, especially in constrained or lossy network environments.\r\n```",
+              "createdAt": "2025-06-18T19:47:15Z",
+              "updatedAt": "2025-06-18T19:47:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRDDT",
+          "commit": {
+            "abbreviatedOid": "90f9072"
+          },
+          "author": "hannestschofenig",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T19:49:32Z",
+          "updatedAt": "2025-06-18T19:49:32Z",
+          "comments": [
+            {
+              "originalPosition": 113,
+              "body": "I wonder whether we have potentially reached the limits of the TLS language syntax here. I wonder whether we should better express the semantics in text by something something like: \r\n\r\n\"In case of the original CertificateVerifiy message ... use this structure. For carrying two signatures use the following structure ...\"",
+              "createdAt": "2025-06-18T19:49:32Z",
+              "updatedAt": "2025-06-18T19:49:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRDl4",
+          "commit": {
+            "abbreviatedOid": "90f9072"
+          },
+          "author": "hannestschofenig",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T19:50:11Z",
+          "updatedAt": "2025-06-18T19:50:12Z",
+          "comments": [
+            {
+              "originalPosition": 82,
+              "body": "I am still wondering whether the approach of defining a new \"Certificate\" type would have been the easier approach. ",
+              "createdAt": "2025-06-18T19:50:12Z",
+              "updatedAt": "2025-06-18T19:50:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRpmw",
+          "commit": {
+            "abbreviatedOid": "eef125d"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T20:57:19Z",
+          "updatedAt": "2025-06-18T20:57:19Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "Good point Hannes.\r\n\r\nI will update to:\r\n\r\n> In order to optimize bandwidth _**in cases where both of the dual certificates are issued by the same CA**_, when constructing a `Certificate` message as described in {{certificate}}, the second certificate chain MAY consist of only an end-entity certificate.",
+              "createdAt": "2025-06-18T20:57:19Z",
+              "updatedAt": "2025-06-18T20:57:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRsnz",
+          "commit": {
+            "abbreviatedOid": "90f9072"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T20:59:44Z",
+          "updatedAt": "2025-06-18T20:59:44Z",
+          "comments": [
+            {
+              "originalPosition": 178,
+              "body": "So I left it this way because we actually mean `DualCertificateVerify`, but then the sentence is weird because you can't \"increase the size\" of something that's new. I know this sentence is a bit awkward, but I don't really have suggestions.",
+              "createdAt": "2025-06-18T20:59:44Z",
+              "updatedAt": "2025-06-18T20:59:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vRtoY",
+          "commit": {
+            "abbreviatedOid": "90f9072"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T21:00:33Z",
+          "updatedAt": "2025-06-18T21:00:34Z",
+          "comments": [
+            {
+              "originalPosition": 82,
+              "body": "I think we can let this shake out during WG review.",
+              "createdAt": "2025-06-18T21:00:34Z",
+              "updatedAt": "2025-06-18T21:00:34Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "PR_kwDOOsIF4s6a4Phy",
+      "title": "Update to Introduction and Security Considerations",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/pull/30",
+      "state": "MERGED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-17T10:59:52Z",
+      "updatedAt": "2025-06-18T00:35:19Z",
       "baseRepository": "hannestschofenig/tls-dual-certs",
       "baseRefName": "main",
       "baseRefOid": "29b6392a39ae0d13d73ad1d2ac975ed223f6d910",
       "headRepository": "hannestschofenig/tls-dual-certs",
-      "headRefName": "mikeo_first_pass_cont",
-      "headRefOid": "db5e344b1abdac18e87a2e09aa6fecc6d8a2598c",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefName": "tireddy2-patch-2",
+      "headRefOid": "5ff6d6f7f6f2918d1c3c2fc0b1b2e1206fe07d91",
+      "closedAt": "2025-06-18T00:35:19Z",
+      "mergedAt": "2025-06-18T00:35:19Z",
+      "mergedBy": "ounsworth",
+      "mergeCommit": {
+        "oid": "9eee96880484dbe6305e193a9133c323fd844b26"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOOsIF4s6u_LX9",
+          "commit": {
+            "abbreviatedOid": "8f5e2fa"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2025-06-17T13:57:01Z",
+          "updatedAt": "2025-06-17T13:57:57Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\r\nThis method exemplifies a PQ/T hybrid protocol with non-composite authentication defined in  {{Section 4 of ?HYBRID-TERMS=I-D.ietf-pquip-pqt-hybrid-terminology}}, where two single-algorithm schemes are used in parallel: each certificate chain uses the same format as in standard PKI, and both chains together provide hybrid assurance without modifying the X.509 certificate structure. While this approach does not produce a single cryptographic hybrid signature, it ensures that both certificates are presented, validated, and cryptographically bound to the TLS handshake transcript.\r\n```",
+              "createdAt": "2025-06-17T13:57:01Z",
+              "updatedAt": "2025-06-17T13:57:57Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\r\n## Preventing Downgrade Attacks\r\n```",
+              "createdAt": "2025-06-17T13:57:37Z",
+              "updatedAt": "2025-06-17T13:57:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vASwr",
+          "commit": {
+            "abbreviatedOid": "8f5e2fa"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:12:04Z",
+          "updatedAt": "2025-06-17T15:12:04Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Question: what about non-X.509 certificates? PGP or raw_key? Those would, in theory, work in a dual cert, so long as both parts use the same cert type, right?",
+              "createdAt": "2025-06-17T15:12:04Z",
+              "updatedAt": "2025-06-17T15:12:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vAoaz",
+          "commit": {
+            "abbreviatedOid": "8f5e2fa"
+          },
+          "author": "yaroslavros",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T15:36:35Z",
+          "updatedAt": "2025-06-17T15:36:35Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Correct. We need to adjust this text to allow non-X.509.",
+              "createdAt": "2025-06-17T15:36:35Z",
+              "updatedAt": "2025-06-17T15:36:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vBWCL",
+          "commit": {
+            "abbreviatedOid": "a6c5e49"
+          },
+          "author": "hannestschofenig",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-17T16:34:50Z",
+          "updatedAt": "2025-06-17T16:34:51Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "```suggestion\r\nThis method exemplifies a PQ/T hybrid protocol with non-composite authentication defined in\r\n```",
+              "createdAt": "2025-06-17T16:34:50Z",
+              "updatedAt": "2025-06-17T16:34:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOOsIF4s6vFSbC",
+          "commit": {
+            "abbreviatedOid": "8f5e2fa"
+          },
+          "author": "ounsworth",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-18T00:34:47Z",
+          "updatedAt": "2025-06-18T00:34:47Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Done.",
+              "createdAt": "2025-06-18T00:34:47Z",
+              "updatedAt": "2025-06-18T00:34:47Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
