@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-19T01:03:39.217503+00:00",
+  "timestamp": "2025-06-29T01:11:08.604622+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -173,7 +173,7 @@
     {
       "number": 12,
       "id": "I_kwDOOsIF4s66uyGd",
-      "title": "Certificate revokation",
+      "title": "Certificate revocation",
       "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/12",
       "state": "OPEN",
       "author": "tireddy2",
@@ -182,7 +182,7 @@
       "labels": [],
       "body": " we may want to clarify on how clients should behave if one of the certificates is revoked ?",
       "createdAt": "2025-06-10T09:25:56Z",
-      "updatedAt": "2025-06-16T20:47:45Z",
+      "updatedAt": "2025-06-26T13:01:18Z",
       "closedAt": null,
       "comments": [
         {
