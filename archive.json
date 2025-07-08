@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-29T01:11:08.604622+00:00",
+  "timestamp": "2025-07-08T01:04:40.566903+00:00",
   "repo": "hannestschofenig/tls-dual-certs",
   "labels": [
     {
@@ -360,6 +360,22 @@
           "updatedAt": "2025-06-18T16:13:00Z"
         }
       ]
+    },
+    {
+      "number": 36,
+      "id": "I_kwDOOsIF4s6_HvKI",
+      "title": "Yaron's comments on -00",
+      "url": "https://github.com/hannestschofenig/tls-dual-certs/issues/36",
+      "state": "OPEN",
+      "author": "yaronf",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- [ ] Abstract: this should have a sentence about PQC, right now it is too generic, in contrast with the Introduction which is all about PQC.\n- [ ] Typo: both components of the dual (dual is an adjective) - this is repeated several times.\n- [ ] 3. The Scope section is mostly about the migration strategy. I think we should have a separate section/appendix about migration going into more details, and that would be a good opportunity to compare this solution against Composite.\n- [ ] Exported Authenticators: even if we originally thought of using them here, now that we aren't, I suggest to only mention this mechanism once. Right now we mention it multiple times, redundantly.\n- [ ] Typo: MUST NOT assume that PQ algorithms will appear in the first list and PQ in the second.\n- [ ] 5.2.1 seems to contradict the earlier discussion of the extension by saying that a peer that supports this extension should respond with the dual_signature_algorithms extension itself.\n- [ ] \"If a signature_algorithms_cert extension is absent, then all certificates of given chain MUST also use an algorithm from the corresponding list, but not necessarily the same one as the end-entity certificate.\" I'm not sure this would work as intended, because chain might have a mix of classical and composite algorithms, and you could end up with fully classical algorithms in both chains with this rule.\n- [ ] Typo: deems in valuable\n- [ ] 7.4: this section is vague enough to be worthless. Few developers understand the intricacies of different lattice-based algorithms, enough to determine what primitives are \"cryptographically independent\".\n- [ ] 7.6: I don't think this discussion is sufficient for general purpose clients. OTOH I don't think this draft is about general purpose clients, so I'll refer this comment to the Composite draft.\n- [ ] B.1.1: frankly I'm not clear if the adversary in [Signature Spectrums] is a CRQC. If so then this protocol is vulnerable to such as active attacker (at least given a classic key exchange), and there's nothing in the classical signature/cert that serves as an indication that something bad happened. Does this still count as weak non-separability?\n- [ ] Related to the above: I am not a cryptographer but I suspect that the security of this protocol is related to the key exchange (classic vs. PQC/hybrid) being used. This is at a minimum worth mentioning in the Security Considerations.",
+      "createdAt": "2025-07-06T12:23:39Z",
+      "updatedAt": "2025-07-06T12:23:39Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
