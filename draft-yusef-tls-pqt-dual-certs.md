@@ -366,6 +366,9 @@ IANA is requested to add the following entry to the "TLS Alerts" registry:
 
 We would like to thank Suzanne Wibada (Université de Sherbrooke) for her reviews and comments during the work on the initial version of this document, and her willingness to implement the recommendation of this document.
 
+We also want to thank Anthony H. from WolfSSL for his and review and feedback on the initial version of this draft.
+
+
 --- back
 
 # Open Design Issues
