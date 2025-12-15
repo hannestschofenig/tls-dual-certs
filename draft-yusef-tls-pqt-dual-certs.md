@@ -90,7 +90,7 @@ This method exemplifies a PQ/T hybrid protocol with non-composite authentication
 
 # Scope
 
-The approach described herein is also compatible with FIPS-compliant deployments, as it supports the continued use of FIPS-approved traditional signature algorithms during the TLS handshake.
+The approach described herein is also compatible with FIPS-compliant deployments (FIPS 140-2 and FIPS 140-3), as it supports the continued use of FIPS-approved traditional signature algorithms during the TLS handshake.
 
 The proposed mechanism is fully backward compatible: traditional certificates and authentication methods remain functional with existing TLS 1.3 implementations. As cryptographically relevant quantum computers (CRQCs) emerge, deployments can transition by gradually disabling traditional authentication and enabling post-quantum–only authentication. This strategy offers a smooth migration path, ensuring long-term cryptographic agility, regulatory compliance, and operational continuity without disrupting existing infrastructure.
 
@@ -105,10 +105,10 @@ A full set of informal design requirements for this specification can be found i
 
 ## Signature Algorithms Negotiation
 
-A new extension, `dual_signature_algorithms`, is defined to negotiate support for two distinct categories of signature algorithms. The extension carries two disjoint lists: one for classical signature algorithms and one for post-quantum signature algorithms.
+A new extension, `dual_signature_algorithms`, is defined to negotiate support for two distinct categories of signature algorithms. The extension carries two disjoint lists: one for traditional signature algorithms and one for post-quantum signature algorithms.
 
-- In the `ClientHello`, this extension indicates the client's supported classical and PQ signature algorithms for dual certificate server authentication.
-- In the `CertificateRequest`, this extension indicates the server's supported classical and PQ signature algorithms for dual certificate client authentication.
+- In the `ClientHello`, this extension indicates the client's supported traditional and PQ signature algorithms for dual certificate server authentication.
+- In the `CertificateRequest`, this extension indicates the server's supported traditional and PQ signature algorithms for dual certificate client authentication.
 
 This allows both endpoints to signal independently two distinct algorithms for dual authentication.
 
@@ -142,7 +142,7 @@ Each signature is computed over the transcript hash as specified in TLS 1.3, but
 
 This encoding applies equally to the `CertificateVerify` message of Exported Authenticators as defined in {{Section 5.2.2 of EXPORTED-AUTH}}.
 
-The order of the signatures in the message MUST correspond to the order of the certificate chains in the Certificate message: the first signature MUST correspond to a classical algorithm from `first_signature_algorithms` list of `dual_signature_algorithms` extension, while the second signature MUST correspond to a PQ algorithm from `second_signature_algorithms` list of `dual_signature_algorithms` extension.
+The order of the signatures in the message MUST correspond to the order of the certificate chains in the Certificate message: the first signature MUST correspond to a traditional algorithm from `first_signature_algorithms` list of `dual_signature_algorithms` extension, while the second signature MUST correspond to a PQ algorithm from `second_signature_algorithms` list of `dual_signature_algorithms` extension.
 
 ## Common Chains
 
@@ -160,7 +160,7 @@ This section defines the normative changes to TLS 1.3 required to support dual-c
 
 ### Structure {#sec-structure}
 
-A new extension, `dual_signature_algorithms`, is defined to allow peers to advertise support for two distinct lists of signature algorithms, for example, classical and post-quantum.
+A new extension, `dual_signature_algorithms`, is defined to allow peers to advertise support for two distinct lists of signature algorithms, for example, traditional and post-quantum.
 
 `SignatureSchemeList` is defined in {{Section 4.2.3 of TLS}}, which is reproduced here:
 
@@ -515,7 +515,7 @@ For client authentication, the same principles apply with roles reversed: the se
 
 ## Example 1: Single-certificate
 
-Client requires only one classical, pq or a composite signature. Client either does not support or is not configured to accept dual certificates.
+Client requires only one traditional, pq or a composite signature. Client either does not support or is not configured to accept dual certificates.
 
 Client behavior:
 
@@ -526,39 +526,39 @@ To satisfy this client, the server MUST send a single certificate chain with com
 
 ## Example 2: Dual-Compatible, Classic Primary, PQ Optional
 
-Client supports both classical and PQ authentication. It allows the server to send either a classical chain alone or both chains.
+Client supports both traditional and PQ authentication. It allows the server to send either a traditional chain alone or both chains.
 
 Client behavior:
 
-- Includes supported classical algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
-- Includes supported classical algorithms again in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
+- Includes supported traditional algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
+- Includes supported traditional algorithms again in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
 
 To satisfy this client, the server MUST either:
 
-- Provide a single certificate chain with compatible classical algorithms and include a single signature in `CertificateVerify`, or
-- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `DualCertificateVerify` as described in {{certificate-verify}}
+- Provide a single certificate chain with compatible traditional algorithms and include a single signature in `CertificateVerify`, or
+- Provide a traditional certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `DualCertificateVerify` as described in {{certificate-verify}}
 
 ## Example 3: Strict Dual
 
-Client requires both classical and PQ authentication to be performed simultaneously. It does not support composite certificates.
+Client requires both traditional and PQ authentication to be performed simultaneously. It does not support composite certificates.
 
 Client behavior:
 
 - Includes an empty list in `signature_algorithms` (since this extension is required by [RFC8446] whenever certificate authentication is desired).
-- Includes supported classical algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
+- Includes supported traditional algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms in `second_signature_algorithms` list of `dual_signature_algorithms`.
 
-To satisfy this client, the server MUST provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
+To satisfy this client, the server MUST provide a traditional certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
 
 ## Example 4: Dual-Compatible, PQ Primary, Classic Optional
 
-Client supports both classical and PQ authentication. It allows the server to send either a PQ chain alone or both chains.
+Client supports both traditional and PQ authentication. It allows the server to send either a PQ chain alone or both chains.
 
 Client behavior:
 
 - Includes supported PQ algorithms in `signature_algorithms` and optionally `signature_algorithms_cert`.
-- Includes supported classical algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms again in `second_signature_algorithms` list of `dual_signature_algorithms`.
+- Includes supported traditional algorithms in `first_signature_algorithms` list of `dual_signature_algorithms` and supported PQ algorithms again in `second_signature_algorithms` list of `dual_signature_algorithms`.
 
 To satisfy this client, the server MUST either:
 
 - Provide a single certificate chain with compatible PQ algorithms and include a single signature in `CertificateVerify`, or
-- Provide a classical certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
+- Provide a traditional certificate chain followed by a PQ certificate chain as described in {{certificate}} and two signatures in `CertificateVerify` as described in {{certificate-verify}}
