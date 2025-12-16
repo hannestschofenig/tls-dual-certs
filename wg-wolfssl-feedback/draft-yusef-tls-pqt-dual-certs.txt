@@ -8,8 +8,6 @@ Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
 Expires: 19 June 2026                                       M. Ounsworth
                                                                  Entrust
-                                                              Y. Sheffer
-                                                                  Intuit
                                                                 T. Reddy
                                                                    Nokia
                                                             Y. Rosomakho
@@ -1208,12 +1206,6 @@ Authors' Addresses
    Entrust
    Canada
    Email: mike.ounsworth@entrust.com
-
-
-   Yaron Sheffer
-   Intuit
-   Israel
-   Email: yaronf.ietf@gmail.com
 
 
    Tirumaleswar Reddy
