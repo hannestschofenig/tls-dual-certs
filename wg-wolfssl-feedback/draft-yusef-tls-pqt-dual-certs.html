@@ -1055,7 +1055,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Shekh-Yusef, et al.</td>
-<td class="center">Expires 18 June 2026</td>
+<td class="center">Expires 19 June 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1071,12 +1071,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="https://www.rfc-editor.org/rfc/rfcRFC9261" class="eref">RFC9261</a>, <a href="https://www.rfc-editor.org/rfc/rfcRFC8446" class="eref">RFC8446</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-12-15" class="published">15 December 2025</time>
+<time datetime="2025-12-16" class="published">16 December 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-06-18">18 June 2026</time></dd>
+<dd class="expires"><time datetime="2026-06-19">19 June 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1141,7 +1141,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 June 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 June 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2135,8 +2135,8 @@ struct {
 <a href="#appendix-D" class="section-number selfRef">Appendix D. </a><a href="#name-compatibility-with-composit" class="section-name selfRef">Compatibility with composite certificates</a>
       </h2>
 <p id="appendix-D-1">Clients and servers may choose to support composite certificate schemes, such as those defined in <span>[<a href="#TLS-COMPOSITE-MLDSA" class="cite xref">TLS-COMPOSITE-MLDSA</a>]</span>. In these schemes, a single certificate contains a composite public key, and the associated signature proves knowledge of private keys of all components. However, from the perspective of the TLS protocol, this is a single certificate producing a single signature and so use of <code>dual_signature_algorithms</code> is not required.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
-<p id="appendix-D-2">If a composite signature algorithm appears in the <code>signature_algorithms</code> extension, it can fulfill the client's requirements for both classical and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
-<p id="appendix-D-3">The advantages of dual certificates over composites is operational flexibility for both Certification Authority operators and TLS server and client operators because two CAs and end-entity certificates, one classical and one PQ, allows for backwards compatible and dynamic negotiation of pure classical, pure PQ, or dual.<a href="#appendix-D-3" class="pilcrow">¶</a></p>
+<p id="appendix-D-2">If a composite signature algorithm appears in the <code>signature_algorithms</code> extension, it can fulfill the client's requirements for both traditional and PQ authentication in a single certificate and signature. It is up to the client policy to decide whether a composite certificate is acceptable in place of a dual-certificate configuration. This allows further deployment flexibility and compatibility with hybrid authentication strategies.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
+<p id="appendix-D-3">The advantages of dual certificates over composites is operational flexibility for both Certification Authority operators and TLS server and client operators because two CAs and end-entity certificates, one traditional and one PQ, allows for backwards compatible and dynamic negotiation of pure traditional, pure PQ, or dual.<a href="#appendix-D-3" class="pilcrow">¶</a></p>
 <p id="appendix-D-4">The advantages of composites over dual certificates is that the certificate chains themselves are protected by dual-algorithms, which can be of great importance in use cases where trust stores are not easily updatable.<a href="#appendix-D-4" class="pilcrow">¶</a></p>
 <p id="appendix-D-5">It is worth noting that composites present as simply another signature algorithm, and as such nothing prevents them from being used as a component within a <code>dual_signature_algorithm</code>.<a href="#appendix-D-5" class="pilcrow">¶</a></p>
 </section>

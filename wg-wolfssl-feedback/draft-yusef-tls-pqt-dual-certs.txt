@@ -6,7 +6,7 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 18 June 2026                                       M. Ounsworth
+Expires: 19 June 2026                                       M. Ounsworth
                                                                  Entrust
                                                               Y. Sheffer
                                                                   Intuit
@@ -14,7 +14,7 @@ Expires: 18 June 2026                                       M. Ounsworth
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                        15 December 2025
+                                                        16 December 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 June 2026.
+   This Internet-Draft will expire on 19 June 2026.
 
 Copyright Notice
 
@@ -1062,7 +1062,7 @@ Appendix D.  Compatibility with composite certificates
 
    If a composite signature algorithm appears in the
    signature_algorithms extension, it can fulfill the client's
-   requirements for both classical and PQ authentication in a single
+   requirements for both traditional and PQ authentication in a single
    certificate and signature.  It is up to the client policy to decide
    whether a composite certificate is acceptable in place of a dual-
    certificate configuration.  This allows further deployment
@@ -1071,8 +1071,8 @@ Appendix D.  Compatibility with composite certificates
    The advantages of dual certificates over composites is operational
    flexibility for both Certification Authority operators and TLS server
    and client operators because two CAs and end-entity certificates, one
-   classical and one PQ, allows for backwards compatible and dynamic
-   negotiation of pure classical, pure PQ, or dual.
+   traditional and one PQ, allows for backwards compatible and dynamic
+   negotiation of pure traditional, pure PQ, or dual.
 
    The advantages of composites over dual certificates is that the
    certificate chains themselves are protected by dual-algorithms, which
