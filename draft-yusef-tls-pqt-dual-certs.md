@@ -47,11 +47,6 @@ author:
       organization: Entrust
       country: Canada
       email: mike.ounsworth@entrust.com
- -    ins: Y. Sheffer
-      fullname: Yaron Sheffer
-      organization: Intuit
-      country: Israel
-      email: yaronf.ietf@gmail.com
  -    ins: T. Reddy
       fullname: Tirumaleswar Reddy
       organization: Nokia
