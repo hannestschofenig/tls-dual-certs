@@ -740,7 +740,7 @@ Table of Contents
    this document, and her willingness to implement the recommendation of
    this document.
 
-   We also want to thank Anthony H. from WolfSSL for his and review and
+   We also want to thank Anthony Hu from WolfSSL for his and review and
    feedback on the initial version of this draft.
 
 10.  References
