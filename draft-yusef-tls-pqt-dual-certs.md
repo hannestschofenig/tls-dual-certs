@@ -115,7 +115,7 @@ The `dual_signature_algorithms` extension does not replace `signature_algorithms
 
 TLS 1.3 defines the `Certificate` message to carry a list of certificate entries representing a single chain. This document reuses the same structure to convey two certificate chains by concatenating them and inserting a delimiter in the form of a zero-length certificate entry.
 
-A zero-length certificate is defined as a `CertificateEntry` with an empty `cert_data` field and omitted `extensions` field. TLS 1.3 prohibits the use of empty certificate entries, making this delimiter unambiguous and an ideal boundry between the two certificate chains. Implementations MUST treat all entries before the zero-length delimiter as the first certificate chain (typically traditional), and all entries after it as the second certificate chain (typically post-quantum).
+A zero-length certificate is defined as a `CertificateEntry` with an empty `cert_data` field and omitted `extensions` field. TLS 1.3 prohibits the use of empty certificate entries, making this delimiter an unambiguous boundary between the two certificate chains. Implementations MUST treat all entries before the zero-length delimiter as the first certificate chain (typically traditional), and all entries after it as the second certificate chain (typically post-quantum).
 
 This encoding applies equally to the `CompressedCertificate` message defined in {{?COMPRESS-CERT=RFC8879}} and to the `Certificate` message of Exported Authenticators as defined in {{Section 5.2.1 of EXPORTED-AUTH}}.
 
