@@ -6,15 +6,13 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 20 December 2025                                   M. Ounsworth
+Expires: 20 June 2026                                       M. Ounsworth
                                                                  Entrust
-                                                              Y. Sheffer
-                                                                  Intuit
                                                                 T. Reddy
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                            18 June 2025
+                                                        17 December 2025
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -56,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 December 2025.
+   This Internet-Draft will expire on 20 June 2026.
 
 Copyright Notice
 
@@ -132,9 +130,11 @@ Table of Contents
    Appendix D.  Compatibility with composite certificates
    Appendix E.  Policy Examples
      E.1.  Example 1: Single-certificate
-     E.2.  Example 2: Dual-Compatible, Classic Primary, PQ Optional
+     E.2.  Example 2: Dual-Compatible, Traditional Primary, PQ
+           Optional
      E.3.  Example 3: Strict Dual
-     E.4.  Example 4: Dual-Compatible, PQ Primary, Classic Optional
+     E.4.  Example 4: Dual-Compatible, PQ Primary, Traditional
+           Optional
    Authors' Addresses
 
 1.  Introduction
@@ -160,10 +160,10 @@ Table of Contents
 
    This document defines a new extension dual_signature_algorithms to
    negotiate support for two categories of signature algorithms,
-   typically one set of classic schemes and one set of PQ schemes.  It
-   also makes changes to the Certificate and CertificateVerify messages
-   to take advantage of both certificates when authenticating the end
-   entity.
+   typically one set of traditional schemes and one set of PQ schemes.
+   It also makes changes to the Certificate and CertificateVerify
+   messages to take advantage of both certificates when authenticating
+   the end entity.
 
    This method exemplifies a PQ/T hybrid protocol with non-composite
    authentication as defined in Section 4 of [PQT-TERMS], where two
@@ -191,8 +191,9 @@ Table of Contents
 3.  Scope
 
    The approach described herein is also compatible with FIPS-compliant
-   deployments, as it supports the continued use of FIPS-approved
-   traditional signature algorithms during the TLS handshake.
+   deployments (FIPS 140-2 and FIPS 140-3), as it supports the continued
+   use of FIPS-approved traditional signature algorithms during the TLS
+   handshake.
 
    The proposed mechanism is fully backward compatible: traditional
    certificates and authentication methods remain functional with
@@ -226,15 +227,15 @@ Table of Contents
 
    A new extension, dual_signature_algorithms, is defined to negotiate
    support for two distinct categories of signature algorithms.  The
-   extension carries two disjoint lists: one for classical signature
+   extension carries two disjoint lists: one for traditional signature
    algorithms and one for post-quantum signature algorithms.
 
    *  In the ClientHello, this extension indicates the client's
-      supported classical and PQ signature algorithms for dual
+      supported traditional and PQ signature algorithms for dual
       certificate server authentication.
 
    *  In the CertificateRequest, this extension indicates the server's
-      supported classical and PQ signature algorithms for dual
+      supported traditional and PQ signature algorithms for dual
       certificate client authentication.
 
    This allows both endpoints to signal independently two distinct
@@ -267,10 +268,11 @@ Table of Contents
    A zero-length certificate is defined as a CertificateEntry with an
    empty cert_data field and omitted extensions field.  TLS 1.3
    prohibits the use of empty certificate entries, making this delimiter
-   unambiguous.  Implementations MUST treat all entries before the zero-
-   length delimiter as the first certificate chain (typically classic),
-   and all entries after it as the second certificate chain (typically
-   post-quantum).
+   an unambiguous boundary between the two certificate chains.
+   Implementations MUST treat all entries before the zero-length
+   delimiter as the first certificate chain (typically traditional), and
+   all entries after it as the second certificate chain (typically post-
+   quantum).
 
    This encoding applies equally to the CompressedCertificate message
    defined in [COMPRESS-CERT] and to the Certificate message of Exported
@@ -310,7 +312,7 @@ Table of Contents
 
    The order of the signatures in the message MUST correspond to the
    order of the certificate chains in the Certificate message: the first
-   signature MUST correspond to a classical algorithm from
+   signature MUST correspond to a traditional algorithm from
    first_signature_algorithms list of dual_signature_algorithms
    extension, while the second signature MUST correspond to a PQ
    algorithm from second_signature_algorithms list of
@@ -347,7 +349,7 @@ Table of Contents
 
    A new extension, dual_signature_algorithms, is defined to allow peers
    to advertise support for two distinct lists of signature algorithms,
-   for example, classical and post-quantum.
+   for example, traditional and post-quantum.
 
    SignatureSchemeList is defined in Section 4.2.3 of [TLS], which is
    reproduced here:
@@ -384,10 +386,8 @@ Table of Contents
 
    When parsing DualSignatureSchemeList, implementations MUST NOT make
    assumptions about which sub-list a given algorithm will appear in.
-   For example, an implementation MUST NOT assume that PQ algorithms
-   will appear in the first list and PQ in the second.  As a test, if a
-   TLS handshake containing a DualSignatureSchemeList succeeds, then an
-   equivalent TLS handshake containing an equivalent
+   As a test, if a TLS handshake containing a DualSignatureSchemeList
+   succeeds, then an equivalent TLS handshake containing an equivalent
    DualSignatureSchemeList but with the first and second lists swapped
    MUST also succeed.  However, it is not required that these two test
    cases result in the same selected signature algorithm and
@@ -740,6 +740,9 @@ Table of Contents
    this document, and her willingness to implement the recommendation of
    this document.
 
+   We also want to thank Anthony Hu from WolfSSL for his and review and
+   feedback on the initial version of this draft.
+
 10.  References
 
 10.1.  Normative References
@@ -760,9 +763,9 @@ Table of Contents
 
    [TLS]      Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", Work in Progress, Internet-Draft, draft-
-              ietf-tls-rfc8446bis-12, 17 February 2025,
+              ietf-tls-rfc8446bis-14, 13 September 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
-              rfc8446bis-12>.
+              rfc8446bis-14>.
 
 10.2.  Informative References
 
@@ -779,9 +782,9 @@ Table of Contents
    [HYBRID-SIGS]
               Bindel, N., Hale, B., Connolly, D., and F. D, "Hybrid
               signature spectrums", Work in Progress, Internet-Draft,
-              draft-ietf-pquip-hybrid-signature-spectrums-06, 9 January
+              draft-ietf-pquip-hybrid-signature-spectrums-07, 20 June
               2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              pquip-hybrid-signature-spectrums-06>.
+              pquip-hybrid-signature-spectrums-07>.
 
    [IANA-TLS] Salowey, J. and S. Turner, "IANA Registry Updates for TLS
               and DTLS", RFC 8447, DOI 10.17487/RFC8447, August 2018,
@@ -789,16 +792,16 @@ Table of Contents
 
    [ML-DSA]   Hollebeek, T., Schmieg, S., and B. Westerbaan, "Use of ML-
               DSA in TLS 1.3", Work in Progress, Internet-Draft, draft-
-              ietf-tls-mldsa-00, 16 May 2025,
+              ietf-tls-mldsa-01, 26 September 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
-              mldsa-00>.
+              mldsa-01>.
 
    [PQ-RECOMMEND]
               Reddy.K, T. and H. Tschofenig, "Post-Quantum Cryptography
               Recommendations for TLS-based Applications", Work in
-              Progress, Internet-Draft, draft-reddy-uta-pqc-app-07, 25
-              February 2025, <https://datatracker.ietf.org/doc/html/
-              draft-reddy-uta-pqc-app-07>.
+              Progress, Internet-Draft, draft-reddy-uta-pqc-app-08, 2
+              July 2025, <https://datatracker.ietf.org/doc/html/draft-
+              reddy-uta-pqc-app-08>.
 
    [PQT-TERMS]
               D, F., P, M., and B. Hale, "Terminology for Post-Quantum
@@ -912,9 +915,9 @@ B.2.  Dual Certificate Semantics
 
 B.2.1.  Independent Chain Usability
 
-   Each certificate chain (e.g., classic and PQ) must be independently
-   usable for authentication, allowing endpoints to fall back to classic
-   or PQ-only validation if necessary.
+   Each certificate chain (e.g., traditional and PQ) must be
+   independently usable for authentication, allowing endpoints to fall
+   back to traditional or PQ-only validation if necessary.
 
 B.2.2.  Unambiguous Chain Separation
 
@@ -1058,7 +1061,7 @@ Appendix D.  Compatibility with composite certificates
 
    If a composite signature algorithm appears in the
    signature_algorithms extension, it can fulfill the client's
-   requirements for both classical and PQ authentication in a single
+   requirements for both traditional and PQ authentication in a single
    certificate and signature.  It is up to the client policy to decide
    whether a composite certificate is acceptable in place of a dual-
    certificate configuration.  This allows further deployment
@@ -1067,8 +1070,8 @@ Appendix D.  Compatibility with composite certificates
    The advantages of dual certificates over composites is operational
    flexibility for both Certification Authority operators and TLS server
    and client operators because two CAs and end-entity certificates, one
-   classical and one PQ, allows for backwards compatible and dynamic
-   negotiation of pure classical, pure PQ, or dual.
+   traditional and one PQ, allows for backwards compatible and dynamic
+   negotiation of pure traditional, pure PQ, or dual.
 
    The advantages of composites over dual certificates is that the
    certificate chains themselves are protected by dual-algorithms, which
@@ -1101,7 +1104,7 @@ Appendix E.  Policy Examples
 
 E.1.  Example 1: Single-certificate
 
-   Client requires only one classical, pq or a composite signature.
+   Client requires only one traditional, pq or a composite signature.
    Client either does not support or is not configured to accept dual
    certificates.
 
@@ -1116,34 +1119,35 @@ E.1.  Example 1: Single-certificate
    chain with compatible algorithms and include a single signature in
    CertificateVerify.
 
-E.2.  Example 2: Dual-Compatible, Classic Primary, PQ Optional
+E.2.  Example 2: Dual-Compatible, Traditional Primary, PQ Optional
 
-   Client supports both classical and PQ authentication.  It allows the
-   server to send either a classical chain alone or both chains.
+   Client supports both traditional and PQ authentication.  It allows
+   the server to send either a traditional chain alone or both chains.
 
    Client behavior:
 
-   *  Includes supported classical algorithms in signature_algorithms
+   *  Includes supported traditional algorithms in signature_algorithms
       and optionally signature_algorithms_cert.
 
-   *  Includes supported classical algorithms again in
+   *  Includes supported traditional algorithms again in
       first_signature_algorithms list of dual_signature_algorithms and
       supported PQ algorithms in second_signature_algorithms list of
       dual_signature_algorithms.
 
    To satisfy this client, the server MUST either:
 
-   *  Provide a single certificate chain with compatible classical
+   *  Provide a single certificate chain with compatible traditional
       algorithms and include a single signature in CertificateVerify, or
 
-   *  Provide a classical certificate chain followed by a PQ certificate
-      chain as described in Section 5.2 and two signatures in
-      DualCertificateVerify as described in Section 5.3
+   *  Provide a traditional certificate chain followed by a PQ
+      certificate chain as described in Section 5.2 and two signatures
+      in DualCertificateVerify as described in Section 5.3
 
 E.3.  Example 3: Strict Dual
 
-   Client requires both classical and PQ authentication to be performed
-   simultaneously.  It does not support composite certificates.
+   Client requires both traditional and PQ authentication to be
+   performed simultaneously.  It does not support composite
+   certificates.
 
    Client behavior:
 
@@ -1151,27 +1155,27 @@ E.3.  Example 3: Strict Dual
       extension is required by [RFC8446] whenever certificate
       authentication is desired).
 
-   *  Includes supported classical algorithms in
+   *  Includes supported traditional algorithms in
       first_signature_algorithms list of dual_signature_algorithms and
       supported PQ algorithms in second_signature_algorithms list of
       dual_signature_algorithms.
 
-   To satisfy this client, the server MUST provide a classical
+   To satisfy this client, the server MUST provide a traditional
    certificate chain followed by a PQ certificate chain as described in
    Section 5.2 and two signatures in CertificateVerify as described in
    Section 5.3
 
-E.4.  Example 4: Dual-Compatible, PQ Primary, Classic Optional
+E.4.  Example 4: Dual-Compatible, PQ Primary, Traditional Optional
 
-   Client supports both classical and PQ authentication.  It allows the
-   server to send either a PQ chain alone or both chains.
+   Client supports both traditional and PQ authentication.  It allows
+   the server to send either a PQ chain alone or both chains.
 
    Client behavior:
 
    *  Includes supported PQ algorithms in signature_algorithms and
       optionally signature_algorithms_cert.
 
-   *  Includes supported classical algorithms in
+   *  Includes supported traditional algorithms in
       first_signature_algorithms list of dual_signature_algorithms and
       supported PQ algorithms again in second_signature_algorithms list
       of dual_signature_algorithms.
@@ -1181,9 +1185,9 @@ E.4.  Example 4: Dual-Compatible, PQ Primary, Classic Optional
    *  Provide a single certificate chain with compatible PQ algorithms
       and include a single signature in CertificateVerify, or
 
-   *  Provide a classical certificate chain followed by a PQ certificate
-      chain as described in Section 5.2 and two signatures in
-      CertificateVerify as described in Section 5.3
+   *  Provide a traditional certificate chain followed by a PQ
+      certificate chain as described in Section 5.2 and two signatures
+      in CertificateVerify as described in Section 5.3
 
 Authors' Addresses
 
@@ -1203,12 +1207,6 @@ Authors' Addresses
    Entrust
    Canada
    Email: mike.ounsworth@entrust.com
-
-
-   Yaron Sheffer
-   Intuit
-   Israel
-   Email: yaronf.ietf@gmail.com
 
 
    Tirumaleswar Reddy
