@@ -248,23 +248,22 @@ struct {
 ~~~
 {: title="TLS 1.3 CertificateVerify message"}
 
-This document defines `DualCertificateVerify` which extends `CertificateVerify` to carry two independent signatures.
+This document defines CertificateVerify as follows to carry one or more independent signatures.
 
-~~~~~~~~~~ ascii-art
+~~~
 struct {
-    SignatureScheme first_algorithm;
-    opaque first_signature<0..2^16-1>;
-    SignatureScheme second_algorithm;
-    opaque second_signature<0..2^16-1>;
-} DualCertificateVerify;
-~~~~~~~~~~
-{: title="DualCertificateVerify message"}
+     SignatureScheme algorithm<1..2^8-1>;
+     opaque signature<0..2^16-1>;
+} CertificateVerify;
+~~~
 
-It is an error for any fields to be empty. In particular, the `DualCertificateVerify` structure MUST NOT be used to carry only a single signature. Both signatures included in a single `DualCertificateVerify` structure MUST use different signature algorithms. Violation of this rules MUST result in session termination with an `illegal_parameter` alert.
+This document extends the CertificateVerify structure to support dual certificates and signatures. The algorithm field now allows carrying one or more signature schemes, and the signature field allows carrying one or more corresponding signatures.
 
-The `DualCertificateVerify` message MAY be used in place of `CertificateVerify` anywhere that it is allowed.
+The extended CertificateVerify structure MUST include at least two distinct signature algorithms and their corresponding signatures when used to support dual certificates. Each signature algorithm and signature pair MUST correspond to a unique certificate in the certificate chain.
 
-Each signature covers the transcript hash as in TLS 1.3, but with a distinct context string for domain separation, which are defined in {{sec-context-strings}}.
+It is an error for any fields to be empty, and the CertificateVerify structure MUST NOT be used to carry only a single signature when dual certificates are in use. Violation of these rules MUST result in session termination with an illegal_parameter alert.
+
+The extended CertificateVerify message MAY be used in place of the original CertificateVerify message anywhere it is allowed. Each signature covers the transcript hash as in TLS 1.3, but with distinct context strings for domain separation, as defined in {{sec-context-strings}}.
 
 ### Context Strings {#sec-context-strings}
 
