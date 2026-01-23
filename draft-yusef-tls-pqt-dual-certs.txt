@@ -6,13 +6,13 @@ TLS Working Group                                         R. Shekh-Yusef
 Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                   H-BRS
-Expires: 20 June 2026                                       M. Ounsworth
+Expires: 27 July 2026                                       M. Ounsworth
                                                                  Entrust
                                                                 T. Reddy
                                                                    Nokia
                                                             Y. Rosomakho
                                                                  Zscaler
-                                                        17 December 2025
+                                                         23 January 2026
 
 
     Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
@@ -54,11 +54,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 June 2026.
+   This Internet-Draft will expire on 27 July 2026.
 
 Copyright Notice
 
-   Copyright (c) 2025 IETF Trust and the persons identified as the
+   Copyright (c) 2026 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -513,31 +513,34 @@ Table of Contents
 
                 Figure 5: TLS 1.3 CertificateVerify message
 
-   This document defines DualCertificateVerify which extends
-   CertificateVerify to carry two independent signatures.
+   This document defines CertificateVerify as follows to carry one or
+   more independent signatures.
 
    struct {
-       SignatureScheme first_algorithm;
-       opaque first_signature<0..2^16-1>;
-       SignatureScheme second_algorithm;
-       opaque second_signature<0..2^16-1>;
-   } DualCertificateVerify;
+        SignatureScheme algorithm<1..2^8-1>;
+        opaque signature<0..2^16-1>;
+   } CertificateVerify;
 
-                  Figure 6: DualCertificateVerify message
+   This document extends the CertificateVerify structure to support dual
+   certificates and signatures.  The algorithm field now allows carrying
+   one or more signature schemes, and the signature field allows
+   carrying one or more corresponding signatures.
 
-   It is an error for any fields to be empty.  In particular, the
-   DualCertificateVerify structure MUST NOT be used to carry only a
-   single signature.  Both signatures included in a single
-   DualCertificateVerify structure MUST use different signature
-   algorithms.  Violation of this rules MUST result in session
-   termination with an illegal_parameter alert.
+   The extended CertificateVerify structure MUST include at least two
+   distinct signature algorithms and their corresponding signatures when
+   used to support dual certificates.  Each signature algorithm and
+   signature pair MUST correspond to a unique certificate in the
+   certificate chain.
 
-   The DualCertificateVerify message MAY be used in place of
-   CertificateVerify anywhere that it is allowed.
+   It is an error for any fields to be empty, and the CertificateVerify
+   structure MUST NOT be used to carry only a single signature when dual
+   certificates are in use.  Violation of these rules MUST result in
+   session termination with an illegal_parameter alert.
 
-   Each signature covers the transcript hash as in TLS 1.3, but with a
-   distinct context string for domain separation, which are defined in
-   Section 5.3.1.
+   The extended CertificateVerify message MAY be used in place of the
+   original CertificateVerify message anywhere it is allowed.  Each
+   signature covers the transcript hash as in TLS 1.3, but with distinct
+   context strings for domain separation, as defined in Section 5.3.1.
 
 5.3.1.  Context Strings
 

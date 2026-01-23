@@ -24,14 +24,14 @@
     Python 3.12.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
-    intervaltree 3.1.0
+    intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 5.3.1
-    platformdirs 4.5.0
+    lxml 6.0.2
+    platformdirs 4.5.1
     pycountry 24.6.1
-    PyYAML 6.0.2
+    PyYAML 6.0.3
     requests 2.32.5
-    wcwidth 0.2.14
+    wcwidth 0.3.0
 -->
 <link href="draft-yusef-tls-pqt-dual-certs.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -572,6 +572,7 @@ aside, blockquote {
 }
 blockquote {
   margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
 }
 cite {
   display: block;
@@ -642,7 +643,7 @@ a.pilcrow {
   }
 }
 @media not print {
-  :hover > a.pilcrow {
+  :hover > a.pilcrow, a.pilcrow:focus {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
@@ -1050,11 +1051,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">PQ/T Dual Certs in TLS</td>
-<td class="right">December 2025</td>
+<td class="right">January 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Shekh-Yusef, et al.</td>
-<td class="center">Expires 20 June 2026</td>
+<td class="center">Expires 27 July 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1070,12 +1071,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="https://www.rfc-editor.org/rfc/rfcRFC9261" class="eref">RFC9261</a>, <a href="https://www.rfc-editor.org/rfc/rfcRFC8446" class="eref">RFC8446</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-12-17" class="published">17 December 2025</time>
+<time datetime="2026-01-23" class="published">23 January 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-06-20">20 June 2026</time></dd>
+<dd class="expires"><time datetime="2026-07-27">27 July 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1136,7 +1137,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 June 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 July 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1145,7 +1146,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2025 IETF Trust and the persons identified as the
+            Copyright (c) 2026 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1629,24 +1630,19 @@ struct {
 <figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
 <a href="#name-tls-13-certificateverify-me" class="selfRef">TLS 1.3 CertificateVerify message</a>
           </figcaption></figure>
-<p id="section-5.3-3">This document defines <code>DualCertificateVerify</code> which extends <code>CertificateVerify</code> to carry two independent signatures.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
-<span id="name-dualcertificateverify-messa"></span><figure id="figure-6">
-          <div class="alignLeft art-ascii-art art-text artwork" id="section-5.3-4.1">
+<p id="section-5.3-3">This document defines CertificateVerify as follows to carry one or more independent signatures.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.3-4">
 <pre>
 struct {
-    SignatureScheme first_algorithm;
-    opaque first_signature&lt;0..2^16-1&gt;;
-    SignatureScheme second_algorithm;
-    opaque second_signature&lt;0..2^16-1&gt;;
-} DualCertificateVerify;
-</pre>
+     SignatureScheme algorithm&lt;1..2^8-1&gt;;
+     opaque signature&lt;0..2^16-1&gt;;
+} CertificateVerify;
+</pre><a href="#section-5.3-4" class="pilcrow">¶</a>
 </div>
-<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
-<a href="#name-dualcertificateverify-messa" class="selfRef">DualCertificateVerify message</a>
-          </figcaption></figure>
-<p id="section-5.3-5">It is an error for any fields to be empty. In particular, the <code>DualCertificateVerify</code> structure <span class="bcp14">MUST NOT</span> be used to carry only a single signature. Both signatures included in a single <code>DualCertificateVerify</code> structure <span class="bcp14">MUST</span> use different signature algorithms. Violation of this rules <span class="bcp14">MUST</span> result in session termination with an <code>illegal_parameter</code> alert.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
-<p id="section-5.3-6">The <code>DualCertificateVerify</code> message <span class="bcp14">MAY</span> be used in place of <code>CertificateVerify</code> anywhere that it is allowed.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
-<p id="section-5.3-7">Each signature covers the transcript hash as in TLS 1.3, but with a distinct context string for domain separation, which are defined in <a href="#sec-context-strings" class="auto internal xref">Section 5.3.1</a>.<a href="#section-5.3-7" class="pilcrow">¶</a></p>
+<p id="section-5.3-5">This document extends the CertificateVerify structure to support dual certificates and signatures. The algorithm field now allows carrying one or more signature schemes, and the signature field allows carrying one or more corresponding signatures.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+<p id="section-5.3-6">The extended CertificateVerify structure <span class="bcp14">MUST</span> include at least two distinct signature algorithms and their corresponding signatures when used to support dual certificates. Each signature algorithm and signature pair <span class="bcp14">MUST</span> correspond to a unique certificate in the certificate chain.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+<p id="section-5.3-7">It is an error for any fields to be empty, and the CertificateVerify structure <span class="bcp14">MUST NOT</span> be used to carry only a single signature when dual certificates are in use. Violation of these rules <span class="bcp14">MUST</span> result in session termination with an illegal_parameter alert.<a href="#section-5.3-7" class="pilcrow">¶</a></p>
+<p id="section-5.3-8">The extended CertificateVerify message <span class="bcp14">MAY</span> be used in place of the original CertificateVerify message anywhere it is allowed. Each signature covers the transcript hash as in TLS 1.3, but with distinct context strings for domain separation, as defined in <a href="#sec-context-strings" class="auto internal xref">Section 5.3.1</a>.<a href="#section-5.3-8" class="pilcrow">¶</a></p>
 <div id="sec-context-strings">
 <section id="section-5.3.1">
           <h4 id="name-context-strings">
