@@ -1,0 +1,951 @@
+
+
+
+
+TLS Working Group                                         R. Shekh-Yusef
+Internet-Draft                                                     Ciena
+Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
+Intended status: Standards Track                                   H-BRS
+Expires: 5 November 2026                                    M. Ounsworth
+                                                                 Entrust
+                                                                T. Reddy
+                                                                   Nokia
+                                                            Y. Rosomakho
+                                                                 Zscaler
+                                                              4 May 2026
+
+
+    Post-Quantum Traditional (PQ/T) Hybrid Authentication with Dual
+                        Certificates in TLS 1.3
+                 draft-yusef-tls-pqt-dual-certs-latest
+
+Abstract
+
+   The anticipated emergence of cryptographically relevant quantum
+   computers (CRQCs) poses a threat to the authentication mechanisms
+   used in TLS 1.3.  This document defines a hybrid authentication
+   mechanism that uses two independent certificates, one traditional and
+   one post-quantum, ensuring that an attacker must break both
+   algorithms to compromise a TLS connection.  The two certificate
+   chains are carried in a single Certificate message and two
+   independent signatures are encoded in the CertificateVerify message.
+
+Discussion Venues
+
+   This note is to be removed before publishing as an RFC.
+
+   Discussion of this document takes place on the Transport Layer
+   Security mailing list (tls@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/tls/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/hannestschofenig/tls-dual-certs.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 5 November 2026.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Scope
+   4.  Design Overview
+     4.1.  Signature Algorithms Negotiation
+     4.2.  Certificate Chain Encoding
+     4.3.  CertificateVerify Signatures
+     4.4.  Common Chains
+   5.  Protocol Changes
+     5.1.  SignatureScheme Code Points
+     5.2.  Certificate Message Encoding
+       5.2.1.  Delimiter
+     5.3.  CertificateVerify Message
+     5.4.  Dual Certificate Policy Enforcement
+   6.  Performance Considerations
+   7.  Security Considerations
+     7.1.  Weak Non-Separability
+     7.2.  Signature Validation Requirements
+     7.3.  Side-Channel Resistance
+     7.4.  Cryptographic Independence Of The Two Chains
+     7.5.  Certificate Usage and Trust
+     7.6.  Preventing Downgrade Attacks
+   8.  IANA Considerations
+   9.  Acknowledgments
+   10. References
+     10.1.  Normative References
+     10.2.  Informative References
+   Appendix A.  Open Design Issues
+     A.1.  Allow mixed certificate chains?
+   Appendix B.  Informal Requirements for Dual TLS Certificate Support
+     B.1.  Dual-Algorithm Security
+       B.1.1.  Weak Non-Separability
+     B.2.  Dual Certificate Semantics
+       B.2.1.  Independent Chain Usability
+       B.2.2.  Unambiguous Chain Separation
+     B.3.  Use Case and Deployment Flexibility
+       B.3.1.  Backward Compatibility
+       B.3.2.  Forward Compatibility
+       B.3.3.  Minimal Protocol Changes
+     B.4.  Non-Goals
+       B.4.1.  Multiple Identities
+   Appendix C.  Compatibility with composite certificates
+   Appendix D.  Policy Examples
+     D.1.  Example 1: Single-certificate
+     D.2.  Example 2: Dual-Compatible, Traditional Primary, PQ
+           Optional
+     D.3.  Example 3: Strict Dual
+     D.4.  Example 4: Dual-Compatible, PQ Primary, Traditional
+           Optional
+   Authors' Addresses
+
+1.  Introduction
+
+   There are several potential mechanisms to address concerns related to
+   the anticipated emergence of cryptographically relevant quantum
+   computers (CRQCs).  While the encryption-related aspects are covered
+   in other documents, this document focuses on the authentication
+   component of the [TLS] handshake.
+
+   One approach is the use of dual certificates: issuing two distinct
+   certificates for the same end entity — one using a traditional
+   algorithm (e.g., [ECDSA]), and the other using a post-quantum (PQ)
+   algorithm (e.g., [ML-DSA]).
+
+   This document defines how TLS 1.3 can utilize such certificates to
+   enable dual-algorithm authentication, ensuring that an attacker would
+   need to break both algorithms to compromise the session.
+
+   It also addresses the challenges of integrating hybrid authentication
+   in TLS 1.3 while balancing backward compatibility, forward security,
+   and deployment practicality.
+
+   This method exemplifies a PQ/T hybrid protocol with non-composite
+   authentication as defined in Section 4 of [PQT-TERMS], where two
+   single-algorithm schemes are used in parallel: when the certificate
+   type is X.509, each certificate chain uses the same format as in
+   standard PKI, and both chains together provide hybrid assurance
+   without modifying the X.509 certificate structure.  While this
+   approach does not produce a single cryptographic hybrid signature, it
+   ensures that both certificates are presented, validated, and
+   cryptographically bound to the TLS handshake transcript.  This
+   specification is also compatible with other certificate types defined
+   in the TLS Certificate Types registry defined in Section 14 of
+   [IANA-TLS] provided that both components of the dual are of the same
+   type.  This document assumes X.509 certificates for all explanatory
+   text.
+
+   This document defines new SignatureScheme code points that identify
+   pairs of traditional and post-quantum signature algorithms.
+   Negotiation uses the existing signature_algorithms extension without
+   modification.  When a dual code point is selected, the Certificate
+   message carries two independent certificate chains, and the
+   CertificateVerify signature field encodes two independent signatures.
+   No new TLS extensions or changes to existing TLS structures are
+   required.
+
+   A key advantage of defining explicit code points per algorithm pair
+   is that it restricts combinations to known good configurations.  This
+   follows the emerging consensus in protocol design that explicit
+   enumeration of vetted pairs is safer than allowing arbitrary
+   combinations of any two algorithms.  Each code point defined in this
+   document represents a specific, vetted pair of traditional and post-
+   quantum algorithms.
+
+   This document is distinct from the composite ML-DSA approach defined
+   in [TLS-COMPOSITE-MLDSA].  In that approach, a single composite
+   certificate contains both public keys and produces a single composite
+   signature.  In this document, two independent certificates and two
+   independent signatures are used, each verifiable on its own.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Scope
+
+   The approach described herein is also compatible with FIPS-compliant
+   deployments (FIPS 140-2 and FIPS 140-3), as it supports the continued
+   use of FIPS-approved traditional signature algorithms during the TLS
+   handshake.
+
+   The proposed mechanism is fully backward compatible: traditional
+   certificates and authentication methods remain functional with
+   existing TLS 1.3 implementations.  As cryptographically relevant
+   quantum computers (CRQCs) emerge, deployments can transition by
+   gradually disabling traditional authentication and enabling post-
+   quantum-only authentication.  This strategy offers a smooth migration
+   path, ensuring long-term cryptographic agility, regulatory
+   compliance, and operational continuity without disrupting existing
+   infrastructure.
+
+4.  Design Overview
+
+   This document introduces new SignatureScheme code points to enable
+   dual-certificate authentication in TLS 1.3.  The primary objective is
+   to allow each TLS peer to present two certificate chains requiring an
+   attacker to break both authentication algorithms to impersonate a
+   peer.  Typically one of the certificate chains uses a traditional
+   cryptographic algorithm while the second leverages post-quantum (PQ)
+   cryptography.
+
+   The design requires no changes to existing TLS structures or
+   extensions.  It reuses the existing signature_algorithms extension
+   for negotiation, the existing Certificate message structure with a
+   delimiter to carry two chains, and the existing CertificateVerify
+   structure with a defined encoding for two signatures within the
+   signature opaque field.  It is applicable to both client and server
+   authentication and is compatible with the Exported Authenticators
+   mechanism [EXPORTED-AUTH].
+
+   A full set of informal design requirements for this specification can
+   be found in Appendix B.
+
+4.1.  Signature Algorithms Negotiation
+
+   Dual code points are advertised and negotiated using the existing
+   signature_algorithms extension defined in Section 4.2.3 of [TLS],
+   exactly as for any other SignatureScheme.  A client that supports
+   dual authentication includes the relevant dual code points in its
+   signature_algorithms list.  The server selects one code point from
+   the client's list, just as in standard TLS 1.3 negotiation.
+
+   A client that wishes to mandate dual authentication includes only
+   dual code points in signature_algorithms.  A client willing to accept
+   either dual or single-algorithm authentication includes both dual and
+   single-algorithm code points.
+
+4.2.  Certificate Chain Encoding
+
+   TLS 1.3 defines the Certificate message to carry a list of
+   certificate entries representing a single chain.  This document
+   reuses the same structure to convey two certificate chains by
+   concatenating them and inserting a delimiter in the form of a zero-
+   length certificate entry.
+
+   A zero-length certificate is defined as a CertificateEntry with an
+   empty cert_data field and omitted extensions field.  TLS 1.3
+   prohibits the use of empty certificate entries, making this delimiter
+   an unambiguous boundary between the two certificate chains.
+   Implementations MUST treat all entries before the zero-length
+   delimiter as the first certificate chain (typically traditional), and
+   all entries after it as the second certificate chain (typically post-
+   quantum).
+
+   This encoding applies equally to the CompressedCertificate message
+   defined in [COMPRESS-CERT] and to the Certificate message of Exported
+   Authenticators as defined in Section 5.2.1 of [EXPORTED-AUTH].
+
+   Since TLS 1.3 supports only a single certificate type in each
+   direction, both certificate chains MUST either contain X.509
+   certificates or certificates of type specified in:
+
+   *  server_certificate_type extension in a EncryptedExtensions message
+      for Server certificates
+
+   *  client_certificate_type extension in a EncryptedExtensions message
+      for Client certificates
+
+   Note that according to Section 5.2.1 of [EXPORTED-AUTH] Exported
+   Authenticators support only X.509 certificates.
+
+4.3.  CertificateVerify Signatures
+
+   The CertificateVerify message is not modified.  When a dual code
+   point has been negotiated, the signature field encodes two
+   independent signatures:
+
+   1.  One computed using the traditional algorithm component of the
+       negotiated code point.
+
+   2.  One computed using the post-quantum algorithm component of the
+       negotiated code point.
+
+   Each signature is computed over the transcript hash as specified in
+   TLS 1.3, using the same context strings defined in Section 4.4.3 of
+   [TLS].  Domain separation between the two signatures is provided by
+   the distinct certificate chain inputs over which they are computed.
+
+   This encoding applies equally to the CertificateVerify message of
+   Exported Authenticators as defined in Section 5.2.2 of
+   [EXPORTED-AUTH].
+
+   The order of the signatures in the message MUST correspond to the
+   order of the certificate chains in the Certificate message: the first
+   signature MUST correspond to the traditional algorithm component of
+   the negotiated code point, and the second signature MUST correspond
+   to the post-quantum algorithm component.
+
+4.4.  Common Chains
+
+   In order to lessen operational burden on Certification Authority (CA)
+   operators, the two certificates of the dual MAY be issued from the
+   same CA.  For example, during the PQC migration, a CA operator might
+   wish to stand up a root CA using a Level 5 PQC algorithm or a hash-
+   based signature, and then continue to issue RSA and ECDSA
+   certificates off that root.
+
+   Negotiation of such a setup requires use of the
+   signature_algorithms_cert TLS 1.3 extension, which is unmodified from
+   its definition in Section 4.2.3 of [TLS] and when present it applies
+   equally to both chains of the dual.
+
+   In order to optimize bandwidth and avoid sending duplicate copies of
+   the same chain, when constructing a Certificate message as described
+   in Section 5.2, the second certificate chain MAY consist of only an
+   end-entity certificate.
+
+5.  Protocol Changes
+
+   This section defines the normative behaviour of TLS 1.3 peers when a
+   dual code point is negotiated.  No new TLS extensions or
+   modifications to existing TLS structures are introduced.  This
+   document defines new SignatureScheme code points that, when
+   negotiated, govern the encoding of the Certificate and
+   CertificateVerify messages.
+
+5.1.  SignatureScheme Code Points
+
+   This document defines new SignatureScheme values for use in the
+   signature_algorithms and signature_algorithms_cert extensions defined
+   in Section 4.2.3 of [TLS]:
+
+   enum {
+       ecdsa_secp256r1_sha256_mldsa44 (TBD1),
+       ecdsa_secp384r1_sha384_mldsa65 (TBD2),
+   } SignatureScheme;
+
+                 Figure 1: Dual SignatureScheme code points
+
+   Each code point identifies a vetted pair of algorithms: a traditional
+   algorithm and a post-quantum algorithm.  The traditional component
+   names match the existing TLS SignatureScheme IANA registry entries
+   exactly.  The naming order <traditional>_<pq> reflects the order in
+   which the two signatures appear in the CertificateVerify signature
+   field, as defined in Section 5.3.
+
+   These code points are distinct from the composite ML-DSA
+   SignatureScheme values defined in [TLS-COMPOSITE-MLDSA], which use a
+   single certificate and a single composite signature, and which use
+   the opposite naming order <pq>_<traditional>.
+
+   When a code point defined in this document is negotiated, the
+   authenticating peer MUST send two certificate chains in the
+   Certificate message as described in Section 5.2, and MUST encode two
+   independent signatures in the signature field of the
+   CertificateVerify message as described in Section 5.3.
+
+   These code points MUST NOT be used in TLS 1.2.  A peer that receives
+   a CertificateVerify message in a TLS 1.2 connection with a code point
+   defined in this document MUST abort the connection with an
+   illegal_parameter alert.
+
+5.2.  Certificate Message Encoding
+
+   TLS 1.3 defines the Certificate message as follows:
+
+   struct {
+       opaque certificate_request_context<0..2^8-1>;
+       CertificateEntry certificate_list<0..2^24-1>;
+   } Certificate;
+
+                   Figure 2: TLS 1.3 Certificate message
+
+   This document re-uses the Certificate structure as-is and extends the
+   semantics of certificate_list to support two logically distinct
+   certificate chains, encoded sequentially and separated by a
+   delimiter.
+
+   In order to support bandwidth optimization in the case that the two
+   certificates are issued by the same CA, the second certificate chain
+   MAY consist of only an end-entity certificate.  In this case,
+   validators SHOULD attempt to validate the second certificate using
+   the chain provided with the first certificate.
+
+5.2.1.  Delimiter
+
+   The delimiter is a zero-length certificate entry encoded as 3 bytes
+   of 0x00.  TLS 1.3 prohibits empty certificate entries, so this
+   delimiter is unambiguous.  The delimiter MUST NOT be sent to peers
+   that did not negotiate a dual code point.
+
+   This specification expands the CertificateEntry structure from
+   Section 4.4.2 of [TLS] in the following way:
+
+   struct {
+       select (is_delimiter) {
+           case Delimiter: uint24 delimiter = 0;
+           case Non_Delimiter:
+             opaque cert_specific_data<1..2^24-1>;
+             Extension extensions<0..2^16-1>;
+       };
+   } CertificateEntry;
+
+          Figure 3: Updated CertificateEntry structure definition
+
+   Certificate parsing logic MUST reject messages that contain more than
+   one zero-length delimiter, or that place the delimiter as the first
+   or last entry in the certificate list.
+
+   All entries before the delimiter are treated as the first certificate
+   chain (traditional) and MUST use the traditional algorithm component
+   of the negotiated code point.  All entries after the delimiter are
+   treated as the second certificate chain (post-quantum) and MUST use
+   the post-quantum algorithm component of the negotiated code point.
+   As specified in Section 4.4.2 of [TLS], the end-entity certificate
+   MUST be the first in both chains.
+
+   A peer receiving this structure MUST validate each chain
+   independently according to its corresponding signature algorithm.
+   Implementers MAY wish to consider performing this verification in a
+   timing-invariant way so as not to leak which certificate failed, for
+   example if it failed for policy reasons rather than cryptographic
+   reasons, however since this information is not hidden in a single-
+   certificate TLS handshake, implementers MAY decide that this is not
+   important.
+
+   The first certificate chain MUST contain an end-entity certificate
+   whose public key is compatible with the traditional algorithm
+   component of the negotiated code point.  The second certificate chain
+   MUST contain an end-entity certificate whose public key is compatible
+   with the post-quantum algorithm component of the negotiated code
+   point.  End-entity certificates of both chains MUST use different
+   public keys.
+
+   If a signature_algorithms_cert extension is absent, then all
+   certificates of a given chain MUST also use an algorithm consistent
+   with its component of the negotiated code point, but not necessarily
+   the same one as the end-entity certificate.  It is always allowed to
+   provide mixed-algorithm certificate chains within the same component
+   as long as the relevant algorithms are acceptable.
+
+   This encoding applies equally to the CompressedCertificate message
+   and to Certificate message of Exported Authenticators.
+
+5.3.  CertificateVerify Message
+
+   TLS 1.3 defines the CertificateVerify message as follows:
+
+   struct {
+        SignatureScheme algorithm;
+        opaque signature<0..2^16-1>;
+   } CertificateVerify;
+
+                Figure 4: TLS 1.3 CertificateVerify message
+
+   This document does not modify this structure.  When a code point
+   defined in Section 5.1 has been negotiated, the algorithm field
+   carries that code point and the signature field encodes two
+   independent signatures as follows: the first two bytes encode the
+   length of the traditional signature as a uint16, followed by the
+   traditional signature (first_signature) of that length, followed by
+   the post-quantum signature (second_signature) occupying the remaining
+   bytes.
+
+   where:
+
+   *  first_signature is computed using the traditional algorithm
+      component of the negotiated code point, over the signing input
+      constructed as specified in Section 4.4.3 of [TLS], with the
+      Certificate input consisting of all entries up to but not
+      including the delimiter.
+
+   *  second_signature is computed using the post-quantum algorithm
+      component of the negotiated code point, over the signing input
+      constructed as specified in Section 4.4.3 of [TLS], with the
+      Certificate input consisting of all entries after the delimiter.
+
+   The context strings used in the signing input are unchanged from
+   Section 4.4.3 of [TLS].  Domain separation between the two signatures
+   is provided by the distinct certificate chain inputs over which they
+   are computed.
+
+   The receiver MUST verify both signatures.  Failure to verify either
+   signature MUST be treated as an authentication failure and MUST cause
+   the connection to be aborted with a decrypt_error alert.
+
+   This encoding applies equally to the CertificateVerify message of
+   Exported Authenticators Section 5.2.2 of [EXPORTED-AUTH].
+
+5.4.  Dual Certificate Policy Enforcement
+
+   Policy enforcement regarding the use of dual certificates is
+   implementation-defined and driven by the authenticating peer.  When
+   dual certificate authentication is required by local policy, the
+   client MUST include only dual code points in signature_algorithms.  A
+   server that cannot satisfy this will be unable to complete the
+   handshake.
+
+   When a client is willing to accept either dual or single-algorithm
+   authentication, it MAY include both dual code points and single-
+   algorithm schemes in signature_algorithms.
+
+   A single composite certificate chain and signature such as defined by
+   [TLS-COMPOSITE-MLDSA] MAY be an acceptable alternative during the
+   post-quantum transition period as long as the corresponding signature
+   scheme is listed in signature_algorithms.
+
+   Additional policy examples are given in Appendix D.
+
+6.  Performance Considerations
+
+   The use of dual certificates increases the size of the certificate
+   and certificate verify messages, which can result in larger TLS
+   handshake messages.  These larger payloads may cause packet
+   fragmentation, retransmissions, and handshake delays, especially in
+   constrained or lossy network environments.
+
+   To mitigate these impacts, deployments can apply certificate chain
+   optimization techniques, such as those described in Section 6.1 of
+   [PQ-RECOMMEND], to minimize transmission overhead and improve
+   handshake robustness.
+
+7.  Security Considerations
+
+7.1.  Weak Non-Separability
+
+   This dual certificate scheme achieves Weak Non-Separability as
+   defined in [HYBRID-SIGS], which is defined as:
+
+      the guarantee that an adversary cannot simply "remove" one of the
+      component signatures without evidence left behind.
+
+   As defined in Section 4.4 of [TLS], CertificateVerify contains
+   signatures over the value Transcript-Hash(Handshake Context,
+   Certificate).  In the dual certificate context, Certificate will
+   contain both certificate chains, which is sufficient to cause the
+   client to abort and therefore achieves Weak Non-Separability.
+
+7.2.  Signature Validation Requirements
+
+   Implementations MUST strictly associate each signature in the
+   CertificateVerify signature field with the corresponding certificate
+   chain, based on their order relative to the zero-length delimiter in
+   the Certificate message.  Failure to properly align signatures with
+   their intended certificate chains could result in incorrect
+   validation or misattribution of authentication.
+
+   Both signatures in the CertificateVerify message MUST be validated
+   successfully and correspond to their respective certificate chains.
+   Implementations MUST treat failure to validate either signature as a
+   failure of the authentication process.  Silent fallback to single-
+   certificate verification undermines the dual-authentication model and
+   introduces downgrade risks.  Implementations MAY short-circuit if the
+   first signature or certificate chain fails, or MAY process both
+   regardless to achieve timing invariance if the implementer deems it
+   valuable to hide which signature or certificate validation failed,
+   for example if one of the certificates was rejected for policy
+   reasons rather than cryptographic reasons.
+
+7.3.  Side-Channel Resistance
+
+   Some implementations MAY wish to treat a dual signature as an atomic
+   signing oracle and thus hide side-channels that would allow an
+   attacker to distinguish the first algorithm from the second
+   algorithm, for example if the first signature fails, still perform
+   the second signature before returning an alert.  However, in most
+   cases this does not have practical value, for example if all
+   algorithms offered as dual are also offered as single.
+
+7.4.  Cryptographic Independence Of The Two Chains
+
+   While the two selected end-entity certificates will contain keys of
+   different algorithms, it is possible for them to have certificate
+   chains that use the same algorithm.  In some cases this could be
+   perfectly acceptable, for example if both chains are rooted in a
+   hash-based signature or a composite, or if it is intentional for both
+   end-entity certificates to chain to the same root.
+
+   However, in general to achieve the intended security guarantees of
+   dual-algorithm protection, implementers and deployment operators
+   SHOULD ensure that the two certificate chains rely on
+   cryptographically independent primitives.
+
+7.5.  Certificate Usage and Trust
+
+   Certificate chains MUST be validated independently with the same
+   logic as if they were each presented in isolation, including trust
+   anchors, certificate usage constraints, expiration, and revocation
+   status.
+
+7.6.  Preventing Downgrade Attacks
+
+   TLS clients that are capable of accepting both traditional-only
+   certificates and dual certificate configurations may remain
+   vulnerable to downgrade attacks.  In such a scenario, an attacker
+   with access to a CRQC could forge a valid traditional certificate to
+   impersonate the server and indicate no support for dual certificates.
+   To mitigate this risk, clients should progressively phase out
+   acceptance of traditional-only certificate chains once dual
+   certificate deployment is widespread and interoperability with legacy
+   servers is no longer necessary.  During the transition period,
+   accepting traditional-only certificate chains may remain necessary to
+   maintain backward compatibility with servers that have not yet
+   deployed dual certificates.
+
+8.  IANA Considerations
+
+   This document requests new entries in the TLS SignatureScheme
+   registry [TLSIANA].
+
+   +=======+================================+=============+===========+
+   | Value | Description                    | Recommended | Reference |
+   +=======+================================+=============+===========+
+   | TBD1  | ecdsa_secp256r1_sha256_mldsa44 | N           | This      |
+   |       |                                |             | document  |
+   +-------+--------------------------------+-------------+-----------+
+   | TBD2  | ecdsa_secp384r1_sha384_mldsa65 | N           | This      |
+   |       |                                |             | document  |
+   +-------+--------------------------------+-------------+-----------+
+
+                 Table 1: New TLS SignatureScheme values
+
+   These values are distinct from the composite ML-DSA SignatureScheme
+   values defined in [TLS-COMPOSITE-MLDSA], which use a single
+   certificate and a single composite signature.
+
+9.  Acknowledgments
+
+   We would like to thank Suzanne Wibada (Université de Sherbrooke) for
+   her reviews and comments during the work on the initial version of
+   this document, and her willingness to implement the recommendation of
+   this document.
+
+   We also want to thank Anthony Hu from WolfSSL for his review and
+   feedback on the initial version of this draft.
+
+10.  References
+
+10.1.  Normative References
+
+   [EXPORTED-AUTH]
+              Sullivan, N., "Exported Authenticators in TLS", RFC 9261,
+              DOI 10.17487/RFC9261, July 2022,
+              <https://www.rfc-editor.org/rfc/rfc9261>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [TLS]      Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", Work in Progress, Internet-Draft, draft-
+              ietf-tls-rfc8446bis-14, 13 September 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+              rfc8446bis-14>.
+
+10.2.  Informative References
+
+   [COMPRESS-CERT]
+              Ghedini, A. and V. Vasiliev, "TLS Certificate
+              Compression", RFC 8879, DOI 10.17487/RFC8879, December
+              2020, <https://www.rfc-editor.org/rfc/rfc8879>.
+
+   [ECDSA]    "Digital Signature Standard (DSS)", National Institute of
+              Standards and Technology (U.S.),
+              DOI 10.6028/nist.fips.186-5, February 2023,
+              <https://doi.org/10.6028/nist.fips.186-5>.
+
+   [HYBRID-SIGS]
+              Bindel, N., Hale, B., Connolly, D., and F. D, "Hybrid
+              signature spectrums", Work in Progress, Internet-Draft,
+              draft-ietf-pquip-hybrid-signature-spectrums-07, 20 June
+              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              pquip-hybrid-signature-spectrums-07>.
+
+   [IANA-TLS] Salowey, J. and S. Turner, "IANA Registry Updates for TLS
+              and DTLS", RFC 8447, DOI 10.17487/RFC8447, August 2018,
+              <https://www.rfc-editor.org/rfc/rfc8447>.
+
+   [ML-DSA]   Hollebeek, T., Schmieg, S., and B. Westerbaan, "Use of ML-
+              DSA in TLS 1.3", Work in Progress, Internet-Draft, draft-
+              ietf-tls-mldsa-02, 22 March 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+              mldsa-02>.
+
+   [PQ-RECOMMEND]
+              Reddy.K, T. and H. Tschofenig, "Post-Quantum Cryptography
+              Recommendations for TLS-based Applications", Work in
+              Progress, Internet-Draft, draft-reddy-uta-pqc-app-08, 2
+              July 2025, <https://datatracker.ietf.org/doc/html/draft-
+              reddy-uta-pqc-app-08>.
+
+   [PQT-TERMS]
+              D, F., P, M., and B. Hale, "Terminology for Post-Quantum
+              Traditional Hybrid Schemes", Work in Progress, Internet-
+              Draft, draft-ietf-pquip-pqt-hybrid-terminology-06, 10
+              January 2025, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-pquip-pqt-hybrid-terminology-06>.
+
+   [Signature-Spectrums]
+              Bindel, N., Hale, B., Connolly, D., and F. D, "Hybrid
+              signature spectrums", Work in Progress, Internet-Draft,
+              draft-ietf-pquip-hybrid-signature-spectrums-06, 9 January
+              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              pquip-hybrid-signature-spectrums-06>.
+
+   [TLS-COMPOSITE-MLDSA]
+              Reddy.K, T., Hollebeek, T., Gray, J., and S. Fluhrer, "Use
+              of Composite ML-DSA in TLS 1.3", Work in Progress,
+              Internet-Draft, draft-tls-reddy-composite-mldsa-00, 2
+              November 2024, <https://datatracker.ietf.org/doc/html/
+              draft-tls-reddy-composite-mldsa-00>.
+
+   [TLSIANA]  Salowey, J. and S. Turner, "IANA Registry Updates for TLS
+              and DTLS", RFC 8447, DOI 10.17487/RFC8447, August 2018,
+              <https://www.rfc-editor.org/rfc/rfc8447>.
+
+Appendix A.  Open Design Issues
+
+   This section documents open design questions that are not resolved in
+   this version, and for which the authors wish Working Group input.
+
+   This section is for Working Group review, and to be removed before
+   publication.
+
+A.1.  Allow mixed certificate chains?
+
+   TLS 1.3 defines signature_algorithms_cert to negotiate CA algorithms
+   separately from end-entity algorithms.  In practice this extension is
+   rarely used, as certificate chains are typically homogeneous (e.g.,
+   exclusively ECDSA or exclusively RSA).
+
+   In a dual-certificate context, both chains MAY be issued from the
+   same CA, for example an SLH-DSA root issuing both an ECDSA and an ML-
+   DSA end-entity certificate.  When signature_algorithms_cert is
+   present, this document specifies that it applies to both chains.  The
+   WG is asked to confirm this is the desired behaviour, or whether a
+   different treatment is preferred.
+
+Appendix B.  Informal Requirements for Dual TLS Certificate Support
+
+   This section documents the design requirements that drove the
+   development of this specification.
+
+   This section is primarily intended to ease WG review and could be
+   removed or simplified prior to RFC publication.
+
+B.1.  Dual-Algorithm Security
+
+B.1.1.  Weak Non-Separability
+
+   The dual certificate authentication achieves, at least, Weak Non-
+   Separability [Signature-Spectrums] at the time of verification of the
+   CertificateVerify message.
+
+B.2.  Dual Certificate Semantics
+
+B.2.1.  Independent Chain Usability
+
+   Each certificate chain (e.g., traditional and PQ) must be
+   independently usable for authentication, allowing endpoints to fall
+   back to traditional or PQ-only validation if necessary.
+
+B.2.2.  Unambiguous Chain Separation
+
+   The mechanism must clearly distinguish and delimit multiple
+   certificate chains to prevent ambiguity or misinterpretation.
+
+B.3.  Use Case and Deployment Flexibility
+
+B.3.1.  Backward Compatibility
+
+   When only one certificate chain is used, the mechanism must remain
+   compatible with existing TLS 1.3 endpoints unaware of dual-
+   certificate support or willing to use only a single certificate.
+
+B.3.2.  Forward Compatibility
+
+   The mechanism must be capable of negotiating algorithms requiring
+   dual certificates as well as algorithms that are acceptable
+   standalone.
+
+B.3.3.  Minimal Protocol Changes
+
+   Any additions or modifications to the TLS protocol must be minimal to
+   ease deployment, reduce implementation complexity and minimize new
+   security risks.
+
+B.4.  Non-Goals
+
+B.4.1.  Multiple Identities
+
+   This mechanism is specific to cryptographic algorithm migration.  It
+   is not a generic mechanism for using multiple identities in a single
+   TLS handshake.  In particular, this mechanism does not allow for
+   negotiating two certificates with the same algorithm but containing
+   different identifiers, or for negotiating two independent sets of
+   certificate_authorities.
+
+Appendix C.  Compatibility with composite certificates
+
+   Clients and servers may choose to support composite certificate
+   schemes, such as those defined in [TLS-COMPOSITE-MLDSA].  In these
+   schemes, a single certificate contains a composite public key, and
+   the associated signature proves knowledge of private keys of all
+   components.  However, from the perspective of the TLS protocol, this
+   is a single certificate producing a single composite signature.
+
+   If a composite signature algorithm appears in the
+   signature_algorithms extension, it can fulfill the client's
+   requirements for both traditional and PQ authentication in a single
+   certificate and signature.  It is up to the client policy to decide
+   whether a composite certificate is acceptable in place of a dual-
+   certificate configuration.  This allows further deployment
+   flexibility and compatibility with hybrid authentication strategies.
+
+   The advantages of dual certificates over composites are operational
+   flexibility for both Certification Authority operators and TLS server
+   and client operators because two CAs and end-entity certificates, one
+   traditional and one PQ, allow for backward-compatible and dynamic
+   negotiation of pure traditional, pure PQ, or dual.
+
+   The advantages of composites over dual certificates are that the
+   certificate chains themselves are protected by dual-algorithms, which
+   can be of great importance in use cases where trust stores are not
+   easily updatable.
+
+   A client may include both composite and dual code points in
+   signature_algorithms, leaving the server to select whichever it can
+   satisfy.
+
+Appendix D.  Policy Examples
+
+   This section provides non-normative examples of how a client
+   populates signature_algorithms to express different authentication
+   policies.  For client authentication, the same principles apply with
+   roles reversed: the server drives requirements via
+   CertificateRequest.
+
+D.1.  Example 1: Single-certificate
+
+   Client requires only one traditional, PQ or a composite signature.
+   Client either does not support or is not configured to accept dual
+   certificates.
+
+   Client behavior:
+
+   *  Includes only single-algorithm and/or composite code points in
+      signature_algorithms and optionally signature_algorithms_cert.
+
+   To satisfy this client, the server MUST send a single certificate
+   chain with compatible algorithms and include a single signature in
+   CertificateVerify.
+
+D.2.  Example 2: Dual-Compatible, Traditional Primary, PQ Optional
+
+   Client supports both traditional and PQ authentication.  It allows
+   the server to send either a traditional chain alone or both chains.
+
+   Client behavior:
+
+   *  Includes both traditional single-algorithm code points and dual
+      code points in signature_algorithms and optionally
+      signature_algorithms_cert.
+
+   To satisfy this client, the server MUST either:
+
+   *  Provide a single certificate chain with compatible traditional
+      algorithms and include a single signature in CertificateVerify, or
+
+   *  Provide a traditional certificate chain followed by a PQ
+      certificate chain as described in Section 5.2 and encode two
+      signatures in CertificateVerify as described in Section 5.3.
+
+D.3.  Example 3: Strict Dual
+
+   Client requires both traditional and PQ authentication to be
+   performed simultaneously.
+
+   Client behavior:
+
+   *  Includes only dual code points in signature_algorithms.
+
+   To satisfy this client, the server MUST provide a traditional
+   certificate chain followed by a PQ certificate chain as described in
+   Section 5.2 and encode two signatures in CertificateVerify as
+   described in Section 5.3.  If the server cannot satisfy this, the
+   handshake will fail.
+
+D.4.  Example 4: Dual-Compatible, PQ Primary, Traditional Optional
+
+   Client supports both traditional and PQ authentication.  It allows
+   the server to send either a PQ chain alone or both chains.
+
+   Client behavior:
+
+   *  Includes both PQ single-algorithm code points and dual code points
+      in signature_algorithms and optionally signature_algorithms_cert.
+
+   To satisfy this client, the server MUST either:
+
+   *  Provide a single certificate chain with compatible PQ algorithms
+      and include a single signature in CertificateVerify, or
+
+   *  Provide a traditional certificate chain followed by a PQ
+      certificate chain as described in Section 5.2 and encode two
+      signatures in CertificateVerify as described in Section 5.3.
+
+Authors' Addresses
+
+   Rifaat Shekh-Yusef
+   Ciena
+   Canada
+   Email: rifaat.s.ietf@gmail.com
+
+
+   Hannes Tschofenig
+   University of Applied Sciences Bonn-Rhein-Sieg
+   Germany
+   Email: hannes.tschofenig@gmx.net
+
+
+   Mike Ounsworth
+   Entrust
+   Canada
+   Email: mike.ounsworth@entrust.com
+
+
+   Tirumaleswar Reddy
+   Nokia
+   India
+   Email: kondtir@gmail.com
+
+
+   Yaroslav Rosomakho
+   Zscaler
+   Email: yrosomakho@zscaler.com
