@@ -266,7 +266,7 @@ an end-entity certificate.
 
 # Protocol Changes
 
-This section defines the normative behaviour of TLS 1.3 peers when a 
+This section defines the normative behaviour of TLS 1.3 peers when a
 dual code point is negotiated. No new TLS extensions or
 modifications to existing TLS structures are introduced. This document
 defines new `SignatureScheme` code points that, when negotiated, govern
@@ -356,7 +356,7 @@ struct {
 
 Certificate parsing logic MUST reject messages that contain more than
 one zero-length delimiter, or that place the delimiter as the first or
-last entry in the certificate list. 
+last entry in the certificate list.
 
 All entries before the delimiter are treated as the first certificate
 chain (traditional) and MUST use the traditional algorithm component
@@ -406,9 +406,9 @@ struct {
 This document does not modify this structure. When a code point defined
 in {{sec-codepoints}} has been negotiated, the `algorithm` field
 carries that code point and the `signature` field encodes two
-independent signatures as follows: the first two bytes encode the length 
-of the traditional signature as a uint16, followed by the traditional 
-signature (first_signature) of that length, followed by the post-quantum 
+independent signatures as follows: the first two bytes encode the length
+of the traditional signature as a uint16, followed by the traditional
+signature (first_signature) of that length, followed by the post-quantum
 signature (second_signature) occupying the remaining bytes.
 
 where:
