@@ -406,23 +406,36 @@ struct {
 This document does not modify this structure. When a code point defined
 in {{sec-codepoints}} has been negotiated, the `algorithm` field
 carries that code point and the `signature` field encodes two
-independent signatures as follows: the first two bytes encode the length
-of the traditional signature as a uint16, followed by the traditional
-signature (first_signature) of that length, followed by the post-quantum
-signature (second_signature) occupying the remaining bytes.
+independent signatures as follows: 
 
-where:
+Let Certificate1 denote all certificate entries up to but not
+including the zero-length delimiter, and Certificate2 denote all
+certificate entries after the delimiter. The two transcript hashes
+are computed as:
 
-- `first_signature` is computed using the traditional algorithm
-  component of the negotiated code point, over the signing input
-  constructed as specified in {{Section 4.4.3 of TLS}}, with the
-  `Certificate` input consisting of all entries up to but not including
-  the delimiter.
+~~~
+first-hash  = Transcript-Hash(Handshake Context, Certificate1)
+second-hash = Transcript-Hash(Handshake Context, Certificate2)
+~~~
 
-- `second_signature` is computed using the post-quantum algorithm
-  component of the negotiated code point, over the signing input
-  constructed as specified in {{Section 4.4.3 of TLS}}, with the
-  `Certificate` input consisting of all entries after the delimiter.
+The two signatures are then computed as:
+
+~~~
+first-signature  = Sign(traditional-private-key, first-hash)
+second-signature = Sign(pq-private-key, second-hash)
+~~~
+
+These are encoded in the signature field as:
+
+~~~
+signature = uint16(len(first-signature)) || first-signature
+                                         || second-signature
+~~~
+
+The first two bytes encode the length of the traditional signature
+as a uint16, followed by the traditional signature (`first-signature`)
+of that length, followed by the post-quantum signature
+(`second-signature`) occupying the remaining bytes.
 
 The context strings used in the signing input are unchanged from
 {{Section 4.4.3 of TLS}}. Domain separation between the two signatures
