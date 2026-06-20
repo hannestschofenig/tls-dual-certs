@@ -124,7 +124,7 @@ document represents a specific, vetted pair of traditional and
 post-quantum algorithms.
 
 This document is distinct from the composite ML-DSA approach defined
-in {{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}}. In that
+in {{?TLS-COMPOSITE-MLDSA=I-D.reddy-tls-composite-mldsa}}. In that
 approach, a single composite certificate contains both public keys and
 produces a single composite signature. In this document, two
 independent certificates and two independent signatures are used, each
@@ -162,8 +162,8 @@ algorithm while the second leverages post-quantum (PQ) cryptography.
 
 The design requires no changes to existing TLS structures or
 extensions. It reuses the existing `signature_algorithms` extension for
-negotiation, the existing `Certificate` message structure with a
-delimiter to carry two chains, and the existing `CertificateVerify`
+negotiation, the existing `Certificate` message structure to carry two
+chains, and the existing `CertificateVerify`
 structure with a defined encoding for two signatures within the
 `signature` opaque field. It is applicable to both client and server
 authentication and is compatible with the Exported Authenticators
@@ -190,17 +190,10 @@ single-algorithm code points.
 
 TLS 1.3 defines the `Certificate` message to carry a list of
 certificate entries representing a single chain. This document reuses
-the same structure to convey two certificate chains by concatenating
-them and inserting a delimiter in the form of a zero-length certificate
-entry.
-
-A zero-length certificate is defined as a `CertificateEntry` with an
-empty `cert_data` field and omitted `extensions` field. TLS 1.3
-prohibits the use of empty certificate entries, making this delimiter
-an unambiguous boundary between the two certificate chains.
-Implementations MUST treat all entries before the zero-length delimiter
-as the first certificate chain (typically traditional), and all entries
-after it as the second certificate chain (typically post-quantum).
+the same structure to convey two certificate chains by placing the
+entries of both chains in a single `certificate_list`. The rules for
+identifying and reconstructing the two chains are specified in
+{{certificate}}.
 
 This encoding applies equally to the `CompressedCertificate` message
 defined in {{?COMPRESS-CERT=RFC8879}} and to the `Certificate` message
@@ -223,27 +216,9 @@ Authenticators support only X.509 certificates.
 
 The `CertificateVerify` message is not modified. When a dual code point
 has been negotiated, the `signature` field encodes two independent
-signatures:
-
-1. One computed using the traditional algorithm component of the
-   negotiated code point.
-1. One computed using the post-quantum algorithm component of the
-   negotiated code point.
-
-Each signature is computed over the transcript hash as specified in
-TLS 1.3, using the same context strings defined in
-{{Section 4.4.3 of TLS}}. Domain separation between the two signatures
-is provided by the distinct certificate chain inputs over which they
-are computed.
-
-This encoding applies equally to the `CertificateVerify` message of
-Exported Authenticators as defined in {{Section 5.2.2 of EXPORTED-AUTH}}.
-
-The order of the signatures in the message MUST correspond to the order
-of the certificate chains in the `Certificate` message: the first
-signature MUST correspond to the traditional algorithm component of the
-negotiated code point, and the second signature MUST correspond to the
-post-quantum algorithm component.
+signatures, one for the traditional and one for the post-quantum
+component of the negotiated code point. The encoding is specified in
+{{certificate-verify}}.
 
 ## Common Chains
 
@@ -295,7 +270,7 @@ defined in {{certificate-verify}}.
 
 These code points are distinct from the composite ML-DSA
 `SignatureScheme` values defined in
-{{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}}, which use a
+{{TLS-COMPOSITE-MLDSA}}, which use a
 single certificate and a single composite signature, and which use the
 opposite naming order `<pq>_<traditional>`.
 
@@ -322,74 +297,30 @@ struct {
 ~~~~~~~~~~
 {: title="TLS 1.3 Certificate message"}
 
-This document re-uses the `Certificate` structure as-is and extends
-the semantics of `certificate_list` to support two logically distinct
-certificate chains, encoded sequentially and separated by a delimiter.
+This document reuses the `Certificate` structure without modification.
+When a dual code point has been negotiated, `certificate_list` contains
+the certificate entries of both chains, encoded as `CertificateEntry`
+structures.
 
-In order to support bandwidth optimization in the case that the two
-certificates are issued by the same CA, the second certificate chain
-MAY consist of only an end-entity certificate. In this case, validators
-SHOULD attempt to validate the second certificate using the chain
-provided with the first certificate.
+Exactly one end-entity certificate MUST carry a public key compatible
+with the traditional algorithm component of the negotiated code point,
+and exactly one MUST carry a public key compatible with the
+post-quantum component. End-entity certificates are distinguished from
+CA certificates by the `basicConstraints` `cA` value
+{{Section 4.2.1.9 of !PKIX=RFC5280}}.
 
-### Delimiter
+Each chain is constructed from its end-entity certificate to a trust
+anchor, using the remaining entries as candidate CA certificates.
 
-The delimiter is a zero-length certificate entry encoded as 3 bytes of
-0x00. TLS 1.3 prohibits empty certificate entries, so this delimiter
-is unambiguous. The delimiter MUST NOT be sent to peers that did not
-negotiate a dual code point.
-
-This specification expands the CertificateEntry structure from
-{{Section 4.4.2 of TLS}} in the following way:
-
-~~~~~~~~~~ ascii-art
-struct {
-    select (is_delimiter) {
-        case Delimiter: uint24 delimiter = 0;
-        case Non_Delimiter:
-          opaque cert_specific_data<1..2^24-1>;
-          Extension extensions<0..2^16-1>;
-    };
-} CertificateEntry;
-~~~~~~~~~~
-{: title="Updated CertificateEntry structure definition"}
-
-Certificate parsing logic MUST reject messages that contain more than
-one zero-length delimiter, or that place the delimiter as the first or
-last entry in the certificate list.
-
-All entries before the delimiter are treated as the first certificate
-chain (traditional) and MUST use the traditional algorithm component
-of the negotiated code point. All entries after the delimiter are
-treated as the second certificate chain (post-quantum) and MUST use
-the post-quantum algorithm component of the negotiated code point. As
-specified in {{Section 4.4.2 of TLS}}, the end-entity certificate MUST
-be the first in both chains.
-
-A peer receiving this structure MUST validate each chain independently
-according to its corresponding signature algorithm. Implementers MAY
-wish to consider performing this verification in a timing-invariant way
-so as not to leak which certificate failed, for example if it failed
-for policy reasons rather than cryptographic reasons, however since
-this information is not hidden in a single-certificate TLS handshake,
-implementers MAY decide that this is not important.
-
-The first certificate chain MUST contain an end-entity certificate
-whose public key is compatible with the traditional algorithm component
-of the negotiated code point. The second certificate chain MUST contain
-an end-entity certificate whose public key is compatible with the
-post-quantum algorithm component of the negotiated code point.
-End-entity certificates of both chains MUST use different public keys.
-
-If a `signature_algorithms_cert` extension is absent, then all
-certificates of a given chain MUST also use an algorithm consistent
-with its component of the negotiated code point, but not necessarily
-the same one as the end-entity certificate. It is always allowed to
-provide mixed-algorithm certificate chains within the same component
-as long as the relevant algorithms are acceptable.
+Implementers MAY wish to consider performing chain validation in a
+timing-invariant way so as not to leak which certificate failed, for
+example if it failed for policy reasons rather than cryptographic
+reasons; however, since this information is not hidden in a
+single-certificate TLS handshake, implementers MAY decide that this is
+not important.
 
 This encoding applies equally to the `CompressedCertificate` message
-and to `Certificate` message of Exported Authenticators.
+and to the `Certificate` message of Exported Authenticators.
 
 ## CertificateVerify Message {#certificate-verify}
 
@@ -408,24 +339,22 @@ in {{sec-codepoints}} has been negotiated, the `algorithm` field
 carries that code point and the `signature` field encodes two
 independent signatures as follows: 
 
-Let Certificate1 denote all certificate entries up to but not
-including the zero-length delimiter, and Certificate2 denote all
-certificate entries after the delimiter. The two transcript hashes
-are computed as:
+Both signatures are computed over a single transcript hash covering
+the complete `Certificate` message:
 
 ~~~
-first-hash  = Transcript-Hash(Handshake Context, Certificate1)
-second-hash = Transcript-Hash(Handshake Context, Certificate2)
+transcript-hash = Transcript-Hash(Handshake Context, Certificate)
 ~~~
 
-The two signatures are then computed as:
+The two signatures are then computed with the two end-entity private
+keys:
 
 ~~~
-first-signature  = Sign(traditional-private-key, first-hash)
-second-signature = Sign(pq-private-key, second-hash)
+first-signature  = Sign(traditional-private-key, transcript-hash)
+second-signature = Sign(pq-private-key, transcript-hash)
 ~~~
 
-These are encoded in the signature field as:
+and encoded in the `signature` field as:
 
 ~~~
 signature = uint16(len(first-signature)) || first-signature
@@ -438,9 +367,7 @@ of that length, followed by the post-quantum signature
 (`second-signature`) occupying the remaining bytes.
 
 The context strings used in the signing input are unchanged from
-{{Section 4.4.3 of TLS}}. Domain separation between the two signatures
-is provided by the distinct certificate chain inputs over which they
-are computed.
+{{Section 4.4.3 of TLS}}.
 
 The receiver MUST verify both signatures. Failure to verify either
 signature MUST be treated as an authentication failure and MUST cause
@@ -462,7 +389,7 @@ authentication, it MAY include both dual code points and
 single-algorithm schemes in `signature_algorithms`.
 
 A single composite certificate chain and signature such as defined by
-{{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}} MAY be an
+{{TLS-COMPOSITE-MLDSA}} MAY be an
 acceptable alternative during the post-quantum transition period as
 long as the corresponding signature scheme is listed in
 `signature_algorithms`.
@@ -493,32 +420,13 @@ is defined as:
 > the guarantee that an adversary cannot simply "remove" one of the
 > component signatures without evidence left behind.
 
-As defined in {{Section 4.4 of TLS}}, `CertificateVerify` contains
-signatures over the value `Transcript-Hash(Handshake Context,
-Certificate)`. In the dual certificate context, `Certificate` will
-contain both certificate chains, which is sufficient to cause the
-client to abort and therefore achieves Weak Non-Separability.
-
-## Signature Validation Requirements
-
-Implementations MUST strictly associate each signature in the
-`CertificateVerify` `signature` field with the corresponding
-certificate chain, based on their order relative to the zero-length
-delimiter in the `Certificate` message. Failure to properly align
-signatures with their intended certificate chains could result in
-incorrect validation or misattribution of authentication.
-
-Both signatures in the `CertificateVerify` message MUST be validated
-successfully and correspond to their respective certificate chains.
-Implementations MUST treat failure to validate either signature as a
-failure of the authentication process. Silent fallback to
-single-certificate verification undermines the dual-authentication
-model and introduces downgrade risks. Implementations MAY short-circuit
-if the first signature or certificate chain fails, or MAY process both
-regardless to achieve timing invariance if the implementer deems it
-valuable to hide which signature or certificate validation failed, for
-example if one of the certificates was rejected for policy reasons
-rather than cryptographic reasons.
+Per {{Section 4.4 of TLS}}, `CertificateVerify` signs
+`Transcript-Hash(Handshake Context, Certificate)`. In the
+dual-certificate context, `Certificate` contains both chains, and both
+signatures are computed over this single transcript
+({{certificate-verify}}). Removing or altering either chain changes the
+transcript and invalidates both signatures, providing Weak
+Non-Separability.
 
 ## Side-Channel Resistance
 
@@ -577,7 +485,7 @@ This document requests new entries in the TLS SignatureScheme registry
 
 These values are distinct from the composite ML-DSA SignatureScheme
 values defined in
-{{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}}, which use
+{{TLS-COMPOSITE-MLDSA}}, which use
 a single certificate and a single composite signature.
 
 # Acknowledgments
@@ -628,7 +536,7 @@ removed or simplified prior to RFC publication.
 ### Weak Non-Separability
 
 The dual certificate authentication achieves, at least, Weak
-Non-Separability {{?Signature-Spectrums=I-D.ietf-pquip-hybrid-signature-spectrums-06}}
+Non-Separability {{HYBRID-SIGS}}
 at the time of verification of the `CertificateVerify` message.
 
 
@@ -642,7 +550,7 @@ back to traditional or PQ-only validation if necessary.
 
 ### Unambiguous Chain Separation
 
-The mechanism must clearly distinguish and delimit multiple certificate
+The mechanism must clearly distinguish and separate multiple certificate
 chains to prevent ambiguity or misinterpretation.
 
 ## Use Case and Deployment Flexibility
