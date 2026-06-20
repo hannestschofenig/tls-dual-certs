@@ -191,7 +191,7 @@ single-algorithm code points.
 TLS 1.3 defines the `Certificate` message to carry a list of
 certificate entries representing a single chain. This document reuses
 the same structure to convey two certificate chains by placing the
-entries of both chains in a single `certificate_list`. The rules for
+entries of both chains in a `certificate_list`. The rules for
 identifying and reconstructing the two chains are specified in
 {{certificate}}.
 
@@ -306,11 +306,20 @@ Exactly one end-entity certificate MUST carry a public key compatible
 with the traditional algorithm component of the negotiated code point,
 and exactly one MUST carry a public key compatible with the
 post-quantum component. End-entity certificates are distinguished from
-CA certificates by the `basicConstraints` `cA` value
-{{Section 4.2.1.9 of !PKIX=RFC5280}}.
+CA certificates by the `cA` boolean in the `basicConstraints` extension
+{{Section 4.2.1.9 of !PKIX=RFC5280}}. The traditional end-entity
+certificate MUST be the first `CertificateEntry` in `certificate_list`.
 
-Each chain is constructed from its end-entity certificate to a trust
-anchor, using the remaining entries as candidate CA certificates.
+Each chain MUST be validated independently as a certification path
+from its end-entity certificate to a trust anchor, as specified in
+{{Section 6 of PKIX}};
+the certificate entries other than the two end-entity certificates
+supply the intermediate certificates.
+
+The negotiated code point constrains only the two end-entity public
+keys. When `signature_algorithms_cert` is present, the signature
+algorithms of the certificates in the chains are governed by it, as
+defined in {{Section 4.2.3 of TLS}}.
 
 Implementers MAY wish to consider performing chain validation in a
 timing-invariant way so as not to leak which certificate failed, for
@@ -368,6 +377,9 @@ of that length, followed by the post-quantum signature
 
 The context strings used in the signing input are unchanged from
 {{Section 4.4.3 of TLS}}.
+
+Both signatures cover the complete `Certificate` message so that each
+is bound to the presence of both chains.
 
 The receiver MUST verify both signatures. Failure to verify either
 signature MUST be treated as an authentication failure and MUST cause
