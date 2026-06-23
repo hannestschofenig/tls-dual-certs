@@ -124,7 +124,7 @@ document represents a specific, vetted pair of traditional and
 post-quantum algorithms.
 
 This document is distinct from the composite ML-DSA approach defined
-in {{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}}. In that
+in {{?TLS-COMPOSITE-MLDSA=I-D.reddy-tls-composite-mldsa}}. In that
 approach, a single composite certificate contains both public keys and
 produces a single composite signature. In this document, two
 independent certificates and two independent signatures are used, each
@@ -295,7 +295,7 @@ defined in {{certificate-verify}}.
 
 These code points are distinct from the composite ML-DSA
 `SignatureScheme` values defined in
-{{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}}, which use a
+{{?TLS-COMPOSITE-MLDSA=I-D.reddy-tls-composite-mldsa}}, which use a
 single certificate and a single composite signature, and which use the
 opposite naming order `<pq>_<traditional>`.
 
@@ -381,13 +381,6 @@ an end-entity certificate whose public key is compatible with the
 post-quantum algorithm component of the negotiated code point.
 End-entity certificates of both chains MUST use different public keys.
 
-If a `signature_algorithms_cert` extension is absent, then all
-certificates of a given chain MUST also use an algorithm consistent
-with its component of the negotiated code point, but not necessarily
-the same one as the end-entity certificate. It is always allowed to
-provide mixed-algorithm certificate chains within the same component
-as long as the relevant algorithms are acceptable.
-
 This encoding applies equally to the `CompressedCertificate` message
 and to `Certificate` message of Exported Authenticators.
 
@@ -462,7 +455,7 @@ authentication, it MAY include both dual code points and
 single-algorithm schemes in `signature_algorithms`.
 
 A single composite certificate chain and signature such as defined by
-{{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}} MAY be an
+{{?TLS-COMPOSITE-MLDSA=I-D.reddy-tls-composite-mldsa}} MAY be an
 acceptable alternative during the post-quantum transition period as
 long as the corresponding signature scheme is listed in
 `signature_algorithms`.
@@ -577,7 +570,7 @@ This document requests new entries in the TLS SignatureScheme registry
 
 These values are distinct from the composite ML-DSA SignatureScheme
 values defined in
-{{?TLS-COMPOSITE-MLDSA=I-D.tls-reddy-composite-mldsa}}, which use
+{{?TLS-COMPOSITE-MLDSA=I-D.reddy-tls-composite-mldsa}}, which use
 a single certificate and a single composite signature.
 
 # Acknowledgments
@@ -628,8 +621,8 @@ removed or simplified prior to RFC publication.
 ### Weak Non-Separability
 
 The dual certificate authentication achieves, at least, Weak
-Non-Separability {{?Signature-Spectrums=I-D.ietf-pquip-hybrid-signature-spectrums-06}}
-at the time of verification of the `CertificateVerify` message.
+Non-Separability {{HYBRID-SIGS}} at the time of verification 
+of the `CertificateVerify` message.
 
 
 ## Dual Certificate Semantics
