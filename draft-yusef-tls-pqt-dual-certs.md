@@ -46,9 +46,11 @@ author:
       email: hannes.tschofenig@gmx.net
  -    ins: M. Ounsworth
       fullname: Mike Ounsworth
-      organization: Entrust
+      org: Cryptic Forest Software
+      abbrev: Cryptic Forest
+      city: Sioux Lookout, Ontario
       country: Canada
-      email: mike.ounsworth@entrust.com
+      email: mike@ounsworth.ca
  -    ins: T. Reddy
       fullname: Tirumaleswar Reddy
       organization: Nokia
