@@ -7,7 +7,7 @@ Internet-Draft                                                     Ciena
 Updates: RFC9261, RFC8446 (if approved)                    H. Tschofenig
 Intended status: Standards Track                                UniBw M.
 Expires: 26 December 2026                                   M. Ounsworth
-                                                                 Entrust
+                                                          Cryptic Forest
                                                                 T. Reddy
                                                                    Nokia
                                                             Y. Rosomakho
@@ -928,9 +928,10 @@ Authors' Addresses
 
 
    Mike Ounsworth
-   Entrust
+   Cryptic Forest Software
+   Sioux Lookout, Ontario
    Canada
-   Email: mike.ounsworth@entrust.com
+   Email: mike@ounsworth.ca
 
 
    Tirumaleswar Reddy
