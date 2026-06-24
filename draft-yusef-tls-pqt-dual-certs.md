@@ -35,11 +35,14 @@ author:
       organization: Ciena
       country: Canada
       email: rifaat.s.ietf@gmail.com
- -    ins: H. Tschofenig
-      fullname: Hannes Tschofenig
-      organization: University of Applied Sciences Bonn-Rhein-Sieg
-      abbrev: H-BRS
+-     ins: H. Tschofenig
+      name: Hannes Tschofenig
+      organization: University of the Bundeswehr Munich
+      abbrev: UniBw M.
+      city: Neubiberg
+      region: Bavaria
       country: Germany
+      code: 85577
       email: hannes.tschofenig@gmx.net
  -    ins: M. Ounsworth
       fullname: Mike Ounsworth
