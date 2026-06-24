@@ -37,9 +37,12 @@ author:
       email: rifaat.s.ietf@gmail.com
  -    ins: H. Tschofenig
       fullname: Hannes Tschofenig
-      organization: University of Applied Sciences Bonn-Rhein-Sieg
-      abbrev: H-BRS
+      organization: University of the Bundeswehr Munich
+      abbrev: UniBw M.
+      city: Neubiberg
+      region: Bavaria
       country: Germany
+      code: 85577
       email: hannes.tschofenig@gmx.net
  -    ins: M. Ounsworth
       fullname: Mike Ounsworth
@@ -399,7 +402,7 @@ struct {
 This document does not modify this structure. When a code point defined
 in {{sec-codepoints}} has been negotiated, the `algorithm` field
 carries that code point and the `signature` field encodes two
-independent signatures as follows: 
+independent signatures as follows:
 
 Let Certificate1 denote all certificate entries up to but not
 including the zero-length delimiter, and Certificate2 denote all
@@ -621,7 +624,7 @@ removed or simplified prior to RFC publication.
 ### Weak Non-Separability
 
 The dual certificate authentication achieves, at least, Weak
-Non-Separability {{HYBRID-SIGS}} at the time of verification 
+Non-Separability {{HYBRID-SIGS}} at the time of verification
 of the `CertificateVerify` message.
 
 
