@@ -36,7 +36,7 @@ author:
       country: Canada
       email: rifaat.s.ietf@gmail.com
 -     ins: H. Tschofenig
-      name: Hannes Tschofenig
+      fullname: Hannes Tschofenig
       organization: University of the Bundeswehr Munich
       abbrev: UniBw M.
       city: Neubiberg
