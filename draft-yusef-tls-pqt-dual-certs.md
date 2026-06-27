@@ -35,6 +35,11 @@ author:
       organization: Ciena
       country: Canada
       email: rifaat.s.ietf@gmail.com
+ -    ins: T. Reddy
+      fullname: Tirumaleswar Reddy
+      organization: Nokia
+      country: India
+      email: kondtir@gmail.com  
  -    ins: H. Tschofenig
       fullname: Hannes Tschofenig
       organization: University of the Bundeswehr Munich
@@ -51,11 +56,6 @@ author:
       city: Sioux Lookout, Ontario
       country: Canada
       email: mike@ounsworth.ca
- -    ins: T. Reddy
-      fullname: Tirumaleswar Reddy
-      organization: Nokia
-      country: India
-      email: kondtir@gmail.com
  -    ins: "Y. Rosomakho"
       fullname: Yaroslav Rosomakho
       organization: Zscaler
@@ -235,11 +235,9 @@ signatures:
 1. One computed using the post-quantum algorithm component of the
    negotiated code point.
 
-Each signature is computed over the transcript hash as specified in
-TLS 1.3, using the same context strings defined in
-{{Section 4.4.3 of TLS}}. Domain separation between the two signatures
-is provided by the distinct certificate chain inputs over which they
-are computed.
+Both signatures are computed over the same transcript hash specified in
+{{Section 4.4.3 of TLS}}, covering the complete `Certificate` message,
+and using the same context string. 
 
 This encoding applies equally to the `CertificateVerify` message of
 Exported Authenticators as defined in {{Section 5.2.2 of EXPORTED-AUTH}}.
@@ -280,8 +278,11 @@ the encoding of the `Certificate` and `CertificateVerify` messages.
 ## SignatureScheme Code Points {#sec-codepoints}
 
 This document defines new `SignatureScheme` values for use in the
-`signature_algorithms` and `signature_algorithms_cert` extensions
-defined in {{Section 4.2.3 of TLS}}:
+`signature_algorithms` extension defined in {{Section 4.2.3 of TLS}}.
+These values MUST NOT be sent in `signature_algorithms_cert`: a dual
+code point identifies a pair of end-entity keys and the two signatures
+in `CertificateVerify`, not an algorithm for the signatures appearing
+in certificates: 
 
 ~~~
 enum {
@@ -386,6 +387,16 @@ an end-entity certificate whose public key is compatible with the
 post-quantum algorithm component of the negotiated code point.
 End-entity certificates of both chains MUST use different public keys.
 
+The negotiated code point constrains only the end-entity public keys,
+as specified above, together with the two signatures in
+`CertificateVerify`. It does not constrain, and cannot express, the
+algorithms of the signatures appearing in the certificates of either
+chain: a dual code point is not a usable certificate signature
+algorithm ({{sec-codepoints}}). Consequently, when either chain contains 
+CA-issued certificates, the peer MUST advertise the acceptable 
+certificate signature algorithms in `signature_algorithms_cert` 
+({{Section 4.2.3 of TLS}}).
+
 This encoding applies equally to the `CompressedCertificate` message
 and to `Certificate` message of Exported Authenticators.
 
@@ -404,24 +415,23 @@ struct {
 This document does not modify this structure. When a code point defined
 in {{sec-codepoints}} has been negotiated, the `algorithm` field
 carries that code point and the `signature` field encodes two
-independent signatures as follows:
+independent signatures as follows.
 
-Let Certificate1 denote all certificate entries up to but not
-including the zero-length delimiter, and Certificate2 denote all
-certificate entries after the delimiter. The two transcript hashes
-are computed as:
-
-~~~
-first-hash  = Transcript-Hash(Handshake Context, Certificate1)
-second-hash = Transcript-Hash(Handshake Context, Certificate2)
-~~~
-
-The two signatures are then computed as:
+Both signatures are computed over the single signing input defined in
+{{Section 4.4.3 of TLS}}, that is over `Transcript-Hash(Handshake
+Context, Certificate)`, where `Certificate` is the `Certificate`
+handshake message as sent and carries both certificate chains. This
+document does not introduce any per-chain or otherwise modified signing
+input. 
 
 ~~~
-first-signature  = Sign(traditional-private-key, first-hash)
-second-signature = Sign(pq-private-key, second-hash)
+first-signature  = Sign(traditional-private-key, signing-input)
+second-signature = Sign(pq-private-key, signing-input)
 ~~~
+
+`first-signature` is produced with the traditional algorithm component
+and `second-signature` with the post-quantum algorithm component of the
+negotiated code point.  
 
 These are encoded in the signature field as:
 
@@ -435,10 +445,15 @@ as a uint16, followed by the traditional signature (`first-signature`)
 of that length, followed by the post-quantum signature
 (`second-signature`) occupying the remaining bytes.
 
-The context strings used in the signing input are unchanged from
-{{Section 4.4.3 of TLS}}. Domain separation between the two signatures
-is provided by the distinct certificate chain inputs over which they
-are computed.
+The context string used in the signing input is unchanged from
+{{Section 4.4.3 of TLS}}. 
+
+Before verifying either signature, the receiver MUST validate the
+encoding of the `signature` field and MUST abort the connection with a
+`decrypt_error` alert if the field is shorter than the two-byte length
+prefix, if the length prefix is zero, or if the length prefix leaves no
+bytes for `second-signature`. `second-signature` consists of all bytes
+following `first-signature`. 
 
 The receiver MUST verify both signatures. Failure to verify either
 signature MUST be treated as an authentication failure and MUST cause
@@ -588,6 +603,7 @@ document.
 We also want to thank Anthony Hu from WolfSSL for his review and
 feedback on the initial version of this draft.
 
+Thanks to Songbo Bu and Eric Rescorla for the review and suggestions.
 
 --- back
 
@@ -626,7 +642,7 @@ removed or simplified prior to RFC publication.
 ### Weak Non-Separability
 
 The dual certificate authentication achieves, at least, Weak
-Non-Separability {{HYBRID-SIGS}} at the time of verification
+Non-Separability {{HYBRID-SIGS}} at the time of verification 
 of the `CertificateVerify` message.
 
 
