@@ -397,6 +397,14 @@ CA-issued certificates, the peer MUST advertise the acceptable
 certificate signature algorithms in `signature_algorithms_cert` 
 ({{Section 4.2.3 of TLS}}).
 
+Both end-entity certificates MUST identify the same peer. A relying
+party MUST verify that both match the reference identity it is
+authenticating ({{?RFC9525}}) and MUST abort with a `bad_certificate`
+alert otherwise. The two certificates MAY also be bound using the
+`RelatedCertificate` extension {{?RELATED-CERTS=RFC9763}}; a receiver
+that processes this extension MUST verify it references the end-entity
+certificate of the other chain. 
+
 This encoding applies equally to the `CompressedCertificate` message
 and to `Certificate` message of Exported Authenticators.
 
